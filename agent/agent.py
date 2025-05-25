@@ -14,6 +14,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_vertexai.model_garden import ChatAnthropicVertex
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Import custom tools
 from .tools.dbk_tool import DbkTool
@@ -41,7 +42,7 @@ class IRPFAgent:
     def __init__(
         self, 
         tools: Optional[List[BaseTool]] = None,
-        verbose: bool = None
+        verbose: Optional[bool] = None
     ):
         """
         Inicializa o agente IRPF.
@@ -168,15 +169,22 @@ FERRAMENTAS DISPONÍVEIS:
 
 NOMES DAS FERRAMENTAS: {tool_names}
 
-FORMATO DE RESPOSTA OBRIGATÓRIO:
+FORMATO DE RESPOSTA ESTRITO E OBRIGATÓRIO:
+Siga EXATAMENTE este formato para CADA etapa do seu raciocínio.
+NÃO use linguagem natural fora da estrutura abaixo, a menos que seja na "Final Answer".
+
 Question: {input}
-Thought: [analise detalhada do que precisa fazer]
-Action: [nome_da_ferramenta]
-Action Input: {{"operation": "operacao", "parametros": "valores"}}
-Observation: [resultado da ação]
-... (repetir Thought/Action/Observation conforme necessário)
-Thought: Agora sei a resposta final
-Final Answer: [resposta completa e detalhada para o usuário]
+Thought: [Sua análise detalhada do que precisa ser feito. Decomponha o problema.]
+Action: [nome_da_ferramenta_a_usar]
+Action Input: {{"operation": "nome_da_operacao_da_ferramenta", "parametro1": "valor1"}}
+Observation: [O resultado EXATO fornecido pela ferramenta]
+Thought: [Sua análise do resultado da ferramenta e o próximo passo.]
+Action: [nome_da_ferramenta_a_usar]
+Action Input: {{"operation": "nome_da_operacao_da_ferramenta", "parametro1": "valor1"}}
+Observation: [O resultado EXATO fornecido pela ferramenta]
+... (Continue este ciclo de Thought/Action/Observation até ter a resposta final)
+Thought: Agora tenho todas as informações necessárias e sei a resposta final.
+Final Answer: [Sua resposta final, completa e detalhada para o usuário. Aqui você pode usar linguagem natural.]
 
 HISTÓRICO DA CONVERSAÇÃO:
 {chat_history}
@@ -194,11 +202,12 @@ VALIDAÇÕES OBRIGATÓRIAS:
 - Confirmar estrutura de registros
 - Verificar consistência entre registros relacionados
 
-EXEMPLOS DE OPERAÇÕES:
+EXEMPLOS DE OPERAÇÕES (Action Input):
 - Carregar arquivo DBK: {{"operation": "read_dbk", "file_path": "caminho/arquivo.dbk"}}
 - Listar registros: {{"operation": "list_records", "file_path": "arquivo.dbk"}}
-- Atualizar registro: {{"operation": "update_record", "record_type": "R21", "data": {{...}}}}
+- Atualizar registro: {{"operation": "update_record", "record_type": "R21", "data": {{}} }}
 - Buscar documentação: {{"operation": "search", "query": "formato registro R17"}}
+- Extrair dados de PDF: {{"operation": "extract_financial_data", "file_path": "informes/meu_informe.pdf"}}
 
 Question: {input}
 Thought:{agent_scratchpad}'''
@@ -220,72 +229,129 @@ Thought:{agent_scratchpad}'''
             }
         
         try:
-            # Formatar histórico da conversação
-            chat_history = self._format_conversation_history()
+            # Adiciona contexto básico sobre arquivos disponíveis à consulta
+            enhanced_query = self._enhance_query_with_context(query)
             
-            # Preparar entrada para o agente
-            agent_input = {
-                "input": query,
-                "chat_history": chat_history
-            }
+            # Executa o agente com monitoramento aprimorado
+            response = self.agent_executor.invoke(
+                {
+                    "input": enhanced_query,
+                    "chat_history": self._format_conversation_history()
+                }
+            )
             
-            if self.verbose:
-                logger.info(f"Processando consulta: {query[:100]}...")
-                if chat_history != "Nenhuma conversa anterior.":
-                    logger.info(f"Usando histórico: {len(self.conversation_history)} interações")
-            
-            # Executar agente
-            result = self.agent_executor.invoke(agent_input)
-            
-            # Extrair resposta
-            output = result.get("output", "")
-            if not output and "intermediate_steps" in result:
-                # Se não há resposta final, usar últimos passos intermediários
-                steps = result["intermediate_steps"]
-                if steps:
-                    last_observation = steps[-1][1] if len(steps[-1]) > 1 else ""
-                    output = f"🔍 Baseado na análise: {last_observation}"
-            
-            if not output:
-                output = "❌ Não consegui processar sua solicitação. Tente reformular a pergunta."
-            
-            # Armazenar no histórico
+            # Atualiza o histórico da conversa
             self.conversation_history.append({
-                "human": query,
-                "ai": output
+                "query": query,
+                "response": response
             })
             
-            # Manter apenas as últimas interações
-            max_history = int(os.getenv("MAX_CONVERSATION_HISTORY", "10"))
-            if len(self.conversation_history) > max_history:
-                self.conversation_history = self.conversation_history[-max_history:]
+            # Analisa e valida a resposta
+            parsed_response = self._parse_and_validate_response(response)
             
             return {
-                "output": output,
                 "success": True,
-                "intermediate_steps": result.get("intermediate_steps", [])
+                "output": parsed_response.get("output", response.get("output", "")),
+                "thought_process": parsed_response.get("thought_process", []),
+                "actions_taken": parsed_response.get("actions_taken", [])
             }
             
         except Exception as e:
-            error_msg = f"❌ Erro ao processar consulta: {str(e)}"
-            logger.error(error_msg)
+            logger.error(f"Erro ao processar consulta: {str(e)}", exc_info=True)
             return {
-                "output": error_msg,
-                "success": False
+                "success": False,
+                "error": f"Erro ao processar sua solicitação: {str(e)}",
+                "suggestion": "Por favor, tente reformular sua pergunta ou fornecer mais detalhes."
             }
     
+    def _enhance_query_with_context(self, query: str) -> str:
+        """Adiciona contexto relevante à consulta do usuário."""
+        context_parts = []
+        
+        # Verifica arquivos DBK
+        try:
+            dbk_files = list(Path("dbks").rglob("*.DBK"))
+            if dbk_files:
+                context_parts.append(f"Arquivos DBK disponíveis: {', '.join(str(f) for f in dbk_files)}")
+        except Exception as e:
+            logger.warning(f"Erro ao verificar arquivos DBK: {e}")
+        
+        # Verifica informes
+        try:
+            informe_files = list(Path("informes").glob("*"))
+            if informe_files:
+                context_parts.append(f"Informes disponíveis: {', '.join(str(f) for f in informe_files)}")
+        except Exception as e:
+            logger.warning(f"Erro ao verificar informes: {e}")
+            
+        # Adiciona contexto do arquivo DBK atual, se definido
+        if self.current_dbk_file:
+            context_parts.append(f"Trabalhando atualmente com o arquivo DBK: {self.current_dbk_file}")
+        
+        # Combina todo o contexto
+        if context_parts:
+            context = "\n".join(context_parts)
+            return f"Contexto:\n{context}\n\nConsulta: {query}"
+        
+        return query
+    
+    def _parse_and_validate_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """Analisa e valida a resposta do agente, garantindo a conformidade com o formato."""
+        output = response.get("output", "")
+        
+        # Extrai etapas do processo de pensamento
+        thought_process = []
+        actions_taken = []
+        
+        # Analisa a saída para extrair informações estruturadas
+        lines = output.split("\n")
+        current_thought = None
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith("Thought:"):
+                if current_thought:
+                    thought_process.append(current_thought)
+                current_thought = {"thought": line[8:].strip(), "actions": []}
+            elif line.startswith("Action:"):
+                if current_thought:
+                    action = {
+                        "tool": line[7:].strip(),
+                        "input": None
+                    }
+                    current_thought["actions"].append(action)
+                    actions_taken.append(action)
+            elif line.startswith("Action Input:"):
+                if current_thought and current_thought["actions"]:
+                    current_thought["actions"][-1]["input"] = line[12:].strip()
+            elif line.startswith("Observation:"):
+                if current_thought and current_thought["actions"]:
+                    current_thought["actions"][-1]["observation"] = line[12:].strip()
+            elif line.startswith("Final Answer:"):
+                if current_thought:
+                    thought_process.append(current_thought)
+                thought_process.append({"final_answer": line[13:].strip()})
+                break
+        
+        return {
+            "output": output,
+            "thought_process": thought_process,
+            "actions_taken": actions_taken
+        }
+    
     def _format_conversation_history(self) -> str:
-        """Formata o histórico da conversação para o prompt."""
+        """Format the conversation history for the prompt."""
         if not self.conversation_history:
-            return "Nenhuma conversa anterior."
-        
+            return "No previous conversation."
+            
         formatted_history = []
-        # Mostrar apenas as últimas 5 interações
-        for interaction in self.conversation_history[-5:]:
-            formatted_history.append(f"👤 Usuário: {interaction['human']}")
-            formatted_history.append(f"🤖 Agente: {interaction['ai']}")
-        
-        return "\\n".join(formatted_history)
+        for entry in self.conversation_history[-5:]:  # Only include last 5 interactions
+            formatted_history.extend([
+                f"Human: {entry['query']}",
+                f"Assistant: {entry['response'].get('output', '')}"
+            ])
+            
+        return "\n".join(formatted_history)
     
     def clear_history(self):
         """Limpa o histórico da conversação."""

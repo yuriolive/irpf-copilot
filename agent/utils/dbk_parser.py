@@ -25,7 +25,7 @@ class DbkRecord:
     line_number: int
     checksum: Optional[str] = None
     is_valid: bool = True
-    validation_errors: List[str] = None
+    validation_errors: Optional[List[str]] = None
     
     def __post_init__(self):
         if self.validation_errors is None:
@@ -174,12 +174,13 @@ class DbkParser:
                         parsed_data['validation_summary']['valid_records'] += 1
                     else:
                         parsed_data['validation_summary']['invalid_records'] += 1
-                        parsed_data['validation_summary']['errors'].extend(record.validation_errors)
-                        
-                        if any('checksum' in error.lower() for error in record.validation_errors):
-                            parsed_data['validation_summary']['checksum_errors'] += 1
-                        if any('format' in error.lower() for error in record.validation_errors):
-                            parsed_data['validation_summary']['format_errors'] += 1
+                        if record.validation_errors:
+                            parsed_data['validation_summary']['errors'].extend(record.validation_errors)
+                            
+                            if any('checksum' in error.lower() for error in record.validation_errors):
+                                parsed_data['validation_summary']['checksum_errors'] += 1
+                            if any('format' in error.lower() for error in record.validation_errors):
+                                parsed_data['validation_summary']['format_errors'] += 1
                 
                 except Exception as e:
                     logger.error(f"Error parsing line {line_num}: {e}")
@@ -540,6 +541,8 @@ class DbkParser:
         """Validate the data in a record."""
         spec = self.RECORD_SPECS.get(record.record_type)
         if not spec:
+            if record.validation_errors is None:
+                record.validation_errors = []
             record.validation_errors.append(f"Unknown record type: {record.record_type}")
             record.is_valid = False
             return
@@ -564,6 +567,8 @@ class DbkParser:
                     errors.append(f"Invalid numeric value for {field_name}: {value}")
         
         if errors:
+            if record.validation_errors is None:
+                record.validation_errors = []
             record.validation_errors.extend(errors)
             record.is_valid = False
     

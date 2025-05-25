@@ -144,7 +144,7 @@ def detectar_tipo_registro(linha: str) -> str:
     else:
         return 'DESCONHECIDO'
 
-def calcular_checksum_automatico(linha: str, nome_arquivo: str = None) -> str:
+def calcular_checksum_automatico(linha: str, nome_arquivo: str | None = None) -> str:
     """
     Calcula o checksum automaticamente baseado no tipo de registro.
     
@@ -172,7 +172,7 @@ def calcular_checksum_automatico(linha: str, nome_arquivo: str = None) -> str:
     else:
         raise ValueError(f"Tipo de registro não suportado: {tipo}")
 
-def validar_checksum_automatico(linha: str, nome_arquivo: str = None) -> bool:
+def validar_checksum_automatico(linha: str, nome_arquivo: str | None = None) -> bool:
     """
     Valida o checksum automaticamente baseado no tipo de registro.
     

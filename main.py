@@ -5,7 +5,6 @@ Provides an interactive CLI interface for manipulating DBK files.
 
 import os
 import sys
-import io
 from pathlib import Path
 from dotenv import load_dotenv
 from rich.console import Console
@@ -14,7 +13,6 @@ from rich.text import Text
 from rich.table import Table
 import logging
 import json
-from contextlib import redirect_stdout
 
 # Add readline support for command history
 try:
