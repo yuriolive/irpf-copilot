@@ -5,9 +5,8 @@ Extracts structured data from PDFs and images using OCR technologies.
 
 import json
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 from pathlib import Path
-import tempfile
 import io
 
 from langchain.tools import BaseTool

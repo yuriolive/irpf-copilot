@@ -4,10 +4,8 @@ Specialized utilities for handling bank statements, tax documents, and invoices.
 """
 
 import logging
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Tuple
 from pathlib import Path
-import tempfile
-import io
 import re
 from dataclasses import dataclass
 

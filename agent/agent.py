@@ -13,7 +13,6 @@ from langchain.tools import BaseTool
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_vertexai.model_garden import ChatAnthropicVertex
-from langchain.memory import ConversationBufferWindowMemory
 from dotenv import load_dotenv
 
 # Import custom tools

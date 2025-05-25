@@ -8,7 +8,7 @@ local e na internet sobre especificações do IRPF e formato DBK.
 import os
 import json
 import glob
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any
 from langchain.tools import BaseTool
 from pydantic import Field
 import logging

@@ -4,7 +4,7 @@ Provides specialized parsing and manipulation of DBK files according to Receita 
 """
 
 import logging
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime
