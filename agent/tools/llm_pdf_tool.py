@@ -200,10 +200,31 @@ class LLMPdfTool(BaseTool):
                 "error": f"File not found: {file_path}"
             })
 
-        document_type = params.get("document_type", "general")
+        # Auto-detect document type if not specified
+        document_type = params.get("document_type", "auto")
+        
+        # Auto-detection of document type based on filename patterns
+        if document_type == "auto":
+            file_name_lower = file_path.name.lower()
+            
+            if any(wallet in file_name_lower for wallet in ['99pay', 'picpay', 'mercadopago', 'paypal', 'pagbank']):
+                document_type = "digital_wallet"
+                logger.info(f"Auto-detected document type: {document_type}")
+            elif any(bank in file_name_lower for bank in ['bank', 'banco', 'bradesco', 'itau', 'santander', 'caixa', 'bb']):
+                document_type = "bank_statement"
+                logger.info(f"Auto-detected document type: {document_type}")
+            elif any(inv in file_name_lower for inv in ['invest', 'nuinvest', 'xp', 'rico', 'clear', 'b3', 'ações']):
+                document_type = "investment"
+                logger.info(f"Auto-detected document type: {document_type}")
+            elif any(intl in file_name_lower for intl in ['avenue', 'nomad', 'remessa', 'passfolio', 'td ameritrade']):
+                document_type = "international"
+                logger.info(f"Auto-detected document type: {document_type}")
+            else:
+                document_type = "general"
+                logger.info(f"No specific document type detected, using generic: {document_type}")
         
         try:
-            # Use LLM processing for both PDFs and images
+            # Process different file types
             if file_path.suffix.lower() == '.pdf':
                 extracted_data = self._process_pdf_with_llm(file_path, document_type)
             elif file_path.suffix.lower() in ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp']:
@@ -215,7 +236,11 @@ class LLMPdfTool(BaseTool):
                     "error": f"Unsupported file format: {file_path.suffix}. Supported formats: PDF, JPG, JPEG, PNG, BMP, TIFF, WEBP"
                 })
             
-            return json.dumps({
+            # For special document types, perform post-processing
+            if document_type == "digital_wallet" and extracted_data.get("structured"):
+                self._enhance_digital_wallet_data(extracted_data)
+            
+            response_data = {
                 "success": True,
                 "data": {
                     "file_path": str(file_path),
@@ -225,7 +250,15 @@ class LLMPdfTool(BaseTool):
                     "confidence": extracted_data.get("confidence", 0.0),
                     "processing_method": extracted_data.get("method", "unknown")
                 }
-            })
+            }
+            
+            # Generate IRPF field mapping suggestions if possible
+            if extracted_data.get("structured") and not extracted_data.get("structured").get("best_effort", False):
+                irpf_mapping = self._suggest_irpf_mapping(extracted_data.get("structured"), document_type)
+                if irpf_mapping:
+                    response_data["data"]["irpf_mapping"] = irpf_mapping
+            
+            return json.dumps(response_data)
         
         except Exception as e:
             logger.error(f"Data extraction error: {e}")
@@ -294,6 +327,9 @@ class LLMPdfTool(BaseTool):
         # Create the prompt based on document type
         prompt = self._create_extraction_prompt(document_type)
         
+        # Add file name context to help with document type detection
+        prompt += f"\n\nNome do arquivo: {file_path.name}"
+        
         # Create document content for Gemini
         pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')
         
@@ -311,10 +347,42 @@ class LLMPdfTool(BaseTool):
             ]
         )
         
-        response = self.gemini_llm.invoke([message])
-        
-        # Parse the structured response
-        return self._parse_llm_response(response.content, "gemini_pdf")
+        try:
+            response = self.gemini_llm.invoke([message])
+            
+            # Parse the structured response
+            return self._parse_llm_response(response.content, "gemini_pdf")
+        except Exception as e:
+            logger.error(f"Error in Gemini PDF processing: {e}")
+            
+            # Try with more basic prompt if the original fails
+            try:
+                simple_prompt = f"""
+                Extraia todas as informações financeiras importantes deste documento {file_path.name}.
+                Foque em CPF, CNPJ, valores monetários, datas e saldos.
+                Retorne em formato JSON simples.
+                """
+                
+                simple_message = HumanMessage(
+                    content=[
+                        {
+                            "type": "text",
+                            "text": simple_prompt
+                        },
+                        {
+                            "type": "media",
+                            "mime_type": "application/pdf",
+                            "data": pdf_base64
+                        }
+                    ]
+                )
+                
+                response = self.gemini_llm.invoke([simple_message])
+                return self._parse_llm_response(response.content, "gemini_pdf_simple")
+                
+            except Exception as second_error:
+                logger.error(f"Second Gemini PDF attempt also failed: {second_error}")
+                raise e  # Re-raise original error
 
     def _process_pdf_with_claude_direct(self, file_path: Path, document_type: str) -> Dict[str, Any]:
         """Process PDF using Claude Direct API."""
@@ -324,36 +392,89 @@ class LLMPdfTool(BaseTool):
         # Create the prompt based on document type
         prompt = self._create_extraction_prompt(document_type)
         
+        # Add file name context to help with document type detection
+        prompt += f"\n\nNome do arquivo: {file_path.name}"
+        
         # Create base64 encoded PDF
         pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')
         
-        response = self.claude_direct_client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=4000,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt
-                        },
-                        {
-                            "type": "document",
-                            "source": {
-                                "type": "base64",
-                                "media_type": "application/pdf",
-                                "data": pdf_base64
+        try:
+            response = self.claude_direct_client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=4000,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": prompt
+                            },
+                            {
+                                "type": "document",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "application/pdf",
+                                    "data": pdf_base64
+                                }
                             }
+                        ]
+                    }
+                ]
+            )
+            
+            response_text = response.content[0].text
+            return self._parse_llm_response(response_text, "claude_pdf")
+            
+        except Exception as e:
+            logger.error(f"Error in Claude PDF processing: {e}")
+            
+            # Try with more basic prompt if the original fails
+            try:
+                simple_prompt = f"""
+                Analyze this financial document {file_path.name} and extract all important information.
+                Focus on:
+                - CPF/CNPJ numbers
+                - Monetary values
+                - Dates
+                - Account balances
+                - Institution names
+                
+                Return the data as simple JSON.
+                """
+                
+                simple_response = self.claude_direct_client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=4000,
+                    temperature=0.1,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": simple_prompt
+                                },
+                                {
+                                    "type": "document",
+                                    "source": {
+                                        "type": "base64",
+                                        "media_type": "application/pdf",
+                                        "data": pdf_base64
+                                    }
+                                }
+                            ]
                         }
                     ]
-                }
-            ]
-        )
-        
-        response_text = response.content[0].text
-        return self._parse_llm_response(response_text, "claude_pdf")
+                )
+                
+                simple_response_text = simple_response.content[0].text
+                return self._parse_llm_response(simple_response_text, "claude_pdf_simple")
+                
+            except Exception as second_error:
+                logger.error(f"Second Claude PDF attempt also failed: {second_error}")
+                raise e  # Re-raise original error
 
     def _process_image_with_gemini(self, file_path: Path, document_type: str) -> Dict[str, Any]:
         """Process image using Gemini 2.5 Flash vision capabilities."""
@@ -363,6 +484,21 @@ class LLMPdfTool(BaseTool):
         # Create the prompt based on document type
         prompt = self._create_extraction_prompt(document_type)
         
+        # Add file name context to help with document type detection
+        prompt += f"\n\nNome do arquivo: {file_path.name}"
+        
+        # For digital wallets, add specific instructions for screenshots
+        if document_type == "digital_wallet":
+            prompt += """
+            Esta imagem provavelmente é um screenshot de uma carteira digital.
+            Extraia:
+            1. Nome da aplicação (99Pay, PicPay, etc)
+            2. Saldo visível
+            3. Data de referência se disponível
+            4. Nome do titular da conta se visível
+            5. Quaisquer rendimentos exibidos
+            """
+        
         # Detect image mime type
         file_ext = file_path.suffix.lower()
         mime_type_map = {
@@ -378,23 +514,53 @@ class LLMPdfTool(BaseTool):
         # Create base64 encoded image
         image_base64 = base64.b64encode(image_data).decode('utf-8')
         
-        message = HumanMessage(
-            content=[
-                {
-                    "type": "text",
-                    "text": prompt
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:{mime_type};base64,{image_base64}"
+        try:
+            message = HumanMessage(
+                content=[
+                    {
+                        "type": "text",
+                        "text": prompt
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:{mime_type};base64,{image_base64}"
+                        }
                     }
-                }
-            ]
-        )
-        
-        response = self.gemini_llm.invoke([message])
-        return self._parse_llm_response(response.content, "gemini_vision")
+                ]
+            )
+            
+            response = self.gemini_llm.invoke([message])
+            return self._parse_llm_response(response.content, "gemini_vision")
+            
+        except Exception as e:
+            logger.error(f"Error in Gemini image processing: {e}")
+            
+            # Try with a simpler prompt
+            try:
+                simple_prompt = "Descreva o que você vê nesta imagem, com foco em valores monetários, datas, CPFs e CNPJs visíveis."
+                
+                simple_message = HumanMessage(
+                    content=[
+                        {
+                            "type": "text",
+                            "text": simple_prompt
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{mime_type};base64,{image_base64}"
+                            }
+                        }
+                    ]
+                )
+                
+                response = self.gemini_llm.invoke([simple_message])
+                return self._parse_llm_response(response.content, "gemini_vision_simple")
+                
+            except Exception as second_error:
+                logger.error(f"Second Gemini vision attempt also failed: {second_error}")
+                raise e  # Re-raise original error
 
     def _process_image_with_claude_direct(self, file_path: Path, document_type: str) -> Dict[str, Any]:
         """Process image using Claude Direct API vision capabilities."""
@@ -404,6 +570,21 @@ class LLMPdfTool(BaseTool):
         # Create the prompt based on document type
         prompt = self._create_extraction_prompt(document_type)
         
+        # Add file name context to help with document type detection
+        prompt += f"\n\nNome do arquivo: {file_path.name}"
+        
+        # For digital wallets, add specific instructions for screenshots
+        if document_type == "digital_wallet":
+            prompt += """
+            Esta imagem provavelmente é um screenshot de uma carteira digital.
+            Extraia:
+            1. Nome da aplicação (99Pay, PicPay, etc)
+            2. Saldo visível
+            3. Data de referência se disponível
+            4. Nome do titular da conta se visível
+            5. Quaisquer rendimentos exibidos
+            """
+        
         # Detect image mime type
         file_ext = file_path.suffix.lower()
         mime_type_map = {
@@ -419,55 +600,183 @@ class LLMPdfTool(BaseTool):
         # Create base64 encoded image
         image_base64 = base64.b64encode(image_data).decode('utf-8')
         
-        response = self.claude_direct_client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=4000,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt
-                        },
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": mime_type,
-                                "data": image_base64
+        try:
+            response = self.claude_direct_client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=4000,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": prompt
+                            },
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": mime_type,
+                                    "data": image_base64
+                                }
                             }
+                        ]
+                    }
+                ]
+            )
+            
+            response_text = response.content[0].text
+            return self._parse_llm_response(response_text, "claude_vision")
+            
+        except Exception as e:
+            logger.error(f"Error in Claude image processing: {e}")
+            
+            # Try with a simpler prompt
+            try:
+                simple_prompt = "Analyze this financial document image. Extract any visible account numbers, balances, dates, and monetary values."
+                
+                simple_response = self.claude_direct_client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=4000,
+                    temperature=0.1,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": simple_prompt
+                                },
+                                {
+                                    "type": "image",
+                                    "source": {
+                                        "type": "base64",
+                                        "media_type": mime_type,
+                                        "data": image_base64
+                                    }
+                                }
+                            ]
                         }
                     ]
-                }
-            ]
-        )
-        
-        response_text = response.content[0].text
-        return self._parse_llm_response(response_text, "claude_vision")
+                )
+                
+                simple_response_text = simple_response.content[0].text
+                return self._parse_llm_response(simple_response_text, "claude_vision_simple")
+                
+            except Exception as second_error:
+                logger.error(f"Second Claude vision attempt also failed: {second_error}")
+                raise e  # Re-raise original error
 
     def _parse_llm_response(self, response_text: str, method: str) -> Dict[str, Any]:
-        """Parse LLM response and extract structured data."""
+        """Parse LLM response and extract structured data with enhanced resilience."""
+        # First try: standard JSON extraction
         try:
-            # Try to extract JSON from the response
+            # Try to extract JSON from the response using regex - most permissive approach
             json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
             if json_match:
-                parsed_data = json.loads(json_match.group())
-                return {
-                    "text": parsed_data.get("extracted_text", response_text),
-                    "structured": parsed_data,
-                    "confidence": parsed_data.get("confidence", 0.9),
-                    "method": method
-                }
-        except (json.JSONDecodeError, AttributeError):
+                try:
+                    parsed_data = json.loads(json_match.group())
+                    return {
+                        "text": parsed_data.get("extracted_text", response_text),
+                        "structured": parsed_data,
+                        "confidence": parsed_data.get("confidence", 0.9),
+                        "method": method
+                    }
+                except json.JSONDecodeError:
+                    # If that exact match fails, try more aggressive methods
+                    pass
+        except (AttributeError, json.JSONDecodeError):
             pass
         
-        # If JSON parsing fails, return the raw text
+        # Second try: search for markdown code blocks with JSON
+        try:
+            code_blocks = re.findall(r'```(?:json)?\s*(\{.+?\})\s*```', response_text, re.DOTALL)
+            if code_blocks:
+                for block in code_blocks:
+                    try:
+                        parsed_data = json.loads(block)
+                        return {
+                            "text": parsed_data.get("extracted_text", response_text),
+                            "structured": parsed_data,
+                            "confidence": parsed_data.get("confidence", 0.8),
+                            "method": f"{method}_codeblock"
+                        }
+                    except json.JSONDecodeError:
+                        continue
+        except Exception:
+            pass
+            
+        # Third try: extract key-value pairs using regex pattern matching
+        # This is a fallback for when the LLM does not return proper JSON
+        try:
+            # Extract common financial data patterns
+            structured_data = {}
+            
+            # Look for CPF
+            cpf_match = re.search(r'CPF:?\s*(\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\d{11})', response_text)
+            if cpf_match:
+                structured_data["cpf"] = cpf_match.group(1).replace(".", "").replace("-", "")
+            
+            # Look for CNPJ
+            cnpj_match = re.search(r'CNPJ:?\s*(\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}|\d{14})', response_text)
+            if cnpj_match:
+                structured_data["cnpj"] = cnpj_match.group(1).replace(".", "").replace("/", "").replace("-", "")
+            
+            # Look for name patterns
+            name_match = re.search(r'[Nn]ome:?\s*([A-Z][A-Za-zÀ-ÿ\s]+?)(?:\n|,|\.|CPF)', response_text)
+            if name_match:
+                structured_data["nome"] = name_match.group(1).strip()
+            
+            # Look for money values with R$
+            money_values = re.findall(r'R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+,\d{2})', response_text)
+            if money_values:
+                structured_data["valores"] = [value.replace(".", "").replace(",", ".") for value in money_values]
+            
+            # Look for date patterns
+            dates = re.findall(r'\d{2}/\d{2}/\d{4}', response_text)
+            if dates:
+                structured_data["datas"] = dates
+            
+            # If we found meaningful data, return it
+            if structured_data:
+                return {
+                    "text": response_text,
+                    "structured": {"extracted_patterns": structured_data},
+                    "confidence": 0.6,
+                    "method": f"{method}_pattern_extraction"
+                }
+        except Exception:
+            pass
+            
+        # Final fallback: return raw text with no structure
+        # Extract the most relevant parts to make it somewhat useful
+        relevant_text = response_text
+        
+        # Try to identify tables or structured data in text form
+        lines = response_text.split('\n')
+        tables = []
+        current_table = []
+        
+        for line in lines:
+            if re.search(r'\d+[.,]\d{2}', line) and any(kw in line.lower() for kw in ['saldo', 'valor', 'total', 'r$']):
+                current_table.append(line.strip())
+            elif current_table and not line.strip():
+                if len(current_table) > 1:
+                    tables.append('\n'.join(current_table))
+                current_table = []
+        
+        if current_table:
+            tables.append('\n'.join(current_table))
+            
         return {
             "text": response_text,
-            "structured": {"raw_response": response_text},
-            "confidence": 0.7,
+            "structured": {
+                "raw_response": response_text,
+                "extracted_tables": tables if tables else [],
+                "best_effort": True
+            },
+            "confidence": 0.4,
             "method": f"{method}_raw"
         }
 
@@ -478,69 +787,201 @@ class LLMPdfTool(BaseTool):
         Analise o documento fornecido e extraia TODAS as informações relevantes de forma estruturada.
         
         FOQUE ESPECIALMENTE EM:
-        - Dados do titular/declarante (CPF, nome, endereço)
-        - Valores monetários (rendimentos, impostos, deduções)
-        - Datas importantes
-        - Códigos de receita/natureza
-        - Informações bancárias
-        - Investimentos e aplicações
-        - Impostos retidos na fonte
+        - Dados do titular/declarante (CPF, nome)
+        - Valores monetários (rendimentos, impostos, saldos)
+        - Datas importantes (ano-calendário, datas de referência)
+        - CNPJ e nome da instituição financeira
+        
+        INSTRUÇÕES IMPORTANTES:
+        1. Extraia todos os valores numéricos exatamente como aparecem no documento
+        2. Preste atenção especial aos saldos finais, rendimentos e impostos
+        3. Identifique o tipo de documento (informe de rendimentos, extrato, etc.)
+        4. Se um campo não existir no documento, deixe como null ou exclua o campo
         
         FORMATO DE RESPOSTA:
-        Retorne um JSON válido com a seguinte estrutura:
+        Retorne um JSON com as informações encontradas. Se não conseguir extrair no formato completo,
+        retorne o máximo de informações que puder em qualquer estrutura JSON válida.
+        
+        Modelo de estrutura ideal (mas pode ser adaptado conforme necessário):
         {
-            "extracted_text": "texto completo extraído",
-            "confidence": 0.95,
-            "titular": {
-                "nome": "nome completo",
-                "cpf": "CPF sem formatação",
-                "endereco": "endereço completo"
+            "tipo_documento": "nome do tipo de documento",
+            "instituicao": {
+                "nome": "nome da instituição financeira",
+                "cnpj": "número do CNPJ"
             },
-            "valores_financeiros": {
-                "rendimentos_tributaveis": 0.00,
-                "imposto_retido": 0.00,
-                "rendimentos_isentos": 0.00
+            "titular": {
+                "nome": "nome do titular",
+                "cpf": "CPF sem formatação"
             },
             "periodo": {
-                "ano_calendario": "2024",
-                "data_inicio": "01/01/2024",
-                "data_fim": "31/12/2024"
+                "ano_calendario": "ano de referência",
+                "data_referencia": "data de referência principal"
             },
-            "irpf_mapping": {
-                "tipo_registro": "R21 ou R17 ou outro",
-                "campos_irpf": {
-                    "campo1": "valor1",
-                    "campo2": "valor2"
-                }
+            "valores": {
+                "saldo_final": valor,
+                "rendimentos": valor,
+                "impostos_retidos": valor
+                // outros valores relevantes
+            },
+            "detalhes_adicionais": {
+                // qualquer outra informação relevante
             }
         }
         """
         
-        if document_type == "bank_statement":
+        # Document specific prompts
+        if document_type == "bank_statement" or document_type == "general":
             return base_prompt + """
             
-            DOCUMENTO ESPECÍFICO: INFORME DE RENDIMENTOS BANCÁRIOS
-            Extraia especialmente:
-            - Rendimentos de aplicações financeiras
-            - IOF retido
-            - IR retido na fonte
-            - Saldos de conta corrente e poupança
-            - Juros de conta corrente
+            Para INFORMES BANCÁRIOS, observe especificamente:
+            - Saldo de conta corrente/poupança
+            - Rendimentos financeiros
+            - IOF e IR retidos na fonte
+            - Juros, dividendos ou outros rendimentos
+
+            Para CARTEIRAS DIGITAIS (como PicPay, 99Pay, Mercado Pago), observe:
+            - Saldo disponível
+            - Rendimentos sobre saldo
+            - Movimentações classificadas por tipo
+            - Data de referência do documento
             """
         
         elif document_type == "investment":
             return base_prompt + """
             
-            DOCUMENTO ESPECÍFICO: INFORME DE INVESTIMENTOS
-            Extraia especialmente:
+            Para INFORMES DE INVESTIMENTOS, observe especificamente:
             - Ganhos de capital
-            - Dividendos recebidos
+            - Dividendos e JCP recebidos
             - Fundos de investimento
-            - Ações negociadas
-            - Taxa de custódia
+            - Ações negociadas e seus custos
+            - Custodia e taxas relacionadas
+            - Valor de compra vs valor atual
+            """
+        
+        elif document_type == "international":
+            return base_prompt + """
+            
+            Para INFORMES INTERNACIONAIS (Avenue, Nomad, etc), observe especificamente:
+            - Valores em moeda estrangeira (USD, EUR, etc)
+            - Taxa de câmbio (se informado)
+            - Equivalente em reais (BRL)
+            - Impostos pagos no exterior
+            - Ganhos de capital e dividendos internacionais
+            - Criptomoedas e outros ativos digitais
+            """
+        
+        elif document_type == "digital_wallet":
+            return base_prompt + """
+            
+            Para CARTEIRAS DIGITAIS (99Pay, PicPay, etc), observe especificamente:
+            - Saldo disponível
+            - Rendimentos sobre saldo
+            - Data de referência do saldo
+            - Tipo de investimento do saldo
+            - CNPJ e razão social do emissor
             """
         
         return base_prompt
+
+    def _enhance_digital_wallet_data(self, extracted_data: Dict[str, Any]) -> None:
+        """Enhance data specific to digital wallets with additional processing."""
+        structured = extracted_data.get("structured", {})
+        
+        # For pattern-based extraction, try to organize the data better
+        if "extracted_patterns" in structured:
+            patterns = structured["extracted_patterns"]
+            
+            # Try to identify which values are saldos (typically the largest values)
+            valores = patterns.get("valores", [])
+            if valores and len(valores) > 1:
+                # Convert to float for numeric comparison
+                valores_float = [float(v) for v in valores]
+                
+                # The largest value is likely the saldo
+                if valores_float:
+                    saldo = max(valores_float)
+                    structured["saldo_identificado"] = saldo
+                    
+                    # If there are other smaller values, they might be rendimentos
+                    smaller_values = [v for v in valores_float if v < saldo and v > 0]
+                    if smaller_values:
+                        structured["possiveis_rendimentos"] = smaller_values
+        
+        # Extract 99Pay specific information if available
+        if "raw_response" in structured:
+            raw_text = structured["raw_response"]
+            
+            # Look for 99Pay specific patterns
+            if "99pay" in raw_text.lower():
+                match_saldo = re.search(r'[Ss]aldo\s+em\s+\d{2}/\d{2}/\d{4}:?\s*R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+,\d{2})', raw_text)
+                if match_saldo:
+                    saldo_str = match_saldo.group(1).replace(".", "").replace(",", ".")
+                    try:
+                        saldo_value = float(saldo_str)
+                        structured["99pay_saldo"] = saldo_value
+                    except ValueError:
+                        pass
+                        
+                # Look for other rendimentos
+                match_rendimentos = re.search(r'[Oo]utros rendimentos\s+em\s+\d{4}:?\s*R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+,\d{2})', raw_text)
+                if match_rendimentos:
+                    rendimentos_str = match_rendimentos.group(1).replace(".", "").replace(",", ".")
+                    try:
+                        rendimentos_value = float(rendimentos_str)
+                        structured["99pay_rendimentos"] = rendimentos_value
+                    except ValueError:
+                        pass
+
+    def _suggest_irpf_mapping(self, structured_data: Dict[str, Any], document_type: str) -> Dict[str, Any]:
+        """Suggest IRPF field mappings based on extracted data."""
+        mapping = {
+            "sugestao_registro": None,
+            "campos": {}
+        }
+        
+        # Map to different IRPF record types based on document type
+        if document_type == "bank_statement":
+            mapping["sugestao_registro"] = "R20"
+            
+            # Try to map fields
+            if "rendimentos" in structured_data:
+                mapping["campos"]["R20_RENDIMENTOS_RECEBIDOS"] = structured_data["rendimentos"]
+            if "imposto_retido" in structured_data:
+                mapping["campos"]["R20_IMPOSTO_RETIDO"] = structured_data["imposto_retido"]
+                
+        elif document_type == "investment":
+            mapping["sugestao_registro"] = "R24"
+            
+            # Map investment fields
+            if "dividendos" in structured_data:
+                mapping["campos"]["R24_DIVIDENDOS"] = structured_data["dividendos"]
+            if "juros_capital" in structured_data:
+                mapping["campos"]["R24_JUROS_CAPITAL"] = structured_data["juros_capital"]
+                
+        elif document_type == "digital_wallet":
+            # Digital wallets typically go to R20 (rendimentos tributáveis) or R23 (isentos)
+            mapping["sugestao_registro"] = "R23"
+            
+            # For 99Pay specific fields
+            if "99pay_rendimentos" in structured_data:
+                mapping["campos"]["R23_RENDIMENTOS"] = structured_data["99pay_rendimentos"]
+            elif "possiveis_rendimentos" in structured_data and structured_data["possiveis_rendimentos"]:
+                mapping["campos"]["R23_RENDIMENTOS"] = structured_data["possiveis_rendimentos"][0]
+                
+        elif document_type == "international":
+            mapping["sugestao_registro"] = "R22"
+            
+            # International income fields
+            if "rendimentos_exterior" in structured_data:
+                mapping["campos"]["R22_RENDIMENTOS"] = structured_data["rendimentos_exterior"]
+            if "imposto_pago_exterior" in structured_data:
+                mapping["campos"]["R22_IMPOSTO_PAGO"] = structured_data["imposto_pago_exterior"]
+                
+        # If we couldn't map anything meaningful, return None
+        if not mapping["campos"]:
+            return None
+            
+        return mapping
 
     def _analyze_document_llm(self, params: Dict[str, Any]) -> str:
         """Perform comprehensive document analysis."""
