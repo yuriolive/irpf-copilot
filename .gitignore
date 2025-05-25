@@ -1,6 +1,9 @@
-# Informações pessoais
-informes/
-dbks/
+# Informações pessoais - manter as pastas mas ignorar conteúdo
+dbks/*
+informes/*
+
+# Keep all .gitkeep files in any directory
+!**/.gitkeep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
