@@ -1,8 +1,19 @@
 # Informações pessoais - manter as pastas mas ignorar conteúdo
-dbks/*
-informes/*
 
-# Keep all .gitkeep files in any directory
+# For the 'dbks' directory and its subdirectories:
+# 1. Ignore everything within 'dbks'
+dbks/**
+# 2. Un-ignore all directories within 'dbks' so Git can traverse them.
+#    This allows Git to find .gitkeep files in subdirectories.
+!dbks/**/
+# 3. Un-ignore '.gitkeep' files within any directory under 'dbks'
+!dbks/**/.gitkeep
+
+# Ignore contents of informes/ and unignore .gitkeep
+informes/*
+!informes/.gitkeep
+
+# Keep all .gitkeep files in any directory (retaining this general rule)
 !**/.gitkeep
 
 # Byte-compiled / optimized / DLL files
