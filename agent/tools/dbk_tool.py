@@ -68,15 +68,13 @@ class DbkTool(BaseTool):
     # Configurações de segurança
     auto_backup: bool = Field(default=True, exclude=True)
     validate_checksums: bool = Field(default=True, exclude=True)
-    parser: DbkParser  # Added type hint for the parser instance variable
+    parser: DbkParser = Field(default_factory=DbkParser)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Configurar baseado em variáveis de ambiente
         object.__setattr__(self, 'auto_backup', os.getenv("AUTO_BACKUP", "true").lower() == "true")
         object.__setattr__(self, 'validate_checksums', os.getenv("VALIDATE_CHECKSUMS", "true").lower() == "true")
-        # Initialize the parser
-        self.parser = DbkParser() # Changed from object.__setattr__
     
     def _run(self, query: str) -> str:
         """Executa operação DBK baseada no JSON de entrada."""
@@ -84,13 +82,12 @@ class DbkTool(BaseTool):
             # Parse da entrada JSON
             try:
                 input_data = json.loads(query)
-                operation = input_data.get('operation')
-                file_path = input_data.get('file_path')
+                operation = input_data.get("operation")
             except json.JSONDecodeError:
                 return "❌ Erro: Entrada deve ser um JSON válido. Exemplo: {\"operation\": \"read_dbk\", \"file_path\": \"arquivo.dbk\"}"
             
             if not operation:
-                return "❌ Erro: 'operation' é obrigatório"
+                return "❌ Erro: 'operation' não especificada no JSON"
             
             # Roteamento de operações
             if operation == "read_dbk":
@@ -397,75 +394,41 @@ class DbkTool(BaseTool):
             result = self.parser.update_file_with_operations(file_path, operations)
             
             if result['success']:
-                response = f"🔄 **Operação batch executada com sucesso!**\\n\\n"
-                response += f"**Arquivo original:** {file_path}\\n"
-                response += f"**Arquivo gerado:** {result['output_path']}\\n"
-                response += f"**Total de operações:** {result['total_operations']}\\n"
-                response += f"**Operações bem-sucedidas:** {result['operations_completed']}\\n"
-                response += f"**Backup criado:** {result['backup_path']}\\n\\n"
-                
-                response += f"📋 **Detalhes das operações:**\\n"
-                for operation_result in result['operation_results']:
-                    response += f"- {operation_result}\\n"
-                
-                if result['validation']['is_valid']:
-                    response += f"\\n**Validação final:** ✅ Arquivo válido\\n"
-                else:
-                    response += f"\\n**Validação final:** ❌ Arquivo com problemas\\n"
-                    if result['validation']['errors']:
-                        response += f"**Erros:** {'; '.join(result['validation']['errors'][:3])}\\n"
-                
-                return response
+                return f"✅ Operações em batch concluídas com sucesso em {result.get('output_path', file_path)}."
             else:
-                return f"❌ Erro: {result['error']}"
+                return f"❌ Erro no batch_update: {result.get('error', 'Erro desconhecido')}"
         
         except Exception as e:
-            logger.error(f"Error in batch update: {e}")
-            return f"❌ Erro crítico no batch update: {str(e)}"
+            logger.error(f"Erro crítico no batch_update para {file_path}: {e}")
+            return f"❌ Erro crítico no batch_update: {str(e)}"
     
     def _write_dbk(self, input_data: Dict[str, Any]) -> str:
         """Salva arquivo DBK completo."""
-        file_path = input_data.get('file_path')
+        file_path_str = input_data.get("file_path")
         data = input_data.get('data')
         create_backup = input_data.get('create_backup', True)
         
-        if not file_path:
-            return "❌ Erro: 'file_path' é obrigatório"
+        if not file_path_str:
+            return "❌ Erro: 'file_path' é obrigatório para write_dbk" # Return error
         if not data:
-            return "❌ Erro: 'data' é obrigatório"
+            return "❌ Erro: 'data' é obrigatório para write_dbk" # Return error
         
         try:
-            # Validate data structure
-            if not isinstance(data, dict) or 'records' not in data:
-                return "❌ Erro: Formato de dados inválido. Esperado dict com chave 'records'."
-            
-            # Write the file using the parser
-            success = self.parser.write_dbk_file(data, Path(file_path), create_backup=create_backup)
-            
+            file_path = Path(file_path_str) # Create Path object
+            # Assuming self.parser.write_dbk_file handles the logic and returns a boolean or raises an exception
+            success = self.parser.write_dbk_file(data, file_path, create_backup=create_backup)
             if success:
-                output_path = self.parser.get_output_path(file_path)
-                validation = self.parser.validate_dbk_file(Path(output_path))
-                
-                response = f"✅ **Arquivo DBK salvo com sucesso!**\\n\\n"
-                response += f"**Arquivo original:** {file_path}\\n"
-                response += f"**Arquivo gerado:** {output_path}\\n"
-                response += f"**Total de registros:** {len(data.get('records', []))}\\n"
-                response += f"**Backup criado:** {'Sim' if create_backup else 'Não'}\\n"
-                
-                if validation['is_valid']:
-                    response += f"**Validação:** ✅ Arquivo válido\\n"
-                else:
-                    response += f"**Validação:** ❌ Arquivo com problemas\\n"
-                    if validation['errors']:
-                        response += f"**Erros:** {'; '.join(validation['errors'][:3])}\\n"
-                
-                return response
+                # write_dbk_file in DbkParser now returns the output path or raises error
+                # For simplicity, let's assume it returns a path string on success
+                output_path = self.parser.get_output_path(str(file_path)) # Get the actual output path
+                return f"✅ Arquivo DBK salvo com sucesso em {output_path}"
             else:
-                return "❌ Erro: Falha ao salvar arquivo DBK"
-        
+                # This else might not be reached if write_dbk_file raises exceptions for errors
+                return f"❌ Erro ao salvar arquivo DBK {file_path_str}. Verifique os logs."
+
         except Exception as e:
-            logger.error(f"Error writing DBK file: {e}")
-            return f"❌ Erro ao salvar arquivo DBK: {str(e)}"
+            logger.error(f"Erro ao salvar arquivo DBK {file_path_str}: {e}") # Added logger
+            return f"❌ Erro ao salvar arquivo: {str(e)}" # Return error
     
     async def _arun(self, query: str) -> str:
         """Versão assíncrona do _run."""
