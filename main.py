@@ -20,7 +20,7 @@ sys.path.insert(0, str(project_root))
 from agent.agent import IRPFAgent
 from agent.tools.dbk_tool import DbkTool
 from agent.tools.search_tool import SearchTool
-from agent.tools.ocr_tool import OcrTool
+from agent.tools.llm_pdf_tool import LLMPdfTool
 
 # Load environment variables
 load_dotenv()
@@ -44,12 +44,12 @@ def display_welcome():
     """Display welcome banner and initial instructions."""
     title = Text("🧾 Agente Inteligente IRPF 2025", style="bold blue")
     subtitle = Text("Automatize sua declaração do Imposto de Renda", style="italic")
-    
-    welcome_panel = Panel(
+      welcome_panel = Panel(
         f"{title}\n{subtitle}\n\n"
         "Este agente pode:\n"
         "• Ler e interpretar arquivos DBK\n"
-        "• Processar informes bancários (PDFs/imagens)\n"
+        "• Processar informes bancários usando IA (Gemini & Claude)\n"
+        "• Extrair dados estruturados de PDFs nativamente\n"
         "• Adicionar/atualizar dados na declaração\n"
         "• Validar checksums automaticamente\n"
         "• Criar backups de segurança\n\n"
@@ -75,10 +75,10 @@ def display_help():
     table.add_row("quit/exit/bye", "Encerra o programa")
     
     console.print(table)
-    
-    console.print("\n[yellow]Exemplos de perguntas:[/yellow]")
+      console.print("\n[yellow]Exemplos de perguntas:[/yellow]")
     console.print("• 'Leia o arquivo DBK original e me mostre um resumo'")
-    console.print("• 'Adicione os dados do informe do Banco X à declaração'") 
+    console.print("• 'Analise o informe 99Pay e extraia os dados bancários'") 
+    console.print("• 'Liste todos os informes disponíveis na pasta'")
     console.print("• 'Validar o checksum do arquivo gerado'")
     console.print("• 'Listar todos os registros R21 na declaração'")
 
@@ -236,14 +236,13 @@ def main():
             console.print("[yellow]Consulte o README.md para instruções de configuração.[/yellow]")
             return 1
         
-        # Ensure directories exist
-        check_directories()
+        # Ensure directories exist        check_directories()
           # Initialize tools
         console.print("[blue]🔧 Inicializando ferramentas...[/blue]")
         tools = [
             DbkTool(),
             SearchTool(),
-            OcrTool()
+            LLMPdfTool()
         ]
         
         # Initialize agent

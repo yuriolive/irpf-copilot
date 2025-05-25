@@ -13,20 +13,20 @@ sys.path.insert(0, str(project_root))
 
 def test_checksum_functions():
     """Test the checksum functions."""
-    print("🧪 Testing checksum functions...")
+    print("\n🧪 Testing checksum functions...")
     
     try:
         from agent.utils.checksum import calcular_checksum_automatico, validar_checksum_automatico
         
-        # Test with a sample line (this would be a real DBK line)
-        test_line = "R16" + "0" * 489 + "12345678"  # 500 chars total
+        # Test with a sample T9 line (recognized record type)
+        test_line = "T9" + "0" * 489 + "1234567890"  # T9 record with dummy checksum
         
         # Calculate checksum
         checksum = calcular_checksum_automatico(test_line)
         print(f"✅ Checksum calculation working: {checksum}")
         
-        # Validate checksum
-        full_line = test_line[:-8] + checksum
+        # Validate checksum with correct checksum
+        full_line = test_line[:-10] + checksum
         is_valid = validar_checksum_automatico(full_line)
         print(f"✅ Checksum validation working: {is_valid}")
         
@@ -61,21 +61,19 @@ def test_dbk_parser():
 
 def test_tools_import():
     """Test importing the tools."""
-    print("\n🧪 Testing tools import...")
-    
+    print("\n🧪 Testing tools import...")    
     try:
         from agent.tools.dbk_tool import DbkTool
         from agent.tools.search_tool import SearchTool
-        from agent.tools.ocr_tool import OcrTool
+        from agent.tools.llm_pdf_tool import LLMPdfTool
         
-        # Test tool instantiation
+        # Test tool instantiation (only for tools that don't require API keys)
         dbk_tool = DbkTool()
         search_tool = SearchTool()
-        ocr_tool = OcrTool()
         
         print(f"✅ DbkTool imported: {dbk_tool.name}")
         print(f"✅ SearchTool imported: {search_tool.name}")
-        print(f"✅ OcrTool imported: {ocr_tool.name}")
+        print(f"✅ LLMPdfTool imported successfully (class: {LLMPdfTool.__name__})")
         
         return True
     except Exception as e:
