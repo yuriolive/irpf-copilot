@@ -139,39 +139,74 @@ def setup_readline():
     # Ensure history directory exists
     HISTORY_DIR.mkdir(exist_ok=True)
     
-    # Set history file
-    if os.path.exists(HISTORY_FILE):
-        # Read existing history
-        with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    readline.add_history(line)
-        
-        readline.set_history_length(1000)  # Limit history size
-        logger.info(f"Loaded {readline.get_current_history_length()} command history entries")
+    # Check which readline functions are available
+    has_add_history = hasattr(readline, 'add_history')
+    has_set_history_length = hasattr(readline, 'set_history_length')
+    has_get_current_history_length = hasattr(readline, 'get_current_history_length')
+    has_get_history_item = hasattr(readline, 'get_history_item')
+    has_set_completer = hasattr(readline, 'set_completer')
+    has_parse_and_bind = hasattr(readline, 'parse_and_bind')
+    
+    # Set history file if functions are available
+    if os.path.exists(HISTORY_FILE) and has_add_history:
+        try:
+            # Read existing history
+            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        readline.add_history(line)  # type: ignore
+            
+            if has_set_history_length:
+                readline.set_history_length(1000)  # type: ignore # Limit history size
+            
+            if has_get_current_history_length:
+                logger.info(f"Loaded {readline.get_current_history_length()} command history entries")  # type: ignore
+            else:
+                logger.info("History loaded (count unavailable)")
+        except Exception as e:
+            logger.warning(f"Failed to load command history: {e}")
     
     # Function to save history on exit
     def save_history():
-        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
-            history_length = readline.get_current_history_length()
-            for i in range(1, history_length + 1):
-                f.write(readline.get_history_item(i) + '\n')
-        logger.info(f"Saved {history_length} command history entries")
+        try:
+            if not (has_get_current_history_length and has_get_history_item):
+                logger.warning("Cannot save history - required functions not available")
+                return
+                
+            with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+                history_length = readline.get_current_history_length()  # type: ignore
+                for i in range(1, history_length + 1):
+                    try:
+                        line = readline.get_history_item(i)  # type: ignore
+                        if line:
+                            f.write(line + '\n')
+                    except Exception:
+                        # Skip invalid history items
+                        continue
+            logger.info(f"Saved {history_length} command history entries")
+        except Exception as e:
+            logger.warning(f"Failed to save command history: {e}")
     
     # Register exit function
     import atexit
     atexit.register(save_history)
     
-    # Set tab completion
-    def complete(text, state):
-        # Custom completion function could suggest commands or file paths
-        commands = ['help', 'status', 'list-dbk', 'clear', 'quit', 'exit', 'bye']
-        results = [c for c in commands if c.startswith(text.lower())] + [None]
-        return results[state]
-    
-    readline.set_completer(complete)
-    readline.parse_and_bind('tab: complete')
+    # Set tab completion if available
+    if has_set_completer and has_parse_and_bind:
+        try:
+            def complete(text, state):
+                # Custom completion function could suggest commands or file paths
+                commands = ['help', 'status', 'list-dbk', 'clear', 'quit', 'exit', 'bye']
+                results = [c for c in commands if c.startswith(text.lower())] + [None]
+                return results[state]
+            
+            readline.set_completer(complete)  # type: ignore
+            readline.parse_and_bind('tab: complete')  # type: ignore
+        except Exception as e:
+            logger.warning(f"Failed to setup tab completion: {e}")
+    else:
+        logger.info("Tab completion not available - some readline functions missing")
 
 
 def check_environment():

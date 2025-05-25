@@ -21,6 +21,7 @@ from pathlib import Path
 import os
 import re
 from datetime import datetime
+from difflib import SequenceMatcher
 
 from langchain.tools import BaseTool
 from pydantic import Field
@@ -64,14 +65,18 @@ class LLMPdfTool(BaseTool):
     
     Operações suportadas:
     - smart_parse: Parse inteligente que identifica automaticamente o conteúdo
+    - extract_data: Extrai dados financeiros estruturados de PDFs ou imagens
     - extract_financial_data: Extrai dados financeiros de qualquer informe
     - analyze_for_irpf: Analisa documento e sugere mapeamento para IRPF
     - find_informes: Busca arquivos de informe no diretório
+    - find_informe_by_name: Busca informe por nome com matching inteligente
     - list_informes: Lista todos os informes disponíveis
+    - auto_detect_files: Detecta automaticamente arquivos DBK e informes
     
     Exemplo de entrada JSON:
     {"operation": "smart_parse", "file_path": "informes/qualquer_banco.pdf"}
-    {"operation": "analyze_for_irpf", "file_path": "informes/informe.pdf"}
+    {"operation": "find_informe_by_name", "search_term": "mercado pago"}
+    {"operation": "auto_detect_files"}
     """
     
     # LLM clients
@@ -148,15 +153,20 @@ class LLMPdfTool(BaseTool):
                 return self._analyze_for_irpf(params)
             elif operation == "find_informes":
                 return self._find_informes(params)
+            elif operation == "find_informe_by_name":
+                return self._find_informe_by_name(params)
             elif operation == "list_informes":
                 return self._list_available_informes()
+            elif operation == "auto_detect_files":
+                return self._auto_detect_files(params)
             else:
                 return json.dumps({
                     "success": False,
                     "error": f"Operação '{operation}' não suportada",
                     "supported_operations": [
                         "smart_parse", "extract_data", "extract_financial_data", 
-                        "analyze_for_irpf", "find_informes", "list_informes"
+                        "analyze_for_irpf", "find_informes", "find_informe_by_name",
+                        "list_informes", "auto_detect_files"
                     ]
                 })
                 
@@ -935,3 +945,143 @@ Seja inteligente e adaptável - não assuma formatos específicos, identifique a
             "total_files": len(files),
             "files": files
         }, ensure_ascii=False, indent=2)
+
+    def _find_informe_by_name(self, params: Dict[str, Any]) -> str:
+        """Find informe files by name pattern with smart matching."""
+        search_term = params.get("search_term", "").lower()
+        if not search_term:
+            return json.dumps({
+                "success": False,
+                "error": "Missing 'search_term' parameter"
+            })
+        
+        try:
+            informes_dir = Path("informes")
+            if not informes_dir.exists():
+                return json.dumps({
+                    "success": False,
+                    "error": "Informes directory not found"
+                })
+            
+            # Supported file extensions
+            supported_extensions = ['.pdf', '.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp']
+            
+            # Find all supported files
+            all_files = []
+            for ext in supported_extensions:
+                all_files.extend(informes_dir.glob(f"*{ext}"))
+                all_files.extend(informes_dir.glob(f"*{ext.upper()}"))
+            
+            # Score and sort matches
+            matches = []
+            for file_path in all_files:
+                file_name_lower = file_path.stem.lower()
+                
+                # Calculate similarity score
+                similarity = SequenceMatcher(None, search_term, file_name_lower).ratio()
+                
+                # Boost score for exact substring matches
+                if search_term in file_name_lower:
+                    similarity += 0.5
+                
+                # Boost score for word matches
+                search_words = search_term.split()
+                file_words = file_name_lower.split()
+                word_matches = sum(1 for word in search_words if any(word in file_word for file_word in file_words))
+                if word_matches > 0:
+                    similarity += (word_matches / len(search_words)) * 0.3
+                
+                if similarity > 0.1:  # Only include reasonable matches
+                    matches.append({
+                        "name": file_path.name,
+                        "path": str(file_path),
+                        "similarity": similarity,
+                        "match_type": "fuzzy"
+                    })
+            
+            # Sort by similarity score
+            matches.sort(key=lambda x: x["similarity"], reverse=True)
+            
+            # Get all files for fallback suggestions
+            all_file_info = [{"name": f.name, "path": str(f)} for f in all_files]
+            
+            return json.dumps({
+                "success": True,
+                "data": {
+                    "search_term": search_term,
+                    "files": matches[:10],  # Top 10 matches
+                    "total_matches": len(matches),
+                    "all_available_files": all_file_info
+                }
+            })
+            
+        except Exception as e:
+            logger.error(f"Error finding informe: {e}")
+            return json.dumps({
+                "success": False,
+                "error": f"Failed to find informe: {str(e)}"
+            })
+
+    def _auto_detect_files(self, params: Dict[str, Any]) -> str:
+        """Auto-detect DBK files and informes in their respective directories."""
+        try:
+            result = {
+                "dbk_files": [],
+                "informe_files": [],
+                "recommendations": []
+            }
+            
+            # Check for DBK files
+            dbk_dir = Path("dbks")
+            if dbk_dir.exists():
+                dbk_files = list(dbk_dir.glob("*.dbk")) + list(dbk_dir.glob("*.DBK"))
+                for dbk_file in dbk_files:
+                    result["dbk_files"].append({
+                        "name": dbk_file.name,
+                        "path": str(dbk_file),
+                        "size": dbk_file.stat().st_size,
+                        "modified": datetime.fromtimestamp(dbk_file.stat().st_mtime).isoformat()
+                    })
+            
+            # Check for informe files
+            informes_dir = Path("informes")
+            if informes_dir.exists():
+                supported_extensions = ['.pdf', '.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp']
+                for ext in supported_extensions:
+                    for informe_file in informes_dir.glob(f"*{ext}"):
+                        result["informe_files"].append({
+                            "name": informe_file.name,
+                            "path": str(informe_file),
+                            "type": informe_file.suffix.lower()[1:],
+                            "size": informe_file.stat().st_size,
+                            "modified": datetime.fromtimestamp(informe_file.stat().st_mtime).isoformat()
+                        })
+            
+            # Generate recommendations
+            if len(result["dbk_files"]) == 0:
+                result["recommendations"].append("Nenhum arquivo DBK encontrado na pasta 'dbks'. Certifique-se de ter um arquivo de declaração.")
+            elif len(result["dbk_files"]) == 1:
+                result["recommendations"].append(f"Arquivo DBK único encontrado: {result['dbk_files'][0]['name']}. Pronto para processamento.")
+            else:
+                result["recommendations"].append(f"Múltiplos arquivos DBK encontrados ({len(result['dbk_files'])}). Especifique qual usar.")
+            
+            if len(result["informe_files"]) == 0:
+                result["recommendations"].append("Nenhum informe encontrado na pasta 'informes'.")
+            else:
+                result["recommendations"].append(f"Encontrados {len(result['informe_files'])} informes prontos para processamento.")
+            
+            # Sort files by modification date (newest first)
+            result["dbk_files"].sort(key=lambda x: x["modified"], reverse=True)
+            result["informe_files"].sort(key=lambda x: x["modified"], reverse=True)
+            
+            return json.dumps({
+                "success": True,
+                "auto_detection": result
+            }, ensure_ascii=False, indent=2)
+            
+        except Exception as e:
+            logger.error(f"Error in auto-detection: {e}")
+            return json.dumps({
+                "success": False,
+                "error": f"Erro na detecção automática: {str(e)}"
+            })
