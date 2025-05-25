@@ -90,9 +90,10 @@ class IRPFAgent:
                 agent=agent,
                 tools=self.tools,
                 verbose=self.verbose,
-                max_iterations=int(os.getenv("MAX_AGENT_ITERATIONS", 5)),
+                max_iterations=int(os.getenv("MAX_AGENT_ITERATIONS", 10)),
                 handle_parsing_errors="Verifique sua saída e certifique-se de que está no formato correto! Quando tiver as informações necessárias, forneça sua resposta final no formato:\\n\\nThought: Agora sei a resposta final\\nFinal Answer: [sua resposta completa aqui]",
-                return_intermediate_steps=True
+                return_intermediate_steps=True,
+                early_stopping_method="generate"
             )
             
         except Exception as e:
