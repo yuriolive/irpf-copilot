@@ -137,6 +137,79 @@ def test_environment_setup():
     
     return True
 
+def test_pdf_extraction():
+    """Test the PDF extraction functionality."""
+    print("\n🧪 Testing PDF extraction...")
+    
+    try:
+        from agent.tools.llm_pdf_tool import LLMPdfTool
+        import json
+        from pathlib import Path
+        
+        # Check for informes directory
+        informes_dir = Path("informes")
+        if not informes_dir.exists() or not any(informes_dir.iterdir()):
+            print("⚠️  No files found in informes/ directory")
+            return False
+            
+        # Look for 99Pay informe or any other
+        test_file = next((f for f in informes_dir.glob("*") if "99pay" in f.name.lower()), None)
+        if not test_file:
+            test_file = next(informes_dir.iterdir(), None)
+            
+        if not test_file:
+            print("❌ No test file found in informes/ directory")
+            return False
+            
+        print(f"📄 Testing extraction with file: {test_file}")
+        
+        # Initialize tool
+        pdf_tool = LLMPdfTool()
+        
+        # Check if any LLM is available
+        if not (pdf_tool.gemini_llm or pdf_tool.claude_vertex_llm or pdf_tool.claude_direct_client):
+            print("⚠️  No LLM models available - skipping actual extraction")
+            print("✅ LLMPdfTool initialized successfully (but no models available)")
+            return True
+            
+        # Prepare query
+        query = json.dumps({
+            "operation": "extract_data",
+            "file_path": str(test_file),
+            "document_type": "auto"
+        })
+        
+        # Process file
+        print("🔍 Processing file...")
+        result = pdf_tool._run(query)
+        
+        # Parse result
+        parsed = json.loads(result)
+        
+        if parsed.get("success"):
+            data = parsed.get("data", {})
+            print(f"✅ Extraction successful using {data.get('processing_method')}")
+            print(f"✅ Document type identified: {data.get('document_type')}")
+            print(f"✅ Confidence level: {data.get('confidence', 0.0):.2f}")
+            
+            # Check for structured data
+            if data.get("structured_data"):
+                print("✅ Structured data extracted successfully")
+                # Print a sample of keys
+                keys = list(data.get("structured_data", {}).keys())[:5]
+                print(f"   Data keys: {', '.join(keys)}...")
+            else:
+                print("⚠️  No structured data extracted")
+                
+            return True
+        else:
+            print(f"❌ Extraction failed: {parsed.get('error', 'Unknown error')}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ PDF extraction test failed: {e}")
+        return False
+
 def main():
     """Run all tests."""
     print("🚀 IRPF Agent - Basic Implementation Test")
@@ -148,7 +221,8 @@ def main():
         ("Checksum Functions", test_checksum_functions),
         ("DBK Parser", test_dbk_parser),
         ("Tools Import", test_tools_import),
-        ("Agent Import", test_agent_import)
+        ("Agent Import", test_agent_import),
+        ("PDF Extraction", test_pdf_extraction)
     ]
     
     passed = 0
@@ -170,6 +244,7 @@ def main():
         print("1. Set up environment variables in .env file")
         print("2. Install dependencies: uv sync")
         print("3. Run the agent: uv run main.py")
+        print("4. Test PDF extraction: uv run main.py and type 'test-pdf'")
     else:
         print("⚠️  Some tests failed. Check the implementation.")
         return 1

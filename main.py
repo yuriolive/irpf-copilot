@@ -5,6 +5,7 @@ Provides an interactive CLI interface for manipulating DBK files.
 
 import os
 import sys
+import io
 from pathlib import Path
 from dotenv import load_dotenv
 from rich.console import Console
@@ -12,10 +13,28 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.table import Table
 import logging
+import json
+from contextlib import redirect_stdout
+
+# Add readline support for command history
+try:
+    import readline
+    READLINE_AVAILABLE = True
+except ImportError:
+    # readline is not available on Windows by default
+    try:
+        import pyreadline3 as readline
+        READLINE_AVAILABLE = True
+    except ImportError:
+        READLINE_AVAILABLE = False
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
+
+# Create directories for history and config
+HISTORY_DIR = project_root / ".history"
+HISTORY_FILE = HISTORY_DIR / "command_history.txt"
 
 from agent.agent import IRPFAgent
 from agent.tools.dbk_tool import DbkTool
@@ -70,6 +89,9 @@ def display_help():
     table.add_row("clear", "Limpa o histórico da conversa")
     table.add_row("status", "Mostra status do sistema e arquivos")
     table.add_row("list-dbk", "Lista arquivos DBK disponíveis")
+    table.add_row("list-informes", "Lista informes disponíveis na pasta informes/")
+    table.add_row("test-pdf", "Testa extração de PDF do informe padrão")
+    table.add_row("test-pdf <arquivo>", "Testa extração de um informe específico")
     table.add_row("backup <arquivo>", "Cria backup de um arquivo DBK")
     table.add_row("validate <arquivo>", "Valida checksums de um arquivo DBK")
     table.add_row("quit/exit/bye", "Encerra o programa")
@@ -81,6 +103,16 @@ def display_help():
     console.print("• 'Liste todos os informes disponíveis na pasta'")
     console.print("• 'Validar o checksum do arquivo gerado'")
     console.print("• 'Listar todos os registros R21 na declaração'")
+    
+    # Show test availability
+    console.print("\n[yellow]Teste completo:[/yellow]")
+    console.print("• Execute 'uv run test_basic.py' para testes completos de implementação")
+    
+    # Show readline status
+    if READLINE_AVAILABLE:
+        console.print("\n[green]✓ Histórico de comandos ativo - use as setas ↑/↓ para navegar[/green]")
+    else:
+        console.print("\n[yellow]⚠️ Readline não disponível - instale 'pyreadline3' para histórico de comandos[/yellow]")
 
 
 def check_directories():
@@ -88,12 +120,58 @@ def check_directories():
     directories = [
         "dbks/original",
         "dbks/gerado", 
-        "informes"
+        "informes",
+        ".history"  # Directory for command history
     ]
     
     for dir_path in directories:
         Path(dir_path).mkdir(parents=True, exist_ok=True)
         logger.info(f"Directory ensured: {dir_path}")
+
+
+def setup_readline():
+    """Setup readline with history file for command persistence."""
+    if not READLINE_AVAILABLE:
+        console.print("[yellow]⚠️ Readline não disponível - histórico de comandos limitado.[/yellow]")
+        console.print("[yellow]Instale 'pyreadline3' no Windows ou use em ambiente Linux/Mac para histórico completo.[/yellow]")
+        return
+    
+    # Ensure history directory exists
+    HISTORY_DIR.mkdir(exist_ok=True)
+    
+    # Set history file
+    if os.path.exists(HISTORY_FILE):
+        # Read existing history
+        with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    readline.add_history(line)
+        
+        readline.set_history_length(1000)  # Limit history size
+        logger.info(f"Loaded {readline.get_current_history_length()} command history entries")
+    
+    # Function to save history on exit
+    def save_history():
+        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+            history_length = readline.get_current_history_length()
+            for i in range(1, history_length + 1):
+                f.write(readline.get_history_item(i) + '\n')
+        logger.info(f"Saved {history_length} command history entries")
+    
+    # Register exit function
+    import atexit
+    atexit.register(save_history)
+    
+    # Set tab completion
+    def complete(text, state):
+        # Custom completion function could suggest commands or file paths
+        commands = ['help', 'status', 'list-dbk', 'clear', 'quit', 'exit', 'bye']
+        results = [c for c in commands if c.startswith(text.lower())] + [None]
+        return results[state]
+    
+    readline.set_completer(complete)
+    readline.parse_and_bind('tab: complete')
 
 
 def check_environment():
@@ -173,6 +251,103 @@ def display_status():
     console.print(status_table)
 
 
+def test_pdf_extraction(file_path=None, document_type="auto"):
+    """Test PDF extraction directly with LLMPdfTool."""
+    try:
+        console.print("[blue]Executando teste de extração de PDF...[/blue]")
+        
+        # Import the test function from test_basic
+        sys.path.insert(0, str(project_root))
+        from test_basic import test_pdf_extraction as run_pdf_test
+        
+        # If a specific file was requested
+        if file_path:
+            # Initialize tool
+            pdf_tool = LLMPdfTool()
+            
+            # Prepare query
+            query = json.dumps({
+                "operation": "extract_data",
+                "file_path": file_path,
+                "document_type": document_type
+            })
+            
+            # Process file
+            with console.status("[blue]Processando arquivo...[/blue]"):
+                result = pdf_tool._run(query)
+                
+            # Parse and show result
+            try:
+                parsed = json.loads(result)
+                
+                if parsed.get("success"):
+                    data = parsed.get("data", {})
+                    
+                    # Create result panel
+                    result_panel = Panel(
+                        f"[bold green]✅ Extração bem-sucedida![/bold green]\n\n"
+                        f"[cyan]Arquivo:[/cyan] {data.get('file_path')}\n"
+                        f"[cyan]Tipo de documento:[/cyan] {data.get('document_type')}\n"
+                        f"[cyan]Método:[/cyan] {data.get('processing_method')}\n"
+                        f"[cyan]Confiança:[/cyan] {data.get('confidence', 0.0):.2f}\n",
+                        title="Resultado da Extração",
+                        border_style="green"
+                    )
+                    console.print(result_panel)
+                    
+                    # Show extracted data
+                    if data.get("structured_data"):
+                        structured = data.get("structured_data")
+                        console.print("[yellow]Dados Estruturados Extraídos:[/yellow]")
+                        console.print_json(json.dumps(structured, indent=2, ensure_ascii=False))
+                        
+                        # Show IRPF mapping if available
+                        if data.get("irpf_mapping"):
+                            console.print("\n[yellow]Mapeamento IRPF Sugerido:[/yellow]")
+                            console.print_json(json.dumps(data.get("irpf_mapping"), indent=2, ensure_ascii=False))
+                    else:
+                        console.print("[yellow]Nenhum dado estruturado extraído.[/yellow]")
+                        
+                    # Show raw text brief
+                    if data.get("extracted_text"):
+                        text = data.get("extracted_text")
+                        console.print(f"\n[dim]Texto extraído (primeiros 200 caracteres): {text[:200]}...[/dim]")
+                else:
+                    console.print(f"[red]❌ Erro na extração: {parsed.get('error', 'Erro desconhecido')}[/red]")
+                    
+            except json.JSONDecodeError:
+                console.print("[red]❌ Erro ao processar resposta da ferramenta[/red]")
+                console.print(result)
+        else:
+            # If no specific file, run the basic test
+            # Capture stdout to display nicely in rich console
+            import io
+            from contextlib import redirect_stdout
+            
+            # Capture output
+            f = io.StringIO()
+            with redirect_stdout(f):
+                run_pdf_test()
+            
+            # Format and display captured output
+            output = f.getvalue()
+            for line in output.split('\n'):
+                if '✅' in line:
+                    console.print(f"[green]{line}[/green]")
+                elif '❌' in line:
+                    console.print(f"[red]{line}[/red]")
+                elif '⚠️' in line:
+                    console.print(f"[yellow]{line}[/yellow]")
+                elif '🧪' in line or '📄' in line or '🔍' in line:
+                    console.print(f"[blue]{line}[/blue]")
+                else:
+                    console.print(line)
+            
+    except Exception as e:
+        logger.error(f"Error testing PDF extraction: {e}")
+        console.print(f"[red]❌ Erro no teste: {e}[/red]")
+
+
 def handle_special_commands(user_input: str) -> bool:
     """Handle special commands. Returns True if command was handled."""
     command = user_input.lower().strip()
@@ -208,6 +383,41 @@ def handle_special_commands(user_input: str) -> bool:
             console.print("[yellow]Nenhum arquivo DBK encontrado nas pastas dbks/original ou dbks/gerado[/yellow]")
         return True
     
+    elif command == "list-informes":
+        informes_dir = Path("informes")
+        if informes_dir.exists():
+            informes = list(informes_dir.glob("*"))
+            if informes:
+                table = Table(title="Informes Disponíveis")
+                table.add_column("Nome do Arquivo", style="cyan")
+                table.add_column("Tipo", style="white")
+                table.add_column("Tamanho", style="yellow")
+                
+                for file in informes:
+                    file_type = file.suffix.lower() if file.suffix else "Desconhecido"
+                    size = f"{file.stat().st_size:,} bytes"
+                    table.add_row(file.name, file_type, size)
+                    
+                console.print(table)
+            else:
+                console.print("[yellow]Nenhum informe encontrado na pasta informes/[/yellow]")
+        else:
+            console.print("[yellow]Pasta informes/ não encontrada[/yellow]")
+        return True
+    
+    elif command == "test-pdf" or command == "test-extraction":
+        test_pdf_extraction()
+        return True
+    
+    elif command.startswith("test-pdf "):
+        file_name = command[9:].strip()
+        file_path = Path("informes") / file_name
+        if file_path.exists():
+            test_pdf_extraction(str(file_path))
+        else:
+            console.print(f"[red]Arquivo não encontrado: {file_name}[/red]")
+        return True
+    
     elif command.startswith("backup "):
         filename = command[7:].strip()
         console.print(f"[blue]Criando backup de {filename}...[/blue]")
@@ -236,8 +446,13 @@ def main():
             console.print("[yellow]Consulte o README.md para instruções de configuração.[/yellow]")
             return 1
         
-        # Ensure directories exist        check_directories()
-          # Initialize tools
+        # Ensure directories exist
+        check_directories()
+        
+        # Setup readline for command history
+        setup_readline()
+        
+        # Initialize tools
         console.print("[blue]🔧 Inicializando ferramentas...[/blue]")
         tools = [
             DbkTool(),
@@ -255,6 +470,7 @@ def main():
         
         console.print("[green]✅ Agente IRPF configurado com sucesso![/green]")
         console.print("\n[cyan]Digite 'help' para ver comandos disponíveis ou faça perguntas diretamente.[/cyan]")
+        console.print("[cyan]Use as setas ↑/↓ para navegar no histórico de comandos.[/cyan]")
         console.print("[dim]Digite 'quit', 'exit' ou 'bye' para sair.[/dim]")
         console.print("=" * 70)
         
@@ -263,6 +479,10 @@ def main():
             try:
                 # Get user input
                 user_input = console.input("\n[bold green]Você:[/bold green] ").strip()
+                
+                # Skip empty input
+                if not user_input:
+                    continue
                 
                 # Check for exit commands
                 if user_input.lower() in ['quit', 'exit', 'bye', 'q', 'sair']:
@@ -277,10 +497,6 @@ def main():
                 
                 # Handle special commands
                 if handle_special_commands(user_input):
-                    continue
-                
-                # Skip empty input
-                if not user_input:
                     continue
                 
                 # Process with agent
