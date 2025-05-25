@@ -92,14 +92,27 @@ llm = ChatAnthropicVertex(
 )
 ```
 
-## 📋 Lista de TO-DOs Prioritários
+## 📋 Lista de Funcionalidades
 
-### ✅ Implementado
+### ✅ Implementadas
 - [x] Algoritmos de checksum (`agent/utils/checksum.py`)
 - [x] Estrutura básica do projeto
 - [x] Configuração pyproject.toml
 
-### 🔄 Em Desenvolvimento (Prioridade Alta)
+### 🔄 Em Desenvolvimento
+
+### 🆕 A Ser Implementadas
+- [ ] Salvar quais informes foram processados e poder continuar de onde parou.
+- [ ] Ler o diretório de informes e ir processando informes um a um.
+- [ ] Poder buscar na web informações sobre como declarar e mudanças na legislação.
+
+### ℹ️ A Validar
+- [ ] Ver se deveríamos usar a LLM diretamente para processar os PDFs.
+- [ ] Converter a documentação, laiautes e códigos de referência em C# para um formato mais amigável para as LLMs, possivelmente Markdown.
+- [ ] Criar documento com a documentação e legislação pertinente para o IRPF 2025.
+- [ ] Realizar cálculos complexos por exemplo de impostos do exterior, bolsa de valores, etc.
+- [ ] Utilizar algum banco de dados local para facilitar a busca de informações pela LLM ao inves de ler diretamente o arquivo DBK.
+- [ ] Permitir mudanças para a declaração de próximos anos, por exemplo 2026, 2027, etc.
 
 #### 1. Agent Core (`agent/agent.py`)
 ```python
