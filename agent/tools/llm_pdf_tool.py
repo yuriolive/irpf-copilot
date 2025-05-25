@@ -23,9 +23,6 @@ from ..utils import (
 
 logger = logging.getLogger(__name__)
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-MAPEAMENTO_XML_PATH = SCRIPT_DIR / "mapeamentoTxt.xml"
-
 
 class LLMPdfTool(BaseTool):
     name: str = "llm_pdf_tool"
@@ -38,25 +35,32 @@ class LLMPdfTool(BaseTool):
 
     Operações:
     - extract_to_xml: Analisa o documento, extrai dados e retorna strings XML formatadas.
+                      IMPORTANTE: CPF e ano calendário são automaticamente extraídos do DBK atual se disponível.
                       Pode incluir um campo 'uncertainty_points' se a LLM indicar dúvidas.
     - get_mapping_details: Fornece detalhes de um registro ou campo específico de mapeamentoTxt.xml.
     - find_informes: Busca arquivos de informe no diretório especificado (padrão: 'informes').
     - find_informe_by_name: Busca informe por nome com matching inteligente no diretório 'informes'.
     - list_informes: Lista todos os informes disponíveis no diretório 'informes').
-    - auto_detect_files: Detecta automaticamente arquivos DBK (em 'dbks') e informes (em 'informes').    Exemplo de entrada JSON para extract_to_xml:
-    {"operation": "extract_to_xml", "file_path": "informes/meu_informe.pdf", "cpf_declarante_irpf": "12345678900", "ano_calendario": "2023"}
+    - auto_detect_files: Detecta automaticamente arquivos DBK (em 'dbks') e informes (em 'informes').
+
+    Exemplo de entrada JSON para extract_to_xml (CPF e ano são opcionais se DBK estiver carregado):
+    {"operation": "extract_to_xml", "file_path": "informes/meu_informe.pdf"}
+    
+    Ou com parâmetros explícitos:
+    {"operation": "extract_to_xml", "file_path": "informes/meu_informe.pdf", "cpf_declarante_irpf": "12345678900", "ano_calendario": "2025"}
+
     Exemplo para get_mapping_details:
     {"operation": "get_mapping_details", "record_name": "REG_BEM"}
     {"operation": "get_mapping_details", "record_name": "REG_BEM", "field_name": "CD_BEM"}
     """
-
+    
     llm_manager: Optional[LLMManager] = Field(default=None, exclude=True)
     xml_processor: Optional[XMLProcessor] = Field(default=None, exclude=True)
-
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         object.__setattr__(self, 'llm_manager', LLMManager())
-        object.__setattr__(self, 'xml_processor', XMLProcessor(MAPEAMENTO_XML_PATH))
+        object.__setattr__(self, 'xml_processor', XMLProcessor())
 
     def _run(self, query: str) -> str:
         """Main execution method for the tool."""
@@ -95,13 +99,42 @@ class LLMPdfTool(BaseTool):
         try:
             file_path_str = params.get("file_path")
             cpf_declarante_irpf = params.get("cpf_declarante_irpf")
-            ano_calendario = str(params.get("ano_calendario", datetime.now().year - 1))
+            ano_calendario = params.get("ano_calendario")
             additional_context_from_agent = params.get("additional_context")
 
             if not file_path_str:
                 return json.dumps({"success": False, "error": "Parâmetro 'file_path' é obrigatório."})
+
+            # Try to get DBK context from agent if CPF and year not provided
+            if not cpf_declarante_irpf or not ano_calendario:
+                try:
+                    # Try to import agent and get current DBK info
+                    from ..agent import get_agent_instance
+                    
+                    # Check if there's a current agent instance with DBK info
+                    # This is a simplified approach - in production you might use a singleton or context manager
+                    import sys
+                    for obj in sys.modules.values():
+                        if hasattr(obj, 'current_dbk_info') and obj.current_dbk_info:
+                            dbk_info = obj.current_dbk_info
+                            if not cpf_declarante_irpf:
+                                cpf_declarante_irpf = dbk_info.get('cpf_declarante', '')
+                            if not ano_calendario:
+                                ano_calendario = dbk_info.get('ano_calendario', '')
+                            logger.info(f"Usando informações do DBK: CPF {cpf_declarante_irpf}, Ano {ano_calendario}")
+                            break
+                except Exception as e:
+                    logger.debug(f"Não foi possível obter contexto do DBK: {e}")
+
+            # Set defaults if still not available
             if not cpf_declarante_irpf:
-                return json.dumps({"success": False, "error": "Parâmetro 'cpf_declarante_irpf' é obrigatório."})
+                return json.dumps({"success": False, "error": "CPF do declarante não foi fornecido e não pôde ser extraído do DBK atual. Por favor, forneça o parâmetro 'cpf_declarante_irpf' ou carregue um arquivo DBK primeiro."})
+            
+            if not ano_calendario:
+                ano_calendario = str(datetime.now().year)
+                logger.info(f"Ano calendário não fornecido, usando ano atual: {ano_calendario}")
+            else:
+                ano_calendario = str(ano_calendario)
 
             file_path = Path(file_path_str)
             

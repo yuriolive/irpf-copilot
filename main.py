@@ -556,8 +556,14 @@ def main():
                     response = agent.ask(user_input)
                 
                 # Display response
-                output = response.get('output', 'Desculpe, tive problemas para processar sua solicitação.')
-                console.print(output)
+                if response.get('success', False):
+                    output = response.get('answer', 'Resposta não disponível.')
+                    console.print(output)
+                else:
+                    error_msg = response.get('error', 'Erro desconhecido')
+                    answer = response.get('answer', 'Desculpe, tive problemas para processar sua solicitação.')
+                    console.print(f"[red]❌ {error_msg}[/red]")
+                    console.print(answer)
                 
             except KeyboardInterrupt:
                 console.print("\n\n[blue]👋 Interrompido pelo usuário. Até logo![/blue]")

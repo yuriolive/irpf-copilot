@@ -40,7 +40,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 class IRPFAgent:
     """
     Agente principal para processamento de arquivos DBK do IRPF.
@@ -65,6 +64,7 @@ class IRPFAgent:
         self.verbose = verbose if verbose is not None else os.getenv("AGENT_VERBOSE", "true").lower() == "true"
         self.conversation_history = []
         self.current_dbk_file = None
+        self.current_dbk_info = None
         self.llm_manager = LLMManager()
         self.agent_executor = self._setup_agent()
         
@@ -96,13 +96,15 @@ class IRPFAgent:
             # Create ReAct agent
             agent = create_react_agent(llm, self.tools, prompt)
             
-            # Create agent executor
+            # Create agent executor with improved error handling
             return AgentExecutor(
                 agent=agent,
                 tools=self.tools,
                 verbose=self.verbose,
-                handle_parsing_errors=True,
-                max_iterations=15
+                handle_parsing_errors="Check your output and make sure it conforms to the format instructions! Always start with 'Action:' followed by the tool name.",
+                max_iterations=10,
+                early_stopping_method="force",
+                return_intermediate_steps=True
             )
             
         except Exception as e:
@@ -122,20 +124,29 @@ REGRAS CRÍTICAS:
 FERRAMENTAS DISPONÍVEIS:
 {tools}
 
-FERRAMENTAS:
+FORMATO DE RESPOSTA OBRIGATÓRIO - SIGA EXATAMENTE:
+Você DEVE seguir este formato sem exceções:
+
+Question: a pergunta do usuário
+Thought: [sua análise do que precisa fazer]
+Action: [nome_exato_da_ferramenta]
+Action Input: {{"param": "valor"}}
+Observation: [resultado retornado pela ferramenta]
+... (repita Thought/Action/Action Input/Observation se necessário)
+Thought: [análise final baseada nas observações]
+Final Answer: [resposta final clara e objetiva para o usuário]
+
+REGRAS CRÍTICAS DE FORMATO:
+- SEMPRE use "Action:" seguido do nome exato da ferramenta
+- SEMPRE use "Action Input:" seguido de JSON válido
+- NUNCA escreva texto livre após "Thought:" sem usar "Action:" ou "Final Answer:"
+- Se precisar de informações adicionais, use Final Answer para perguntar claramente
+- NÃO repita a mesma ação várias vezes se ela falhar - tente uma abordagem diferente
+
+FERRAMENTAS DISPONÍVEIS:
 {tool_names}
 
-FORMATO DE RESPOSTA:
-Question: {input}
-Thought: analise o que precisa fazer
-Action: [nome_da_ferramenta]
-Action Input: {{"operation": "operacao", "param": "valor"}}
-Observation: resultado da ação
-... (repetir se necessário)
-Thought: agora sei a resposta
-Final Answer: resposta final para o usuário
-
-HISTÓRICO:
+HISTÓRICO DA CONVERSA:
 {chat_history}
 
 Question: {input}
@@ -161,32 +172,61 @@ Thought:{agent_scratchpad}'''
             }
         
         try:
+            # Clear conversation history if it gets too long to avoid context pollution
+            if len(self.conversation_history) > 10:
+                self.conversation_history = self.conversation_history[-5:]
+                logger.info("Histórico de conversação truncado para manter performance")
+            
             # Enhance query with context if needed
             enhanced_query = self._enhance_query_with_context(query)
             
-            # Invoke agent
-            result = self.agent_executor.invoke({
-                "input": enhanced_query,
-                "chat_history": self._format_conversation_history()
-            })
-            
-            # Save conversation
-            self.conversation_history.append({
-                "user": query,
-                "agent": result.get("output", "")
-            })
-            
-            return {
-                "success": True,
-                "answer": result.get("output", ""),
-                "intermediate_steps": result.get("intermediate_steps", [])
-            }
-        except Exception as e:
-            logger.error(f"Erro ao processar query: {e}", exc_info=True)
+            # Invoke agent with retry logic
+            max_retries = 2
+            for attempt in range(max_retries):
+                try:
+                    result = self.agent_executor.invoke({
+                        "input": enhanced_query,
+                        "chat_history": self._format_conversation_history()
+                    })
+                    
+                    # Save conversation only if successful
+                    self.conversation_history.append({
+                        "user": query,
+                        "agent": result.get("output", "")
+                    })
+                    
+                    return {
+                        "success": True,
+                        "answer": result.get("output", ""),
+                        "intermediate_steps": result.get("intermediate_steps", [])
+                    }
+                    
+                except Exception as retry_error:
+                    logger.warning(f"Tentativa {attempt + 1} falhou: {retry_error}")
+                    if attempt == max_retries - 1:
+                        raise retry_error
+                    # Continue to next retry attempt
+                    continue
+                    
+            # This shouldn't be reached due to the raise above, but added for safety
             return {
                 "success": False,
-                "error": str(e),
-                "answer": f"Ocorreu um erro ao processar sua solicitação: {str(e)}"
+                "error": "Todas as tentativas falharam",
+                "answer": "Não foi possível processar sua solicitação após múltiplas tentativas."
+            }
+                    
+        except Exception as e:
+            logger.error(f"Erro ao processar query: {e}", exc_info=True)
+            error_msg = str(e)
+            
+            # Provide more helpful error messages based on the error type
+            if "Invalid Format" in error_msg or "Missing 'Action:'" in error_msg:
+                error_msg = "O agente está tendo dificuldade para seguir o formato correto. Tente reformular sua pergunta de forma mais específica."
+            
+            return {
+                "success": False,
+                "error": error_msg,
+                "answer": f"Ocorreu um erro ao processar sua solicitação: {error_msg}"
             }
     
     def _enhance_query_with_context(self, query: str) -> str:
@@ -205,12 +245,33 @@ Thought:{agent_scratchpad}'''
         if self.current_dbk_file:
             context_parts.append(f"Arquivo DBK atual: {self.current_dbk_file}")
         
+        # Add DBK info context if available
+        if self.current_dbk_info:
+            context_parts.append(f"CPF Declarante: {self.current_dbk_info.get('cpf_declarante', 'N/A')}")
+            context_parts.append(f"Ano Calendário: {self.current_dbk_info.get('ano_calendario', 'N/A')}")
+            
+            # Add instruction for automatic parameter injection
+            dbk_context = f"""
+INFORMAÇÕES DO DBK ATUAL DISPONÍVEIS:
+- CPF do declarante: {self.current_dbk_info.get('cpf_declarante', '')}
+- Ano calendário: {self.current_dbk_info.get('ano_calendario', '')}
+- Ano exercício: {self.current_dbk_info.get('ano_exercicio', '')}
+
+INSTRUÇÃO IMPORTANTE: Quando usar a ferramenta llm_pdf_tool com operação extract_to_xml, 
+SEMPRE inclua automaticamente os parâmetros cpf_declarante_irpf e ano_calendario com os valores acima.
+NÃO peça essas informações ao usuário, pois elas já estão disponíveis no DBK carregado.
+
+Exemplo correto de uso:
+{{"operation": "extract_to_xml", "file_path": "caminho/do/arquivo.pdf", "cpf_declarante_irpf": "{self.current_dbk_info.get('cpf_declarante', '')}", "ano_calendario": "{self.current_dbk_info.get('ano_calendario', '')}"}}
+"""
+            context_parts.append(dbk_context)
+        
         # If no context, return original query
         if not context_parts:
             return query
         
         # Add context to query
-        context = " | ".join(context_parts)
+        context = "\n".join(context_parts)
         return f"{query}\n\n[Contexto: {context}]"
     
     def _format_conversation_history(self) -> str:
@@ -221,11 +282,11 @@ Thought:{agent_scratchpad}'''
             Histórico formatado como string
         """
         if not self.conversation_history:
-            return ""
+            return "Nenhum histórico anterior."
         
         formatted_history = []
         
-        # Limit history to last 5 exchanges
+        # Limit history to last 5 exchanges to avoid context pollution
         for exchange in self.conversation_history[-5:]:
             formatted_history.append(f"Usuario: {exchange.get('user', '')}")
             formatted_history.append(f"Agente: {exchange.get('agent', '')}")
@@ -256,14 +317,38 @@ Thought:{agent_scratchpad}'''
     
     def set_current_dbk_file(self, file_path: str):
         """
-        Define o arquivo DBK atual para o agente.
+        Define o arquivo DBK atual para o agente e extrai informações básicas.
         
         Args:
             file_path: Caminho do arquivo DBK
         """
         self.current_dbk_file = file_path
+        self.current_dbk_info = None
+        
+        # Extrair informações básicas do DBK para contexto
+        try:
+            from .utils import DbkParser
+            parser = DbkParser()
+            analysis = parser.analyze_dbk_file(file_path)
+            
+            if analysis and not analysis.get('error'):
+                # Extrair CPF e ano calendário do header IRPF
+                for record in analysis.get('records', []):
+                    if record.get('record_type') == 'IRPF':
+                        self.current_dbk_info = {
+                            'cpf_declarante': record.get('cpf', '').strip(),
+                            'ano_calendario': record.get('year', '').strip(),
+                            'ano_exercicio': record.get('tax_year', '').strip(),
+                            'file_path': file_path
+                        }
+                        logger.info(f"DBK info extraída: CPF {self.current_dbk_info['cpf_declarante']}, "
+                                  f"Ano calendário {self.current_dbk_info['ano_calendario']}")
+                        break
+                        
+        except Exception as e:
+            logger.warning(f"Não foi possível extrair informações do DBK {file_path}: {e}")
+        
         logger.info(f"Arquivo DBK atual definido: {file_path}")
-
 
 def get_agent_instance(tools: Optional[List[BaseTool]] = None) -> IRPFAgent:
     """

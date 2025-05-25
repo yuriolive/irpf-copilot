@@ -8,7 +8,7 @@ arquivos DBK da Receita Federal de forma segura.
 import os
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from langchain.tools import BaseTool
 from pydantic import Field
 from pathlib import Path
@@ -16,6 +16,7 @@ from pathlib import Path
 # Import utilities from utils package
 from ..utils import (
     DbkParser,
+    XMLProcessor,
     parse_json_input,
     format_error_response,
     format_success_response,
@@ -44,6 +45,8 @@ class DbkTool(BaseTool):
     name: str = "dbk_tool"
     description: str = """Ferramenta completa para manipulação de arquivos DBK do IRPF.
     
+    Utiliza mapeamentoTxt.xml para parsing e geração precisa de registros DBK.
+    
     Operações disponíveis:
     1. read_dbk - Ler e analisar arquivo DBK completo
     2. write_dbk - Salvar arquivo DBK com validações de checksum
@@ -71,11 +74,11 @@ class DbkTool(BaseTool):
     - Verificação de integridade pós-modificação
     - Arquivos modificados são salvos na pasta 'gerado', mantendo originais intocados
     """
-    
     # Configurações de segurança
     auto_backup: bool = Field(default=True, exclude=True)
     validate_checksums: bool = Field(default=True, exclude=True)
     parser: DbkParser = Field(default_factory=DbkParser, exclude=True)
+    xml_processor: Optional[XMLProcessor] = Field(default=None, exclude=True)
     path_manager: WorkspacePathManager = Field(default_factory=WorkspacePathManager, exclude=True)
     
     def __init__(self, **kwargs):
@@ -84,7 +87,12 @@ class DbkTool(BaseTool):
         self.auto_backup = os.getenv("AUTO_BACKUP", "true").lower() == "true"
         self.validate_checksums = os.getenv("VALIDATE_CHECKSUMS", "true").lower() == "true"
         self.path_manager = WorkspacePathManager()
-        self.parser = DbkParser()
+        
+        # Set up XML processor (uses default mapeamentoTxt.xml path from data folder)
+        self.xml_processor = XMLProcessor()
+        
+        # Initialize parser with XML processor
+        self.parser = DbkParser(xml_processor=self.xml_processor)
     
     def _run(self, query: str) -> str:
         """Executa operação DBK baseada no JSON de entrada."""

@@ -38,10 +38,20 @@ class DbkParser:
     # Configurações básicas para todos os tipos de registro
     DEFAULT_RECORD_LENGTH = 500
     CHECKSUM_POSITION = (490, 500)  # Posição padrão do checksum
-    
-    def __init__(self):
-        """Initialize the DBK parser."""
+    def __init__(self, xml_processor=None):
+        """Initialize the DBK parser with XMLProcessor for enhanced parsing.
+        
+        Args:
+            xml_processor: XMLProcessor instance. If None, creates a new instance automatically.
+        """
         self.encoding = 'latin-1'  # DBK files use Latin-1 encoding
+        
+        # Import XMLProcessor here to avoid circular imports
+        if xml_processor is None:
+            from .xml_processors import XMLProcessor
+            xml_processor = XMLProcessor()
+        
+        self.xml_processor = xml_processor
     
     def get_output_path(self, input_path: str) -> str:
         """

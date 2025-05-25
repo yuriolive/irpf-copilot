@@ -10,11 +10,24 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+# Path to mapeamentoTxt.xml in the data folder
+SCRIPT_DIR = Path(__file__).resolve().parent
+MAPEAMENTO_XML_PATH = SCRIPT_DIR.parent / "data" / "mapeamentoTxt.xml"
+
 
 class XMLProcessor:
     """Handles XML processing for IRPF records."""
     
-    def __init__(self, mapeamento_xml_path: Path):
+    def __init__(self, mapeamento_xml_path: Optional[Path] = None):
+        """Initialize XMLProcessor with mapeamentoTxt.xml path.
+        
+        Args:
+            mapeamento_xml_path: Optional custom path to mapeamentoTxt.xml.
+                                If None, uses the default path in data folder.
+        """
+        if mapeamento_xml_path is None:
+            mapeamento_xml_path = MAPEAMENTO_XML_PATH
+        
         self.record_definitions = self._load_mapeamento_xml(mapeamento_xml_path)
     
     def _load_mapeamento_xml(self, xml_file_path: Path) -> Dict[str, Dict[str, Any]]:
