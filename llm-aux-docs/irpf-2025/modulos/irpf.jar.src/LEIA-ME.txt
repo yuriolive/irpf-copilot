@@ -1,0 +1,3 @@
+É recomendado que se utilize esse diretório para armazenar os arquivos TXT 
+que contenham dados estáticos, como por exemplo tabela de municípios de uma UF, tabela de ceps e quaisquer
+outros dados de domínio definido que possam ser armazenados em TXT.  

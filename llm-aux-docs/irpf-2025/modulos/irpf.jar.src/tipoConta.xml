@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TABELA xmlns="http://www.receita.fazenda.gov.br/declaracao">
+    <ITEM COL1="1" COL2="Conta corrente"/>
+    <ITEM COL1="2" COL2="Conta poupança"/>
+    <ITEM COL1="3" COL2="Conta pagamento"/>
+    <ITEM COL1="4" COL2="Pix"/>
+    <ITEM CRC="902829050" VIGENCIA="20220103"/>
+</TABELA>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<informePlanoSaude>
+
+	<header>
+		<cnpjPlanoSaude>12345432123454</cnpjPlanoSaude>
+		<nomePlanoSaude>Sulamerica</nomePlanoSaude>
+		<cpfBeneficiario>12345654321</cpfBeneficiario>
+		<nomeBeneficiario>José da Silva</nomeBeneficiario>
+		<anoExercicio>2018</anoExercicio>
+		<anoCalendario>2017</anoCalendario>
+	</header>
+
+	<listaPagamentoPremio>
+		<itemPagamentoPremio>
+			<cpfBeneficiarioPagamentoPremio>23454323456</cpfBeneficiarioPagamentoPremio>
+			<nomeBeneficiarioPagamentoPremio>Pessoa de Testes</nomeBeneficiarioPagamentoPremio>
+			<valorPagoPagamentoPremio>5000,00</valorPagoPagamentoPremio>
+		</itemPagamentoPremio>
+	</listaPagamentoPremio>
+
+	<listaReembolso>
+		<itemReembolso>
+			<cpfBeneficiarioReembolso>76567898765</cpfBeneficiarioReembolso>
+			<nomeBeneficiarioReembolso>Segunda Pessoa de Testes</nomeBeneficiarioReembolso>
+			<cpfcnpjPrestadorServico>34567654567890</cpfcnpjPrestadorServico>
+			<nomePrestadorServico>Hospital de Testes</nomePrestadorServico>
+			<valorTotalPago>300,00</valorTotalPago>
+			<valorReembolsado>45,00</valorReembolsado>
+		</itemReembolso>
+	</listaReembolso>
+
+</informePlanoSaude>

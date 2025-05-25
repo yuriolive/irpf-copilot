@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<informeRendimentosFontePagadora>
+	<header>
+		<cpfCnpjFontePagadora>08382346000103</cpfCnpjFontePagadora>
+		<nomeFontePagadora>Serviço Federal de Processamento de Dados</nomeFontePagadora>
+		<cpfBeneficiario>43727112719</cpfBeneficiario>
+		<nomeBeneficiario>Pessoa de Testes</nomeBeneficiario>
+		<anoExercicio>2022</anoExercicio>
+		<anoCalendario>2021</anoCalendario>
+	</header>
+        <listaRendimentosTributaveisRecebidosPessoaJuridica>
+            <itemRendimentosTributaveisRecebidosPessoaJuridica>
+                <totalRendimentoInclusiveFerias>95000,00</totalRendimentoInclusiveFerias>
+                <contribuicaoPrevidenciariaOficial>11000,00</contribuicaoPrevidenciariaOficial>
+                <impostoRetidoFonte>12000,00</impostoRetidoFonte>
+                <decimoTerceiro>8000,00</decimoTerceiro>
+            </itemRendimentosTributaveisRecebidosPessoaJuridica>
+            <itemRendimentosTributaveisRecebidosPessoaJuridica>
+                <totalRendimentoInclusiveFerias>900,00</totalRendimentoInclusiveFerias>
+                <contribuicaoPrevidenciariaOficial>100,00</contribuicaoPrevidenciariaOficial>
+                <impostoRetidoFonte>100,00</impostoRetidoFonte>
+                <decimoTerceiro>80,00</decimoTerceiro>
+            </itemRendimentosTributaveisRecebidosPessoaJuridica>
+        </listaRendimentosTributaveisRecebidosPessoaJuridica>
+        <listaPrevidenciaComplementar>
+            <itemPrevidenciaComplementar>
+                <cnpjFundo>56257140000102</cnpjFundo>
+                <nomeFundo>Serpros Fundo Multipatrocinado</nomeFundo>
+                <tipoFundo>1</tipoFundo>
+                <valorPagoFundo>2800,00</valorPagoFundo>
+            </itemPrevidenciaComplementar>
+            <itemPrevidenciaComplementar>
+                <cnpjFundo>56257140000102</cnpjFundo>
+                <nomeFundo>Serpros Fundo Multipatrocinado 2</nomeFundo>
+                <tipoFundo>2</tipoFundo>
+                <valorPagoFundo>800,00</valorPagoFundo>
+            </itemPrevidenciaComplementar>
+        </listaPrevidenciaComplementar>
+        <listaPensaoAlimenticia>
+            <itemPensaoAlimenticia>
+                <cpfAlimentando>22319774351</cpfAlimentando>
+                <nomeAlimentando>Morta Fome</nomeAlimentando>
+                <valorPagoPensaoAlimenticia>1600,00</valorPagoPensaoAlimenticia>
+                <valorDecimoTerceiroPensaoAlimenticia>1300,00</valorDecimoTerceiroPensaoAlimenticia>
+            </itemPensaoAlimenticia>
+        </listaPensaoAlimenticia>
+        <listaRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>1</tipoRendimentoIsento>
+                <valorRendimento>1000,00</valorRendimento>
+                <decimoTerceiro>110,00</decimoTerceiro>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>2</tipoRendimentoIsento>
+                <valorRendimento>200,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>3</tipoRendimentoIsento>
+                <valorRendimento>300,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>4</tipoRendimentoIsento>
+                <valorRendimento>400,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>5</tipoRendimentoIsento>
+                <valorRendimento>500,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>5</tipoRendimentoIsento>
+                <valorRendimento>600,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>7</tipoRendimentoIsento>
+                <valorRendimento>700,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>8</tipoRendimentoIsento>
+                <valorRendimento>800,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>9</tipoRendimentoIsento>
+                <valorRendimento>900,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>10</tipoRendimentoIsento>
+                <valorRendimento>1000,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+            <itemRendimentosIsentosNaoTributaveis>
+                <tipoRendimentoIsento>11</tipoRendimentoIsento>
+                <valorRendimento>1100,00</valorRendimento>
+            </itemRendimentosIsentosNaoTributaveis>
+        </listaRendimentosIsentosNaoTributaveis>
+        <listaOutrosRendimentosIsentosNaoTributaveis>
+            <itemOutrosRendimentosIsentosNaoTributaveis>
+                <descricaoRendimento>Outro rendimento isento N1</descricaoRendimento>
+                <valorRendimento>300,00</valorRendimento>
+            </itemOutrosRendimentosIsentosNaoTributaveis>
+            <itemOutrosRendimentosIsentosNaoTributaveis>
+                <descricaoRendimento>Outro rendimento isento N2</descricaoRendimento>
+                <valorRendimento>400,00</valorRendimento>
+            </itemOutrosRendimentosIsentosNaoTributaveis>
+            <itemOutrosRendimentosIsentosNaoTributaveis>
+                <descricaoRendimento>Outro rendimento isento N3</descricaoRendimento>
+                <valorRendimento>500,00</valorRendimento>
+            </itemOutrosRendimentosIsentosNaoTributaveis>
+        </listaOutrosRendimentosIsentosNaoTributaveis>
+        <listaRendimentosSujeitosTributacaoExclusiva>
+            <itemRendimentosSujeitosTributacaoExclusiva>
+                <tipoRendimentoTributacaoExclusiva>1</tipoRendimentoTributacaoExclusiva>
+                <valorRendimento>200,00</valorRendimento>
+            </itemRendimentosSujeitosTributacaoExclusiva>
+            <itemRendimentosSujeitosTributacaoExclusiva>
+                <tipoRendimentoTributacaoExclusiva>2</tipoRendimentoTributacaoExclusiva>
+                <valorRendimento>300,00</valorRendimento>
+            </itemRendimentosSujeitosTributacaoExclusiva>
+        </listaRendimentosSujeitosTributacaoExclusiva>
+        <listaOutrosRendimentosSujeitosTributacaoExclusiva>
+            <itemOutrosRendimentosSujeitosTributacaoExclusiva>
+                <descricaoRendimento>Outro rendimento tributação exclusiva N1</descricaoRendimento>
+                <valorRendimento>230,00</valorRendimento>
+            </itemOutrosRendimentosSujeitosTributacaoExclusiva>
+            <itemOutrosRendimentosSujeitosTributacaoExclusiva>
+                <descricaoRendimento>Outro rendimento tributação exclusiva N2</descricaoRendimento>
+                <valorRendimento>330,00</valorRendimento>
+            </itemOutrosRendimentosSujeitosTributacaoExclusiva>
+        </listaOutrosRendimentosSujeitosTributacaoExclusiva>
+        <listaRendimentosRecebidosAcumuladamente>
+            <itemRendimentosRecebidosAcumuladamente>
+                <numeroProcesso>01234567890123456789</numeroProcesso>
+                <numeroMeses>5,0</numeroMeses>
+                <mesRecebimento>10</mesRecebimento>
+                <valorRendimento>7100,00</valorRendimento>
+                <despesaComAcaoJudicial>100,00</despesaComAcaoJudicial>
+                <contribuicaoPrevidenciariaOficial>300,00</contribuicaoPrevidenciariaOficial>
+                <impostoRetidoFonte>150,00</impostoRetidoFonte>
+                <valorRRAMolestiaGrave>200,00</valorRRAMolestiaGrave>
+                <listaPensaoAlimenticiaRRA>
+                    <itemPensaoAlimenticiaRRA>
+                        <cpfAlimentando>87038648551</cpfAlimentando>
+                        <nomeAlimentando>Primeiro Alimentando de Testes</nomeAlimentando>
+                        <valorPago>290,00</valorPago>
+                    </itemPensaoAlimenticiaRRA>
+                    <itemPensaoAlimenticiaRRA>
+                        <cpfAlimentando></cpfAlimentando>
+                        <nomeAlimentando>Segundo Aliemntando de Testes</nomeAlimentando>
+                        <valorPago>420,00</valorPago>
+                    </itemPensaoAlimenticiaRRA>
+                </listaPensaoAlimenticiaRRA>
+            </itemRendimentosRecebidosAcumuladamente>
+        </listaRendimentosRecebidosAcumuladamente>
+        <listaPagamentos>
+            <itemPagamentos>
+                <cpfBeneficiarioServico>83442301360</cpfBeneficiarioServico>
+                <nomeBeneficiarioServico>Primeira Pessoa de Testes</nomeBeneficiarioServico>
+                <cpfcnpjPrestadorServico>13138684000134</cpfcnpjPrestadorServico>
+                <nomePrestadorServico>Medico Testes</nomePrestadorServico>
+                <valorTotalPago>100,00</valorTotalPago>
+                <valorReembolsado>200,00</valorReembolsado>
+            </itemPagamentos>
+            <itemPagamentos>
+                <cpfBeneficiarioServico></cpfBeneficiarioServico>
+                <nomeBeneficiarioServico>Segunda Pessoa de Testes</nomeBeneficiarioServico>
+                <cpfcnpjPrestadorServico>13138684000134</cpfcnpjPrestadorServico>
+                <nomePrestadorServico>Escola Testes</nomePrestadorServico>
+                <valorTotalPago>300,00</valorTotalPago>
+                <valorReembolsado>400,00</valorReembolsado>
+            </itemPagamentos>
+        </listaPagamentos>
+        <listaRendimentosExigibilidadeSuspensa>
+            <itemRendimentosExigibilidadeSuspensa>
+                <numeroProcessoRendimentoExigibilidadeSuspensa>09876543210987654321</numeroProcessoRendimentoExigibilidadeSuspensa>
+                <valorRendimentoExigibilidadeSuspensa>321,00</valorRendimentoExigibilidadeSuspensa>
+                <valorDepositosJudiciaisExigibilidadeSuspensa>123,00</valorDepositosJudiciaisExigibilidadeSuspensa>
+            </itemRendimentosExigibilidadeSuspensa>
+        </listaRendimentosExigibilidadeSuspensa>
+</informeRendimentosFontePagadora>

@@ -1,0 +1,996 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.10.12
+Created-By: 11.0.16+8 (Oracle Corporation)
+Main-Class: serpro.ppgd.app.IRPFPGD
+Class-Path: lib/balloontip-1.2.4.jar lib/batik-awt-util.jar lib/batik-do
+ m.jar lib/batik-svg-dom.jar lib/batik-svggen.jar lib/batik-util.jar lib
+ /batik-xml.jar lib/bcmail-jdk15on-1.49.jar lib/bcpkix-jdk15on-1.49.jar 
+ lib/bcprov-jdk15on-1.49.jar lib/chardet.jar lib/commons-beanutils-1.9.4
+ .jar lib/commons-codec-1.11.jar lib/commons-collections-3.2.2.jar lib/c
+ ommons-digester-1.8.jar lib/commons-io-2.4.jar lib/commons-lang-2.6.jar
+  lib/commons-logging-1.2.jar lib/core-3.3.0.jar lib/exificient-0.9.6.ja
+ r lib/exificient-core-0.9.6.jar lib/exificient-grammars-0.9.6.jar lib/f
+ luent-hc-4.5.9.jar lib/forms-1.0.3.jar lib/foxtrot.jar lib/freesans.jar
+  lib/groovy-3.0.16.jar lib/groovyconverter.jar lib/gson-2.3.jar lib/iTe
+ xt-2.1.0.jar lib/icepdf-core.jar lib/icepdf-viewer.jar lib/jai-imageio-
+ core-1.3.1.jar lib/jasperreports-5.6.0.jar lib/javase-3.3.0.jar lib/jax
+ b-api-2.3.0.jar lib/jcommander-1.48.jar lib/jna-4.5.2.jar lib/jna-platf
+ orm-4.5.2.jar lib/jsignnet-3.5.1.jar lib/maven-artifact-3.8.4.jar lib/m
+ idas-layouts-2.0.jar lib/ppgd-formatosext-4.3.1.jar lib/ppgd-gui-beans-
+ 4.3.1.jar lib/ppgd-icones-4.0.jar lib/ppgd-infraestrutura-4.3.1.jar lib
+ /ppgd-negocio-4.3.1.jar lib/ppgd-persistencia-4.3.1.jar lib/ppgd-pgd-ut
+ ils-4.3.1.jar lib/qrcodeutil-0.0.1.jar lib/receitanet.jar lib/recnet-en
+ velope-1.2.jar lib/recnetutil-1.1.jar lib/serpro.jar lib/slf4j-api-1.7.
+ 25.jar lib/slf4j-nop-1.7.25.jar lib/sqladaj-2.0.1.jar lib/swing-layout-
+ 1.0.4.jar lib/swingx-1.6.jar lib/tinylaf-1.4.0.jar lib/xalan.jar lib/xe
+ rcesImpl-2.11.0.jar lib/xml-apis-1.4.01.jar lib/xmladaj.jar lib/xslconv
+ erter.jar lib-modulos/irpf_gui-atividade-rural.jar lib-modulos/irpf_gui
+ -basica.jar lib-modulos/irpf_gui-carne-leao.jar lib-modulos/irpf_gui-de
+ claracao.jar lib-modulos/irpf_gui-gcap.jar lib-modulos/irpf_gui-renda-v
+ ariavel.jar lib-modulos/irpf_icones.jar lib-modulos/irpf_importacao-exp
+ ortacao.jar lib-modulos/irpf_impressao.jar lib-modulos/irpf_negocio-cal
+ culo.jar lib-modulos/irpf_negocio-declaracao.jar lib-modulos/irpf_servi
+ cos-nuvem.jar pgd-updater.jar
+
+Name: subCalculoAPrazoPSocDetalhe.jasper
+SHA-256-Digest: eUxY+L6yJroEfLc8CEl94D0qymtrRM/CO+CcC72or+k=
+
+Name: subAliquotaEfetiva.jasper
+SHA-256-Digest: 5JJvYEUxERY01rnogzsRYB/8eZNfer9tPQWbfoVkDVU=
+
+Name: subReal.jasper
+SHA-256-Digest: E5Wn4jyTmJ79EHpERYjhBmu9DbT5k/yPuPiB72CAvs4=
+
+Name: subOperacoesMoedaEstrangeira.jasper
+SHA-256-Digest: +R+7OTXmm77Bsuprkizxil2nT0/dl7OeaXdDfF35cNU=
+
+Name: relNotificacao.jasper
+SHA-256-Digest: DqSBGGaqnfnvyjcwx+uPabxN22EMk6QvjMwpBlAQcKk=
+
+Name: SC.xml
+SHA-256-Digest: MN+6hmYK/yZN79Vf5HPZKqm+3PIejjCI/dCegkzzDuY=
+
+Name: relDeclaracaoSemInfo.jasper
+SHA-256-Digest: O6xH3ehEBopPp4Bk3ypDCEMDZa0SEdRKHxvlB97MGLM=
+
+Name: DIRPF2025.jasper
+SHA-256-Digest: JWkrOZo0U9FfQA7T78dzD5Hz2vL4xuS1EbAHw++EbIw=
+
+Name: subCalculoAPrazoExteriorAmbasMoedasDetalhe.jasper
+SHA-256-Digest: Y5Wamo2rRFcgvXViT8G0fteVH+FosqgiF5dENp4LxbU=
+
+Name: subCalculoAPrazoImovelExteriorAmbasMoedasDetalhe.jasper
+SHA-256-Digest: k9UWmlKsjcOFnWTczxNeQT3u1ZIQIXkpQaCfyIekJoc=
+
+Name: relNotificacaoSaida.jasper
+SHA-256-Digest: RuWgrz/nTFo9C4ycWuS4xS04M8bMzUbds5bPXcWjZ98=
+
+Name: relDeclaracaoAlimentandosDecisaoJudicial.jasper
+SHA-256-Digest: 4XgjqRu3tLgMrO3ojKb0g/6ENVTrek60RTL01pxOiBY=
+
+Name: relDemonstrativoPSoc.jasper
+SHA-256-Digest: rsR2wkgqH+tkGF+B97lqzjT8Z6vWOxm7dctp5XcERjs=
+
+Name: relRendaVariavelQuadroImpostoPagar.jasper
+SHA-256-Digest: /Fwj79NDwRw4qutpet0kAJpACI/asRxHMwjt/38lyUk=
+
+Name: subApuracaoMoedaEstrangeira.jasper
+SHA-256-Digest: CbguOZ1XXoTpCLTwMgQx+M/e502em3NO92ECVC2Qwfg=
+
+Name: subConsolidacaoBrasil.jasper
+SHA-256-Digest: /mkop3e4KkIK1bj0Mh/KxkyDumQpjsS0cZSq4Q/HnOE=
+
+Name: tipoAtividadesRural.xml
+SHA-256-Digest: MPfIOgMnPO+1hoSRJWPtckoX4IpFJp95DprOT94+zh0=
+
+Name: relDeclaracaoBensDireitosUsufrutuarioDetalhe.jasper
+SHA-256-Digest: bdzT6xDEzUOgCSAud/sbWcu2h18HrTiP7JNaGYQtIxo=
+
+Name: relDeclaracaoRendimentosTributaveisPFMesesDependente.jasper
+SHA-256-Digest: 437s4UOxk1SGRqcsWd0HF9VCp32fig3AqhVKxBxLEqY=
+
+Name: subCalculoAPrazoImovelExteriorMoedaNacParcelas.jasper
+SHA-256-Digest: 4iGDyDFVUoJeXEXFj9KWmmTCEJEOaEw9yPalTpZLCXI=
+
+Name: subPerguntasImovel.jasper
+SHA-256-Digest: MwL2L3zeJfO9cCx5XtHl23PW8bKStioyHGQRvNy1f4w=
+
+Name: relRendaVariavelTitular.jasper
+SHA-256-Digest: qPYrmc5W97oIcebfCC1rJKhEStdQzf4LcZ7rEww+b4c=
+
+Name: PB.xml
+SHA-256-Digest: V/MsuE4b1QwZmJXisvocOSzR/iceW5ieqlrzFvBRPT4=
+
+Name: relRecibo.jasper
+SHA-256-Digest: m+4I8z/LCZe4WhmY9qKAE6rbyjOQck99fkc/91NmgB4=
+
+Name: subApuracaoMovelBrasil.jasper
+SHA-256-Digest: F8apyN7Wx1XsgZAkr3KTKsl7Po84FkB9zgEodMicpvM=
+
+Name: tipoLogradouro.xml
+SHA-256-Digest: 9rqXiKdr+dDUTN+X8XLvE3I9WqWuv9lc0S+fGds5gNg=
+
+Name: relDemonstrativoMoveis.jasper
+SHA-256-Digest: J9BYLiMZktwLLBZCMyAtxJU/MwynXZWsgiHNCPoATGY=
+
+Name: Mensagens.properties
+SHA-256-Digest: y+IO2ij8MegePdRkJ6gNq8PESN2dv9hUATnwgd0Cbmw=
+
+Name: subApuracaoEmReaisAlienacaoAPrestacao1.jasper
+SHA-256-Digest: fiUICNFpWkwACqqzDJ7mLizdW+TIeHI82bN3ahIaPvg=
+
+Name: relDeclaracaoEspolioConjugePartilha.jasper
+SHA-256-Digest: PX1CEbNBIq17hT4Xb5aWJp3MllegTXNbgjug8kXygjI=
+
+Name: relARRebanhoExterior.jasper
+SHA-256-Digest: RzLhZW+Zc83kG27XTax/ntnmij23GeEtBQmyg1tSpEg=
+
+Name: subCustoAquisicaoImoveisExtMoedaEst.jasper
+SHA-256-Digest: 4NLIfy9QTZjpG32d8Q/wpa1kvNQ1TuJTpZJrAlHJ/rE=
+
+Name: relDeclaracaoAlimentandos.jasper
+SHA-256-Digest: iVtAOIAxhTe8KLrulCbLpEqE0e1uZ5gHRrvT+NxRva8=
+
+Name: subAliquotaEfetivaValores.jasper
+SHA-256-Digest: vTYzjkppZ7jSNAC1xCutSImiFhs9B3hYB5ANoIVc4ls=
+
+Name: subCalculoAPrazoExteriorMoedaNacParcelas.jasper
+SHA-256-Digest: O+OBF5wscb3DMEa6pPvAD8h9YlxI2/w7AIV8b6G3b5w=
+
+Name: relDeclaracaoRendimentosTributaveisPJTitular.jasper
+SHA-256-Digest: ZgVSau3Qgfq4YH47CICSzdJPc6MJfctH90788QDTFrM=
+
+Name: relARApuracaoExterior.jasper
+SHA-256-Digest: loBW0qPd6x/WwPiUMuUwY9FWMEQPcZIX/nOI7+QKXxo=
+
+Name: serpro/ppgd/app/PlataformaIRPFPGD.class
+SHA-256-Digest: Hp1DndoajIQ8RdJ+IiKqh8zE0eakgAlGrayqZ5Kj7Cw=
+
+Name: subApuracaoAmbasMoedas.jasper
+SHA-256-Digest: ssQLMhpdNIMbiPIHvVlFjxuVSk7/KcUIybwDU6/odi0=
+
+Name: PI.xml
+SHA-256-Digest: GZAReRTkVu07W0Dpp2rhktQjBWOl+1Uzcm78VpeMCIU=
+
+Name: relRendaVariavelItemGanhosLiquidosPerdas.jasper
+SHA-256-Digest: aVfcN5BpwiNptK+RAVRp8FM+6YOuuvEw/Z6tyPRhPtE=
+
+Name: relARParticipantes.jasper
+SHA-256-Digest: ZL6Okw2sXlEUQt1ZdlSJe+VB0dFr0mNMUOAE7ru8C9g=
+
+Name: subTotalizacaoEspecie.jasper
+SHA-256-Digest: KyA0Gx4FGfVxoBR+vXHsAm4S2k/ItJneyM++cy0ZDLA=
+
+Name: LayoutDadosDIRPF2025.xml
+SHA-256-Digest: HgvQH0J/t//rVLXKEV6ukwx4ZWCQOn/zBTPoI+b2ayU=
+
+Name: subApuracaoFinalMoedaEstrangeira.jasper
+SHA-256-Digest: XYlNymMz86um3cX5NZkeHzMUjUQwkSNRP+bUuNTYAHk=
+
+Name: subAquisicaoExteriorAmbasMoedas.jasper
+SHA-256-Digest: AXb/z0hFFWEg7pgY+CAXpKhuct8iD1gm34oykLKr++s=
+
+Name: relARBensDaAtividadeRural.jasper
+SHA-256-Digest: NLT2hsGdq5UC8M1VB1O4akG3OG5tIeHf2lSwHQSW97c=
+
+Name: relDeclaracaoRendimentosTributaveisPFContasTitular.jasper
+SHA-256-Digest: wuEVMIbpEQyV+PctomrQS6NGtSvlBYb51Reik6FDD60=
+
+Name: relDeclaracaoRendimentosTributaveisPFTitular.jasper
+SHA-256-Digest: gfZiBf5MXhyV0ozmrTC2+zobQ8CCEgaMjzN5Pg0PWbQ=
+
+Name: subApuracaoFinalGanhoImovelExtAmbasMoedas.jasper
+SHA-256-Digest: +s0ggurIXGt7wLvXl8RvbCKer0DzLrjw4Jivftxn8Jg=
+
+Name: FolhaDeRosto.jasper
+SHA-256-Digest: cSiXrTw7FTcU93HNZp6LYoVo6k6RfS9JkQ4Vhq/iyjw=
+
+Name: relComunicacaoSaida.jasper
+SHA-256-Digest: vYlVLTkM2SpW9jBqEA8WmLNKVRWW+cjencPtoRQd1d4=
+
+Name: relDeclaracaoBensDireitosParticipacaoInventarioDetalhe.jasper
+SHA-256-Digest: lslSFBuJFdUODUy0KQraSIt8TTddqEXW0t6dsuVyOqM=
+
+Name: relDeclaracaoRendimentosTributaveisPFMeses.jasper
+SHA-256-Digest: RTDCtKf1mD/C9kzmrzhSxXox4nhRD0+BpFR35jcjDrs=
+
+Name: DIRPF2025.xsl
+SHA-256-Digest: EfjDqYdfrQPSN9Zo0MKkIbxknne+IKTjialRW1IYEac=
+
+Name: relInformeRendimentosPJRendACMAlimentandos.jasper
+SHA-256-Digest: RpHGENY0jSu2JdvwLYhk3NE0L71vRBvgS6XE1mY1TWA=
+
+Name: relDeclaracaoDoacoes.jasper
+SHA-256-Digest: DImk4amUQT0Ft510s41oSIu4tA6TCpPWZmiEcSWXDQI=
+
+Name: relDeclaracaoInventarianteDecisaoJudicialSobrepartilha.jasper
+SHA-256-Digest: FOBW9q47HgYhhkujU+Nu6bsa1Mw6wGZL9uQc51raxKs=
+
+Name: AM.xml
+SHA-256-Digest: LlYqDcWflwDZIpBz+AG7bUNcyYpxgn/p8O2QFx3zzXA=
+
+Name: subGanhoCapitalImoveisExterior.jasper
+SHA-256-Digest: V8RbZfAuR/6PHOohVUPxxIVQxPAiWzzGzFBcjXpdY9Q=
+
+Name: markpreenchimento.png
+SHA-256-Digest: 7Thaw2rrcYQ705N8Bc8BezZOCz+MQSRru4SpXO4weG4=
+
+Name: serpro/ppgd/app/MensagensIf.class
+SHA-256-Digest: fgJpmjEIZuAPnXtnByEYE+vXZaUBgGYAZuOATWjqNBE=
+
+Name: Default-flat.theme
+SHA-256-Digest: QWl8KffEIF2B4J8Fk3YKZRptIPLWkHbSIksZt9myjZI=
+
+Name: subEstrangeiraAquisicao.jasper
+SHA-256-Digest: xRd5Rn2JKV4pzJaCB9o8C1JynNNn7To9eVHXEOkuULk=
+
+Name: subMista.jasper
+SHA-256-Digest: b0fuzx/FUaW6eI5bG19rgrrZG7QGnsRlkvWaHVAPGG0=
+
+Name: relDeclaracaoInventarianteEscrituraPublicaPartilha.jasper
+SHA-256-Digest: UQ4Nw1iklf05b2kwOj+JDijluY1FumWV8MIcX6ccMB4=
+
+Name: subCalculoAPrazoImovelExteriorMoedaNacEnquadramento.jasper
+SHA-256-Digest: 1eJhvzG+LU7EwFyGDu7L5OFAYXyblcIIqBDLKLkdd4o=
+
+Name: RS.xml
+SHA-256-Digest: wLaY0DNpAHvOZ4Y810Qp9vlNWeDjSJBJjT6ax3bWSyQ=
+
+Name: relDarfAuxilioEmergencial.jasper
+SHA-256-Digest: y6zZtRKFvjQUT6JAb6S19zQxuVxcf4wlEbpZewCVpr8=
+
+Name: subApuracaoGanhoImovelExtMoedaNac.jasper
+SHA-256-Digest: Ki4LFyuGTXeevshWKd4otLopbv/zZsZWHY+8CnHqvb8=
+
+Name: subCustoAquisicaoImoveisBrasil.jasper
+SHA-256-Digest: ZmWN327dHe91PfuLWr5lRZp9nZaKKbQmUXZwaXSMr7k=
+
+Name: informe_fontes_pagadoras.xsd
+SHA-256-Digest: TKNR2a1KZnJBCFNAqR5Pt9N0L8pdn3pH+grJZ2GNhow=
+
+Name: relDeclaracaoDoacoesECA.jasper
+SHA-256-Digest: s23xiHQmiTf7Zj6VJcnFVgDRBCUl4gj1A82B6/h+RIk=
+
+Name: relDeclaracaoConjuge.jasper
+SHA-256-Digest: XIPBBvTc3P8cz/6PCxAHGs2nSZMXOSPqGWpA79VlrBI=
+
+Name: relDeclaracaoRendimentosAcumuladamenteTitular.jasper
+SHA-256-Digest: 1hn7IXIV5T8BAbzjUoT6CZjNcB9x017SXZUS5FPZp9k=
+
+Name: subCalculoAPrazoImovelBrasilParcelaDetalhe.jasper
+SHA-256-Digest: WoA6Nv2Y+FdKVpN5aju7VCctIhn7vQHtrH70w0qONN8=
+
+Name: subCalculoAPrazoImovelExteriorMoedaNacDetalhe.jasper
+SHA-256-Digest: jd93jZ9pOglGkFEqYovdA6ld54XNmgT9bRU2EIh/FVU=
+
+Name: relInformeRendimentosPJOutrosRendIsentos.jasper
+SHA-256-Digest: d/54wwhSlCGCP4LfYfWp5qlFti47A+uoj+AUnnuS0hA=
+
+Name: relDarfAuxilio.jasper
+SHA-256-Digest: 4tGb2/a1lkz2p5kvpe9L+5kj7kglzWP80pob1oqVy0s=
+
+Name: serpro/ppgd/app/AjudaIf.class
+SHA-256-Digest: YkpGg2nQ5oHyijhc7i9yGaAQHwDNi23Zb2Q9KdSg13E=
+
+Name: relDeclaracaoRendimentosSujTribExclusiva.jasper
+SHA-256-Digest: o4of7ALW3YyvcG05OmvHfwYgZZh5ORzXgnognJPT42c=
+
+Name: subCalculoAPrazoImovelExteriorMoedaEstDetalheEnquadramento.jasper
+SHA-256-Digest: zdbuuxaW9HxzC8g2lf+ACc7l85Bulgoa4Ykq3S4pKvY=
+
+Name: subCalculoAPrazoImovelExteriorMoedaEstParcelas.jasper
+SHA-256-Digest: NMuhnNaxL9/9ygwt4olG1iiMTiDMIYyO/CF2nGfuEgM=
+
+Name: relDeclaracaoDoacoesIdoso.jasper
+SHA-256-Digest: Pp07IwTdfpbsPuBTjxC7/lcKLiTt2RUVNdi1f37TofA=
+
+Name: relDeclaracaoDependentesSaida.jasper
+SHA-256-Digest: tnt5kM94tR1mt1FgcLLHZ1VJK/MDDsV4/CH4KlKfpco=
+
+Name: relDeclaracaoTransportesGCAlienBensDireitos.jasper
+SHA-256-Digest: dZEVGA/MrD12h0iWTWj5m9SROWqgZiukom/l2VAQJlo=
+
+Name: bancos_calculo_dv.xml
+SHA-256-Digest: q4Z8L+PbVfOCkPKZ6mnGa5NWbu9ZJJ07uOiMbv89akc=
+
+Name: subAquisicaoBrasil.jasper
+SHA-256-Digest: DAct4zmJ+ysxTrwuws95kz6IbEUwsDzB8q0ps2bj0Xg=
+
+Name: relDeclaracaoRendimentosTributaveisPJComExigibilidadeTitular.jaspe
+ r
+SHA-256-Digest: SkHESCOFAOJ0+8+iiwtoD8rvdhZp5JhWzqfCb6x55hk=
+
+Name: subCalculoAPrazoImovelExteriorMoedaEstDetalhe.jasper
+SHA-256-Digest: tRvWjU6XWzECkYsPvhYKSSfKbkxZpIHz++axQflnXoc=
+
+Name: subApuracaoMoedaEstrangeiraAlienacaoPrestacao1.jasper
+SHA-256-Digest: YAdculxuhKxbEC3RpnMZOkcA/Pv/OD02Fj5hdQC9e4k=
+
+Name: relDeclaracaoContribuinte.jasper
+SHA-256-Digest: Gx2yrUolv0IPN0B0JIy0dBPWbEe9pw3wUDH+8nL+1sM=
+
+Name: relDemonstrativoMoedaEspecie.jasper
+SHA-256-Digest: /fNlLz8f7bN1bYTfbgcWCEVEgha+f3LteFxs8NXDk2I=
+
+Name: MG.xml
+SHA-256-Digest: 70cyuNHxFACq7WNsm22TF0hqDb5ZQdxMuS9h7nbt0pQ=
+
+Name: subCalculoAPrazoPSocParcelaDetalhe.jasper
+SHA-256-Digest: BYxO8bajYaQdLb4aHJBVo/lntdua2knWZVzg/m61RZY=
+
+Name: subReaisAquisicao.jasper
+SHA-256-Digest: 6g4pjyL2mTaK8FJfAkqCHY86MS+0zp3cpj3HZhX5SCI=
+
+Name: relARBrasil.jasper
+SHA-256-Digest: udFyPbbMxPFmaAh5y8YNg9N9xXkhT8Kv7t68Qn9Q+xc=
+
+Name: subCustoAlienacao.jasper
+SHA-256-Digest: Ha7q5iKg4WzcfH0tbvCQRhlPLIYqE+SW17ILrxMkP24=
+
+Name: ufssigla.xml
+SHA-256-Digest: kx0kwuF1HKKWvB65y79v19CkyQICFLjlCtm3nEGvhPU=
+
+Name: relDeclaracoes.jasper
+SHA-256-Digest: kAol+HgcGSW99kkWadycttediaCLLOk4SbGQcYlWPsg=
+
+Name: subCalculoAPrazoBrasilDetalhe.jasper
+SHA-256-Digest: P2Wu4KwMcnSNflgHC46TnvRNqzU9hF+tw02PfegIIC0=
+
+Name: subCalculoAPrazoBrasilMovelPSocDetalhe.jasper
+SHA-256-Digest: TaAlUvodCAs0RP35vMKL3k2vaymeQL1GxUJx67k7Sy0=
+
+Name: serpro/ppgd/app/ConstantesIf.class
+SHA-256-Digest: w3EiWjo6LcQAWX3Z6tOHtfzIogVZ39AjwCBVh5RAR28=
+
+Name: subOperacaoImovelExterior.jasper
+SHA-256-Digest: skgwB7Wek0E57VYh48+isNH4sQmxi8cYgKERBNKlJOY=
+
+Name: informe_planos_saude.xml
+SHA-256-Digest: KNbgirUOzWA9//VClBJvm7KFxOY8CIF+xSKn1hZSQng=
+
+Name: AP.xml
+SHA-256-Digest: sfBZDJFXYFjl2Ks+EbDz3JAjXIvBB4saNbGypMmhlzo=
+
+Name: ES.xml
+SHA-256-Digest: eXQmaYk82AUA4hISz51Ethdx19ngKB/EAGid2HXlgPw=
+
+Name: relDeclaracaoTransportesSemInfo.jasper
+SHA-256-Digest: bqllAgo51fnm6a+9YidRaYvTiGv0WRUk3cRh5jZASH0=
+
+Name: PA.xml
+SHA-256-Digest: 9tZDQT00PU+iPZtcdMNJsk5z2rtCzGFc4Cddp+YP5us=
+
+Name: Default-orig.theme
+SHA-256-Digest: hmAPWbmyYzt+5D9C+4TBuE5qU7p5VXsryM7C1lVWrEE=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalhe.jasper
+SHA-256-Digest: Q4f6/Z4zUbqj0RxMxjVmu/ZXmxuxmci/w5vor3+PvMQ=
+
+Name: subApuracaoFinalGanhoImovelExtMoedaEst.jasper
+SHA-256-Digest: c4nDJqePf+r/ApCUMP4ydrk51kwGfSzlKvMi5y1Yxmo=
+
+Name: tipoBensAR.xml
+SHA-256-Digest: Wxgf0Ff2jm+GBmLFoViM9xMhoUfBlXflEcRVIy82Xj8=
+
+Name: relInformeRendimentosPJPagamentos.jasper
+SHA-256-Digest: uG0Y54UBgRdvXrJzg0KtvQi8UMIhTtrhWCeotdgCcrA=
+
+Name: RO.xml
+SHA-256-Digest: bXk8Q+ysLse42QA7uiM33HeTHCfZN0S71WUZnuLS6IA=
+
+Name: CE.xml
+SHA-256-Digest: 3MZA+k1R4KHwPKwghz7+HFmpOyU059p0dSgLDDk6kgM=
+
+Name: subCalculoAPrazoImovelExteriorMoedaNac.jasper
+SHA-256-Digest: 5FUzvpFfgdj066zLEXGN4y+lBQ0j8w3C8WahDX/GPGg=
+
+Name: relComunicacaoSaidaDetalhe.jasper
+SHA-256-Digest: Z1sIhNPs1RefP0gKrKkcNhqMwULO50vH+jCxf/K5Qak=
+
+Name: relDeclaracaoRendimentosTributaveisPFContasDependente.jasper
+SHA-256-Digest: gCRzKwmKv0getNzdCMN/HdJX1k4mut2YdcaQOZXAsAM=
+
+Name: subApuracaoCustoAquisicaoImoveisExterior.jasper
+SHA-256-Digest: lubxtIKf90MB8FS5wMOWjWqiC6ZL/pZheowuH9PM5Ow=
+
+Name: subGanhoCapitalImoveisAmbasMoedas.jasper
+SHA-256-Digest: O8CrWcGwy6hNtA0stSgxpfPu7mEN/khH68cRvpvXZOM=
+
+Name: logoreceita1.gif
+SHA-256-Digest: pwGAhgCHciEovdf0+hLcliYbkRrrC++jqIyuFPC8t6s=
+
+Name: subApuracaoGanhoImovelExtAmbasMoedas.jasper
+SHA-256-Digest: PQXF6sNr4eOob5A8frlNRXwypVZsLVWksGq6GAZGrQU=
+
+Name: serpro/ppgd/app/ConstantesMensagens$ConstantesEnum.class
+SHA-256-Digest: eUuUxfq53ap7UDB2HSLBGLnbq5D/HI5n2fAEO+dOJvM=
+
+Name: subCalculoAPrazoExteriorMoedaEst.jasper
+SHA-256-Digest: TIZkhVYaf+vRF7fDrfiQB8LPARvRZQJ9d34DVM+Me70=
+
+Name: aplicacao.properties
+SHA-256-Digest: gZooAYgZE9f2N+shTiuY3vouJnTaCxB0T2aHt9LQxvI=
+
+Name: preenchimento.xcf
+SHA-256-Digest: U4V54o9S/YvzX1Y7TdXk3XCz+HTg6gFsfAjtOrZSEGw=
+
+Name: relDarfDoacaoEstatutoIdoso.jasper
+SHA-256-Digest: iohSjOyFubg8aslxJtu840SIr4Qk1BZ3uvJ8aW2ULXg=
+
+Name: relDeclaracaoHerdeiros.jasper
+SHA-256-Digest: 4wkCeEUppg29LjGuwfJxbgS1OhhlYoscr8aQRvR/oIA=
+
+Name: subEnderecoBrasil.jasper
+SHA-256-Digest: av+6A9Q+9mUCo0R024cANsm6chaRWSY5s518etoM8RE=
+
+Name: relARReceitasDespesasBrasil.jasper
+SHA-256-Digest: SmrqQKFvYeSmk6dqvCWytdYFZcbMKV6HtdpWPn8i0AM=
+
+Name: subCalculoAPrazoImovelExteriorMoedaEstParcelaDetalhe.jasper
+SHA-256-Digest: c6JKFR9ewyFW1uMmwOm7D4Z52racOqumuqvamZcOPDQ=
+
+Name: dirpf2025scriptlets/RelDeclaracaoRendimentosTributaveisPJDependent
+ eScriptlet.class
+SHA-256-Digest: CVwdaUxq+k1VnITcbWjb99/KOsCq58KpREWpY3HJ3s4=
+
+Name: marksigilo.png
+SHA-256-Digest: bHM4FEpLAURZylqUTm3wkj1Nm91RM0ERirI6ohznElw=
+
+Name: subCalculoAPrazoExteriorMoedaNacParcelaDetalhe.jasper
+SHA-256-Digest: Y+U1SLtuLznELR/ssgI7Awew8l7YrnEbCEaW1dIUCtA=
+
+Name: relDeclaracaoSemInfo2.jasper
+SHA-256-Digest: woiZsOqS7cAZazZh2v5Fx4nKOZnOK2U0Git+FgT8Q8U=
+
+Name: subAquisicaoExterior.jasper
+SHA-256-Digest: T+LNL92Q/Sa9xordgUZlIDeLdD9vmpP49DMxp8gOiNg=
+
+Name: relInformeRendimentosPJRendPJExigibilidadeSuspensa.jasper
+SHA-256-Digest: k5fGXFLgiMI321acx8VfcJYpIMwJYOJmQtghO8QgJjo=
+
+Name: AL.xml
+SHA-256-Digest: eREeWvCUudO75txDfEWU7ZkFKP0wVrGpsSbrz4wJ1wQ=
+
+Name: relDeclaracaoAlimentandosEscrituraPublica.jasper
+SHA-256-Digest: B6dZuEWRfPlspYhAgpFRsdffsDKoPAMJS+nEvKjVAT8=
+
+Name: relARReceitasDespesasExterior.jasper
+SHA-256-Digest: qxZHRIvXmgFVvG00AHDeNDEjHInCZOf0l3AksntmX40=
+
+Name: relRendaVariavelDependentes.jasper
+SHA-256-Digest: HMHd6XLZeQih5RX9WuslQlICQUJPrQImoL3V4gTq84g=
+
+Name: subApuracaoMoedaNacional.jasper
+SHA-256-Digest: tSoBIpVOf8ToPvCUkw94FZr4pwAqr7qCJoXIpxawqSI=
+
+Name: subCalculoAPrazoPSocParcelas.jasper
+SHA-256-Digest: Go8Q95WzDn34keMc2KOzSOuEIXp0z1Er1nnxMSqQf+E=
+
+Name: subMensagemMudancaEnquadramento.jasper
+SHA-256-Digest: A+t5XUu1SokO1HSShXdmOkWnLKXfpZRibmT13kGSmY8=
+
+Name: paises_gcap.xml
+SHA-256-Digest: Hn9dygGFS30Evx1k2Jk5IjpYCwuZ9uipYKynM7YXkTM=
+
+Name: PE.xml
+SHA-256-Digest: q/A6QHCbtKv4osDHq+Zq1BAR83wznSpAN8K+lIVJtt0=
+
+Name: subEspecie.jasper
+SHA-256-Digest: pd8fSRS2/3gBUMpLTyU6d63luhzZojI5c6Jo4z+CC70=
+
+Name: AC.xml
+SHA-256-Digest: FJQkPIuhTv4xQQfPARz0O9v/c/9STASydTLlPbkYr2c=
+
+Name: relAR.jasper
+SHA-256-Digest: sHlu3FnRoq3XGRTJy1nG4yOoclEE9knqtIJAx3jkqMM=
+
+Name: subCalculoAPrazoImovelBrasilDetalhe.jasper
+SHA-256-Digest: NzSReqsxv2Wa4gc7C+39ORAvkOHXUK+ocyAyTaxyfOk=
+
+Name: subCalculoAPrazoImovelExteriorAmbasMoedasDetalhe_copia.jasper
+SHA-256-Digest: AHEdo9/tx8dj7qUU2DzSmZD5Qylj6inhUlRku+y9iGY=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveis.jasper
+SHA-256-Digest: q89doM2sHtF5r92HxNJahcQ1MOEDo+9iQ+l/pMmYRqQ=
+
+Name: relInformePlanoSaudeReembolsos.jasper
+SHA-256-Digest: 9H0a7gjCW8jHQT2pemWTEMAleNzpr0bWuKUO1bBfdEg=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalheLucro.jasper
+SHA-256-Digest: 3ubaVspR80zbe7zMS3zTBmkkoB4l2x8lyHOM5YnaN38=
+
+Name: relDarfCodBarra.jasper
+SHA-256-Digest: 8Bsog6ZYTR1p5rpZFaaHIi7Nk/iVy9zoER7hC/FTXBA=
+
+Name: relDeclaracaoTransportesParcIsenME.jasper
+SHA-256-Digest: stNpVVz8BiQBZxWi5JEVfu9V2rxt8AHfBIVmexC9Rjo=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalheIndenizacoes.j
+ asper
+SHA-256-Digest: uPY3lbgqORhwBLw53LjST1sNQfhwiI0rko5OdJnx5Pw=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalheTransferenciaP
+ atrimonial.jasper
+SHA-256-Digest: kN4Y6JM9HzeikSlNT6yFGLuH/3BMdZgj5ekifFMIlf8=
+
+Name: relDeclaracaoRendimentosAcumuladamenteTitularAlimentandos.jasper
+SHA-256-Digest: 0KPxid/CpQSU6cPl6MolJ5StxfNi/Bi7aY1yuHtWpo8=
+
+Name: relDeclaracaoRendimentosTributaveisPFMesesTitular.jasper
+SHA-256-Digest: b3+d9qRi+IaRcUlMplkIKwfB5bK3VdE0+TDzz8NZYec=
+
+Name: relDeclaracaoResumoSimplificada.jasper
+SHA-256-Digest: EvUvbvKiWLXSqHH4bTYwwM0dxsOSC2lo6qweHnoTqME=
+
+Name: relInformeRendimentosPJOutrosRendTribExclusiva.jasper
+SHA-256-Digest: +cw8chC/RFdH5VnBSOXEb7dBYSH34+ggfec2KwjeQZM=
+
+Name: subApuracaoFinalAmbasMoedas.jasper
+SHA-256-Digest: kRst5DmAk04gm9O0fHm/xds0Un9vy/37YL+d6qYgnm8=
+
+Name: subPerguntas.jasper
+SHA-256-Digest: 0g8E7zAQ1j7PoiFY1DGDlWGppvq8Ltxv/3ZqAZF/S0s=
+
+Name: subImpostoPagoExterior.jasper
+SHA-256-Digest: Ze3wjA4fAteGfQrKgmFtx/9cb/uQaHhm/XVnJtmLR84=
+
+Name: mapeamentoXmlGCAP.xml
+SHA-256-Digest: Z7HJqSK98GUhJEOOm9HpgbUbKGpXOGeiCPAE9X1BxX0=
+
+Name: subEnderecoExterior.jasper
+SHA-256-Digest: RWS9Z4T+xU8lNHDd5gpVM9AeaSQrxr/ehyz0JLwgzV8=
+
+Name: altcoins.xml
+SHA-256-Digest: EAWtKzU1RRD+WG3prAQp2pSitnr+wDk0WMOfhP3j7zY=
+
+Name: mapeamentoTxt.xml
+SHA-256-Digest: n0zqFOSvKSdPr8AVxlFw1fzYJ/oG/yW1uq59kImZhEM=
+
+Name: dirpf2025scriptlets/RelDeclaracaoContribuinteScriptlet.class
+SHA-256-Digest: iolFu+K+JwY6LcGBgUPA/c5mdd6c7thw9piPNXp+8qs=
+
+Name: subApuracaoGanhoImovelBrasil.jasper
+SHA-256-Digest: Q05vyh5UBPzK2TOzshZNmPOLEVgr23CHqfiTohoP/oY=
+
+Name: relDarfDoacaoECA.jasper
+SHA-256-Digest: ObRNa2m0RlV37pf4fRaefEuplB+87/FH+x0/O/P0pm8=
+
+Name: relDeclaracaoPagamentos.jasper
+SHA-256-Digest: gL25DkodLLCseyrxmkqoLwIkeLo9nQY2CcJdxaVduM0=
+
+Name: subApuracaoCustoAquisicaoImoveisExteriorAmbasMoedas.jasper
+SHA-256-Digest: /1BmZQj4R4sAd5xFe0XpuBJkmcAyQIeTUmUWim0intA=
+
+Name: subAjuste.jasper
+SHA-256-Digest: 4hkorCsHEjEbz1/n5VlFWX9Gz47eYGUB7phNv5dupZI=
+
+Name: SP.xml
+SHA-256-Digest: KqDnLS/kiFAMve6ffTlUDuH3kXlw69UhKfhePapBtHI=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalheSemFontePagado
+ ra.jasper
+SHA-256-Digest: Qpa0b5jZZZLbhS2B2uubosd9ZTCYqeuJsnGlLIqVnWE=
+
+Name: relRendaVariavelGanhosLiquidosPerdas.jasper
+SHA-256-Digest: u5LnPWPGhpCQULIAE/kH9mLnKHkYTMW7pKpoiYQE8Pk=
+
+Name: RN.xml
+SHA-256-Digest: 4iNcUch/MXoGQmNbiKp509pRBtT8/vGucU49eLmnBg8=
+
+Name: relDeclaracaoTransportesGCAlienMEEspecie.jasper
+SHA-256-Digest: FEPhyRNro//Vwmksl5ygoK7zywp7eUfkVswSreLc5Vw=
+
+Name: subCalculoAPrazoExteriorMoedaEstDetalhe.jasper
+SHA-256-Digest: +4aBUCk7vIbGzZwi+ff4Ucp4p+bgPIVyxs9wks4kDZY=
+
+Name: relInformeRendimentosPJRendPJ.jasper
+SHA-256-Digest: O2jsYQa9Rst2qPaAys4zanEMXiADGr1ILtJ6iTGj6dQ=
+
+Name: subCalculoAPrazoImovelExteriorMoedaNacDetalheEnquadramento.jasper
+SHA-256-Digest: 7pjAghUXfG/XuUxyiG1zD+XyHQomlsAQv+mYdfruM2g=
+
+Name: 2025/DIRPF2025.groovy
+SHA-256-Digest: J5q1GcrNEF4rzw9Hlx1tTtTl0xYaVhSj2r8bbHahw68=
+
+Name: relRendaVariavelFundoInvestimentoDependentes.jasper
+SHA-256-Digest: GhyBij/BKMk+waSwVPlnBHIs6raPsNqf5cVHq3qJ8cg=
+
+Name: subApuracaoFinalGanhoImovelExtMoedaNac.jasper
+SHA-256-Digest: sBeXHxGCaf9FrkgC0UM/UZxHnb/5Brz6LU0GPPP7hQk=
+
+Name: relInformeRendimentosPJRendACM.jasper
+SHA-256-Digest: 4XzcK/JnpfC5bBcDEmoAKjlkjUhUkwXNhGgoVe4FLLE=
+
+Name: relARExterior.jasper
+SHA-256-Digest: bBHGG68Cjb/1hI6A2tISv/NUmxEMWhgobGyiYsghkWY=
+
+Name: subOperacaoExterior.jasper
+SHA-256-Digest: iSnLbz0MwM+1CqhyHHx41vqczgyinHOxCCNBeIOpPQg=
+
+Name: subCalculoAPrazoExteriorMoedaEstParcelaDetalhe.jasper
+SHA-256-Digest: zunCidGLbo+ZhSgJQaLp38+G7gGsjV6rcGVthDwIunQ=
+
+Name: relDeclaracaoResumo.jasper
+SHA-256-Digest: /TR2VNGD02toE0bkKyoh46yG4YTO1xNSM/ZxD3pm5lo=
+
+Name: PR.xml
+SHA-256-Digest: Bam2OH6fplylnc5pt/KEDsi1/zieLw0vfDnjz4UV+p4=
+
+Name: LEIA-ME.txt
+SHA-256-Digest: JwuoRC+DTB80pfDzo5kflwP+Kvwk2PFJdFN9cDt+TjM=
+
+Name: subCalculoAPrazoImovelExteriorAmbasMoedasParcelaDetalhe.jasper
+SHA-256-Digest: xScSr+Ham2WzKGMhuwnbwG7o6JtFX3GG5PTKs6H84i0=
+
+Name: subCalculoAVistaMovelExterior.jasper
+SHA-256-Digest: Vi7kcfKLWyitSdxWO8TPXz96EKsvbDrERLv8BgBco3U=
+
+Name: qrcode-download.jpg
+SHA-256-Digest: MMb1C2Pms7M8kI29PAD+dSKnXe5rg4bMQ2ylnbAY1h4=
+
+Name: relDemonstrativoMoedaEspecieDetalhe.jasper
+SHA-256-Digest: VdISUdXHd/gj6UhYqAhUyfgShb8CDqzyqgqGufTyQpo=
+
+Name: subRelGCAP.jasper
+SHA-256-Digest: GT3SglElf/pg4WFxqTJoYjP3r8PT8CpUZc6iIxDqYMY=
+
+Name: Default.theme
+SHA-256-Digest: hmAPWbmyYzt+5D9C+4TBuE5qU7p5VXsryM7C1lVWrEE=
+
+Name: subPerguntasPSoc.jasper
+SHA-256-Digest: FxXDsYkTE19bPh8A8jIAeoY2JYxzvqna23ndV8tpeGo=
+
+Name: subRelGCME.jasper
+SHA-256-Digest: ZmLVUqzvHvcFPe8OyB+nEoZqBoI3JsqMaaHXIyJrREE=
+
+Name: relDeclaracaoImpostoPagoSimplificado.jasper
+SHA-256-Digest: 6PPDVeDjUxh231TzXM94CLpUPp8Hqzl12ucoq4tpCxo=
+
+Name: subConsolidacaoDeAlienacao.jasper
+SHA-256-Digest: ppbz6/TYeO0TylOyNQwFTvjo8SMUupBAufHiojerKHk=
+
+Name: informe_planos_saude.xsd
+SHA-256-Digest: OMyRK8GKBdGGLnR1VZ0JKeW+0I5GVCV0rDgHSwKyPIo=
+
+Name: subIdentificacaoAdquirenteMoeda.jasper
+SHA-256-Digest: Vs32I4yT6T2+FGMMtkbF4oUmn12p9ruXmPWrfrjl0H4=
+
+Name: lista.cmd
+SHA-256-Digest: NxrKi+c/8HG6xrmJF7QxoYljsZkQ2Y/uVU/uKR+ERWU=
+
+Name: subCalculoAPrazoImovelExteriorMoedaNacParcelaDetalhe.jasper
+SHA-256-Digest: uMheCigm005SPKdXp5/9JsTHrDOruOWuFg4bGCl2mqg=
+
+Name: relDeclaracaoDetalhePensaoAlimenticia.jasper
+SHA-256-Digest: GVZir40zdprj3ETeiYRhra93Y7S6T6SOerRAO8kFJO0=
+
+Name: MT.xml
+SHA-256-Digest: UJb0Aysyv8WcPPyCVrzxc054x3QhgOuNrCLYQXW5aTQ=
+
+Name: subApuracaoFinalMoedaNacional.jasper
+SHA-256-Digest: iAWff1gCaw42z0VcHakSze0ApL1NBfj6/udXpf9GTYs=
+
+Name: DF.xml
+SHA-256-Digest: 76lf4VQC4DvB2XphH6Nx24A15YJ82OwM0PPy5SK2+cc=
+
+Name: subCalculoAPrazoExteriorMoedaNacDetalhe.jasper
+SHA-256-Digest: ItipGSqTYUqV6VBdC5PIbJ4YfaceJmBgtfgs9BuB6zk=
+
+Name: relARIdentificacao.jasper
+SHA-256-Digest: 9HeD0PCcM5c5DUtwQrqyfNQH41aInS8Da5niviWOPp4=
+
+Name: relNotificacaoCondicoesObrigatoriedade.jasper
+SHA-256-Digest: 71ZlUOrgmwgUhpnslQPEhUkzd3qpOk/5CrnhTbwPImY=
+
+Name: subGanhoCapitalImoveisBrasil.jasper
+SHA-256-Digest: aW5Q7n3HXRXcTMm7nlyX2O3QvunLVpm3h7nFCAShde0=
+
+Name: subCalculoAPrazoPSoc.jasper
+SHA-256-Digest: 0wvMJqnEK85Snka88VoNp66bN45ERw6L8DmfYmBHf1Y=
+
+Name: relARApuracaoBrasil.jasper
+SHA-256-Digest: 54RfBISgBc5DH3ldz5eZ/Ra1cnRN3soBWyHmvuVnUUA=
+
+Name: serpro/ppgd/app/PGDAb.class
+SHA-256-Digest: Q/364LSu8q6ptdqqlfHDdm4O8/61U6j25MrCHiwXdgg=
+
+Name: relDeclaracaoSaida.jasper
+SHA-256-Digest: Yzc3Pc9u/ZOAHAGaWTmo3lkIEkMCltbeExYCgkEAEk4=
+
+Name: subAdquirentes.jasper
+SHA-256-Digest: YJ+ggtwA+nGoReEGtc2CsTeUsvcLE0ljzDuyFW6OvzA=
+
+Name: mapeamentoXml.xml
+SHA-256-Digest: Itu0Ux2WUHtzVKV/cmpUvL/lktCeV3nXbxJCuXpxJ4E=
+
+Name: subApuracaoEmReaisAlienacaoAVista1.jasper
+SHA-256-Digest: Vq7QHCP6upfIfqhoD57NljYju6R3RL2u4MZHOnIs6nA=
+
+Name: subApuracaoMoedaEstrangeiraAlienacao1.jasper
+SHA-256-Digest: Ls7vcwwQ4wuBfwkV83KENaztMoDRyj/ity5E8XmEfL4=
+
+Name: relNotificacaoEspolio.jasper
+SHA-256-Digest: mWgLi65kwkyVh0TZ02WcUyW4UP6l9c9s+/BYoQEMpkU=
+
+Name: relDeclaracaoTransportesParcIsenGC.jasper
+SHA-256-Digest: Dd/+wdKo6hg3eG/J9oa6fVTcz0klRRlIctq2thN0YhU=
+
+Name: serpro/ppgd/app/PlataformaIRPFPGD$1.class
+SHA-256-Digest: jZbsoHBygi+8dEo8MYjgmUHjQt6lOesyYrQdQsZeTkE=
+
+Name: relDeclaracaoRendimentosTributaveisPJDependente.jasper
+SHA-256-Digest: MfnWfo0bR0L/MtfUMrKFKPVp9hs07suXnEk69U03dO0=
+
+Name: representacoes.xml
+SHA-256-Digest: 87OlwcQRP96U7CwPXB3Nm6c1uqsf/9+GUjrJE78uU8A=
+
+Name: relDemonstrativoAplicacoesFinanceirasExterior.jasper
+SHA-256-Digest: Tgym7a7ws2/M21db0vUa0QLvqo32pscz6y/7ud3svRM=
+
+Name: IRPF-Licenses.txt
+SHA-256-Digest: 7x+p8wnfi7poe0nr2p4/dP1uB893arHxsa+wbxouRqY=
+
+Name: subApuracaoEmReaisAlienacaoAPrestacao2.jasper
+SHA-256-Digest: 7xp9YCHStJp5i9pOWZfE3WKNTcPhZGQXSP4fs7MH/7o=
+
+Name: subCalculoAPrazoExteriorAmbasMoedas.jasper
+SHA-256-Digest: J1FHU9eg+Xm+MeWycESmBVcR2trhnJYmyLZb86Oz68U=
+
+Name: marksigilo.xcf
+SHA-256-Digest: 516yBndyqvavV3XAru7w4VPMNxbGdzYibCUUxIVkahw=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalhePensao65Anos.j
+ asper
+SHA-256-Digest: 1riiOL07amMBGSDrumPm1R8COmSqVsKkDE7ITL2X150=
+
+Name: subCalculoAPrazoImovelBrasil.jasper
+SHA-256-Digest: F44P/QTHSMc1uYy34lc6j25y9Ok8eDBSq7TjSKV02NQ=
+
+Name: subCalculoAPrazoImovelExteriorAmbasMoedas.jasper
+SHA-256-Digest: w19WhVmiYYzQkIw/Ps1/WNUqRNyzY4oKqSCCpio8jLY=
+
+Name: condicoesExploracao.xml
+SHA-256-Digest: p/VVPVyvFZXEO5gV82mKXNMOe6JUBZRz3nwe8mPcHmw=
+
+Name: relARRebanhoBrasil.jasper
+SHA-256-Digest: /4f9Qez+kfBzHSh6x1F+zb5x4uyCQp/i/KteZWur5jw=
+
+Name: relDeclaracaoEspolioConjugeSobrepartilha.jasper
+SHA-256-Digest: 4he0YLxo71ST5EAVlE9IxExQvoZO71wKjc2UzK0YbHA=
+
+Name: relDemonstrativoImoveis.jasper
+SHA-256-Digest: pNR1AW5q5q39LBeJDnVkXo7CgMLz2GhFUjFfczmnd8A=
+
+Name: RJ.xml
+SHA-256-Digest: ILFVNkmd7MFjYKJwH00v3PweTVkQHSoXQ8VnNENcNQ0=
+
+Name: subCalculoAPrazoImovelExteriorAmbasMoedasParcelas.jasper
+SHA-256-Digest: S5A52FQ2NG42HxV0Rup0lZghV59xdHrQkKPxpDdTnLE=
+
+Name: DIRPFComponente.groovy
+SHA-256-Digest: boYWXMtX7/Xr/rPz81bOEaezi3Q+c7LQXFKtCWmyH6M=
+
+Name: relInformePlanoSaudePagamentos.jasper
+SHA-256-Digest: 4DgVWII9RsE5K+tBUNNsdtg9DvOIobxGQsZy2oPMoSQ=
+
+Name: subCalculoAPrazoExteriorMoedaEstParcelas.jasper
+SHA-256-Digest: CWj6CAU2WtWzfgGE/mwxDKQhCLW7oaHc4rtECy/iiCU=
+
+Name: relInformeRendimentosPJ.jasper
+SHA-256-Digest: K63t/kSaziIrKR/Gx8vFwjCPAzQ8u3IPL3s04zrXXtY=
+
+Name: stablecoins.xml
+SHA-256-Digest: eD2/uk7LqocVmbv4H8CdOoNCDC74u7D910Vx3y+tovY=
+
+Name: relDeclaracaoTransportesGCAlienBensDireitosME.jasper
+SHA-256-Digest: VJm6ZUQwRA0/1tw3I270hJTEsBa1MgxKpmmdFBuF7/Y=
+
+Name: GO.xml
+SHA-256-Digest: sytvxasKdb8BsO/slJcloKsy0oukZYFE8tq3K/yhp1o=
+
+Name: subReaisAlienacaoDeBensDireitosOuAplicacoesFinanceiras.jasper
+SHA-256-Digest: jDrBH4TgnYkYObC0AhL2gz01xFN4mOY/zB/U9fZIRXs=
+
+Name: DIRPFIf.groovy
+SHA-256-Digest: 9bYH8gci8y6UqStqLTWhJzLRVDUWL/evwq9lFUJHGDM=
+
+Name: subCalculoAPrazoMovelBrasil.jasper
+SHA-256-Digest: rAHgEjBuQybVlxQKZwttxpL5ZsAFq2rMFyMa7h1YxQ0=
+
+Name: ufs.xml
+SHA-256-Digest: cUURhyTbBxo5EiASUmvXtYxqFImy7+J42H/DoiXkyk8=
+
+Name: subCalculoAVistaImovelExterior.jasper
+SHA-256-Digest: vZYVjVuz573onDRWTa1MuKbeBTSHsc2grMaIWDdvLtQ=
+
+Name: relInformeRendimentosPJPrevidencia.jasper
+SHA-256-Digest: uFGSZyl1coi2I4Agoi9HiPip8+IuizH4UtxqD71KfuU=
+
+Name: serpro/ppgd/app/ConstantesMensagens.class
+SHA-256-Digest: JabgngX3dnaawSN3c82lt+aOoFL6peuRoblWlvdOnhg=
+
+Name: BA.xml
+SHA-256-Digest: fK0nfCCpA/EF0E7OfV3u2uvWy6lhfVTKI5Zjf7ZWq3c=
+
+Name: relDeclaracaoRendimentosTributaveisPFDependenteIndividual.jasper
+SHA-256-Digest: lb1w7zoeyARbxk5ZqdXzo2Fjw7LIo6T1CJqBxmgTzPM=
+
+Name: subCalculoAPrazoMovelBrasilDetalhe.jasper
+SHA-256-Digest: UF6/ZA/Z16QTPgu9jX0zEdgksdB8MbMv31EODRA3pUI=
+
+Name: relARBensDaAtividadeRuralExterior.jasper
+SHA-256-Digest: gJ2JFPlc1FxaiBCR/eil+qZ+QkwpIKRVeR6fe4Ab5hg=
+
+Name: relDeclaracaoRendimentosTributaveisPFMesesListaDependentes.jasper
+SHA-256-Digest: X+/i2UAHJ/1WKhv5l2uQx8t8BoUWY3RPImnY44vHZeQ=
+
+Name: subCalculoAVistaBrasil.jasper
+SHA-256-Digest: D50gO/Ge4uoRT4Kdy9Qblo393CCHdSPeOFGJXQtocnk=
+
+Name: relDeclaracaoDividasOnusReais.jasper
+SHA-256-Digest: toiGqj3+CnXc+wtA/5mNo7KFAhkL7KNIkZ7Cliw3Xmc=
+
+Name: relARDividas.jasper
+SHA-256-Digest: UvFSLEB0d6O+UAI9JR9gC79xYulFo8cKw3z5O3oZCdI=
+
+Name: relDarfMulta.jasper
+SHA-256-Digest: +cGf7iX+M/2ti1HDa2N/e3cZBMMTRQf/zNXaEUCGnQ4=
+
+Name: relDeclaracaoInventarianteDecisaoJudicialPartilha.jasper
+SHA-256-Digest: 0qoJDWvEKF6GYR3jQGQNwsk9QOMaBTaShEBK4k3Adc0=
+
+Name: subApuracaoMoedaEstrangeiraAlienacao2.jasper
+SHA-256-Digest: 1DA9W0geWRO6WGhzZL7fxDYTY13Fiyo+WNF4lMFiRVA=
+
+Name: subCalculoAPrazoExteriorAmbasMoedasParcelas.jasper
+SHA-256-Digest: axC6s3aAYevLJci+u61rxMhtF4MjwJW5J7gu+X2UQZw=
+
+Name: subCustoAquisicaoImoveisExtAmbasMoedas.jasper
+SHA-256-Digest: eZWJugxuPtoLdueg1Y/kcGmCODEKFMWA5cjOWzj23TY=
+
+Name: serpro/ppgd/app/PGDAb$1.class
+SHA-256-Digest: varJB7QIA4Ce9TCQT2cytsUoGhCZKNRDrcQf+RwbxW4=
+
+Name: MA.xml
+SHA-256-Digest: 5sL+2pCTPD7rdVTxME4epFSu/9YQjx9nfKfANezTJ6E=
+
+Name: subCustoAquisicaoPSocietarias.jasper
+SHA-256-Digest: RaAsoWxdkThwh2ayWMmDPpvFv2Ll3GZ4It9ZMQQy+g4=
+
+Name: relDeclaracaoDependentes.jasper
+SHA-256-Digest: jwoJkP/3GkX+GLHmaaqYXEZ0aqltWfTiTwgnBNzKkK8=
+
+Name: subCustoAquisicaoImoveisExtMoedaNac.jasper
+SHA-256-Digest: Zh2zA7M61WDHji4jVPVIIWo3RrXUuTPRNzm2eqK3plg=
+
+Name: relDeclaracaoBensDireitos.jasper
+SHA-256-Digest: OzRTrRaNmSsoXb/TTC+p2nr7/90IrdEdcmbjyzcc2cw=
+
+Name: subCalculoAPrazoImovelExteriorMoedaEstEnquadramento.jasper
+SHA-256-Digest: 7lYPJwss7fLZm+zvtmaPdO81CZ+D0c+R15tdEbf153U=
+
+Name: subOperacaoBrasil.jasper
+SHA-256-Digest: UnhEFjW+Qu44WNeMlPY0JnxMFSYQ/JMZb8RSQNvmvMY=
+
+Name: subCalculoAPrazoImovelExteriorMoedaEst.jasper
+SHA-256-Digest: Ydw0RlHcmGO4P96VSDwtePOVOZyIemlO1uluUP5Tndw=
+
+Name: relDeclaracaoDoacoesEleitorais.jasper
+SHA-256-Digest: rwkf78W7mA89OTtpe0Q/qHYbLW0pZ690PzaDsnvWoY8=
+
+Name: relDeclaracaoRendimentosAcumuladamenteDependente.jasper
+SHA-256-Digest: Nzwx9vdUQikhkoBVCzPqLKMj0AVIOC7CzTd12pczVaU=
+
+Name: subCalculoAPrazoMovelBrasilParcelaDetalhe.jasper
+SHA-256-Digest: wBVRNdzsm6y1oINT9Gx7+6QYbdQ+tgV0dFi7TTUW37Y=
+
+Name: tipoConta.xml
+SHA-256-Digest: 9qOOXQxYUFcB1ki4BBZfAO+ixfdBbQcCoDynWZ+3IVg=
+
+Name: subCustoAquisicaoImoveisBrasilExtMoedaEst.jasper
+SHA-256-Digest: QY2zkRVCa2fy+HZLxpwDSVOElMsmNzJYhwWgAslZBsw=
+
+Name: qrcode-download.png
+SHA-256-Digest: gzDTr9CBTKqD2WUoD6exuofoQMa07WY6P9lWsn7FUKw=
+
+Name: MS.xml
+SHA-256-Digest: Fv5xyh6qG3S+xKoasG3A6lSu6HOi0Kvk+hJ2AQHFmwA=
+
+Name: subCalculoAPrazoImovelBrasilParcelas.jasper
+SHA-256-Digest: pk4eraPQdz/mEPhKLXQeTF2lH1C45y58XYh3JORvTyU=
+
+Name: relInformePlanoSaude.jasper
+SHA-256-Digest: yDRVVtIrcKUUgZFJbSZ+fsCnczp7liUGtR3NQEwjzF4=
+
+Name: relInformeRendimentosPJPensaoAlimenticia.jasper
+SHA-256-Digest: b5Wm2FG4GCPMoOSaIHkwITdEmZ+RwSrTcTDVHq9ETX8=
+
+Name: relDeclaracaoImpostoPago.jasper
+SHA-256-Digest: eOqtCduiqoVs9Z9i8jXuMgO8H/xPFQaGshvVVpkQT2U=
+
+Name: subEspecificacaoBemDireitoEstrangeira.jasper
+SHA-256-Digest: imPRzxfz8inhjUl2Bu4i1/Ph/2BrYCL475LsrrmJkT8=
+
+Name: informe_fontes_pagadoras.xml
+SHA-256-Digest: 5yxrAaoT4EhUre3bVuYuiOcKqY1fig10fQ8J2DTfbTs=
+
+Name: serpro/ppgd/app/IRPFPGD.class
+SHA-256-Digest: mt1/rMTOxH5wQ9DXkPjHY8PKfzI8tngusPtpMDkks0o=
+
+Name: relDeclaracaoDetalheOutrosRendimentos.jasper
+SHA-256-Digest: 0lPuqY7xUvTGfTFoFt6EIrj+jJqsvjyHor+1XD7Ckl8=
+
+Name: subApuracaoEmReaisAlienacaoAVista2.jasper
+SHA-256-Digest: 2E5BA9gcEoAON9YSub3Hbbwk47h1WqB42tSvZH8iUAE=
+
+Name: subCalculoAVistaExterior.jasper
+SHA-256-Digest: eDqX4UmoCLwyzdShDO1P/8JswnL051/2SKdD8JtBYqE=
+
+Name: relDeclaracaoRendimentosTributaveisPJComExigibilidadeDependente.ja
+ sper
+SHA-256-Digest: x4QM+pfh/jxW1/0n9SA7QvkeC1ONdWOAj8lnbnFKU2s=
+
+Name: relInformeRendimentosPJTribExclusiva.jasper
+SHA-256-Digest: kJQeQieXly1gegRJzQ+cccH1kCVJHcTiVEm5ps13tLU=
+
+Name: relDeclaracaoInventarianteEscrituraPublicaSobrepartilha.jasper
+SHA-256-Digest: D7FK2yIgD+FiBPHpiz0Q4+NfV4nCHfJW9rX3Ar+rIwk=
+
+Name: TO.xml
+SHA-256-Digest: MxKDlYxuUqhrbdv+Nq0dowd+UlgLhvA+HTAzur8hVac=
+
+Name: informe_tipos.xsd
+SHA-256-Digest: uq+wKLN9mUW0MCBa/yJbRp5ubD1ESnyg3fgnR9/SPdo=
+
+Name: subConsolidacaoExterior.jasper
+SHA-256-Digest: Bwb3g3h2ciHpN4tDWULt/N9otqNz4nzgKznZB/LMVxo=
+
+Name: subApuracaoGanhoImovelExtMoedaEst.jasper
+SHA-256-Digest: O1q/5DxFmjookui/84bam9iT1EeeWbXXteCEHA2bPvc=
+
+Name: subCalculoAPrazoExteriorMoedaNac.jasper
+SHA-256-Digest: e5JV5cWmfDqzzsTPUDzgagamdzLyJtBPvxm9STnHvjY=
+
+Name: serpro/ppgd/app/ConstantesImpressaoIf.class
+SHA-256-Digest: AkLwEXMrcZfooV9XkXlZeCo6n+EMwh07AKVrM5mWSnw=
+
+Name: subCalculoAPrazoExteriorAmbasMoedasParcelaDetalhe.jasper
+SHA-256-Digest: eq6R6w4sz8bMl/oH6jVwffMr7N5kLiON4JZEDvY/Dtc=
+
+Name: subCalculoAPrazoMovelBrasilParcelas.jasper
+SHA-256-Digest: 6Cqy7J75kWwXSAlj3X/Cjlh9iaThmZg+czTB0ilBnrA=
+
+Name: relDeclaracaoRendimentosIsentosNaoTributaveisDetalhePensaoMolestia
+ Grave.jasper
+SHA-256-Digest: MBraY3XNPx4lCrbJ4tQuXp4VxwU++X56L5XCsFpeTD4=
+
+Name: subApuracaoCustoAquisicaoImoveisBrasil.jasper
+SHA-256-Digest: MFDLxkkckaSTHFAfU5EG83P7jZ8sSA72kCRt3n4fZ1k=
+
+Name: subApuracaoMoedaEstrangeiraAlienacaoPrestacao2.jasper
+SHA-256-Digest: PefUbRV8QRq3MHIEpZ0Wkdby6qkc02C0Q5d6Cifyj1w=
+
+Name: RR.xml
+SHA-256-Digest: pZqbmMFmRmU2RIemdbb8YtqPSdQopN1Me4jdX26IIIM=
+
+Name: moedas.xml
+SHA-256-Digest: AYn2Om0P4N2GdXwybwiZpL1rjZmj/6ENbi0JjcgwsSg=
+
+Name: relRendaVariavelFundoInvestimentoTitular.jasper
+SHA-256-Digest: CThdUY4EwaIk5YoDMwMq63oOjQnZ44nfgbS1woLkUG4=
+
+Name: subEstrangeira.jasper
+SHA-256-Digest: P2MV+sPOxilEa3jBXDmZTgnefPoKzrz0bszohkuR4zM=
+
+Name: relDeclaracaoInventariante.jasper
+SHA-256-Digest: ElA0LdcVc3k0TZCJs9EjeC8rtQ+37UtYpwT0mzChV3k=
+
+Name: relInformeRendimentosPJRendIsentos.jasper
+SHA-256-Digest: 666yH+nhIiQvaEefRn6creVwzJWq3786MJb+lipvNV8=
+
+Name: SE.xml
+SHA-256-Digest: p2v1Hx7VREC/HACNxVWAMgkRnbu0Vu+UN12DpEvFxpw=
+
+Name: relRendaVariavelItemGanhosLiquidosPerdasDependente.jasper
+SHA-256-Digest: ESG+l4PTxvOjF9Y4BVq/fAkfO7zvXJUS1w1irEjwCds=
+

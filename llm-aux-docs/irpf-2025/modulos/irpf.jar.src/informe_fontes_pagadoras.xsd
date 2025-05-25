@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tipos="http://www.receita.fazenda.gov.br/Tipos"
+	elementFormDefault="qualified">
+	
+	<!-- importação dos tipos e elementos comuns -->
+	<xs:import schemaLocation="informe_tipos.xsd"
+		namespace="http://www.receita.fazenda.gov.br/Tipos" />
+
+	<!-- início da definição dos tipos -->
+	<xs:simpleType name="codigoTipoFundo">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="1" /><!--Previdência Complementar -->
+			<xs:enumeration value="2" /><!--Fapi – Fundo de Aposentadoria Programa Individual -->
+			<xs:enumeration value="3" /><!--Funpresp – Fundações de Previdência Complementar do Servidor Público Federal dos Poderes Executivo, Legislativo e Judiciário -->
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="codigoTipoRendimentoIsento">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="1" /><!--Valor parcela isenta 65 anos -->
+			<xs:enumeration value="2" /><!--Valor moléstia grave -->
+			<xs:enumeration value="3" /><!--Lucros e dividendos -->
+			<xs:enumeration value="4" /><!--Valor Sócio ou Titular de microempresa ou empresa de pequeno porte -->
+			<xs:enumeration value="5" /><!--Valor indenização rescisão, PDV, acidente de trabalho -->
+			<xs:enumeration value="7" /><!--Bolsa de estudo recebida por médico -->
+			<xs:enumeration value="8" /><!--Bolsa de estudo recebida por não médico -->
+			<xs:enumeration value="9" /><!--IRRF - Valor compensado de anos-calendário anteriores -->
+			<xs:enumeration value="10" /><!--Diárias e ajuda de custo -->
+			<xs:enumeration value="11" /><!--Abono pecuniário -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="codigoTipoRendimentoTributacaoExclusiva">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="1" /><!--Juros Sobre Capital Próprio -->
+			<xs:enumeration value="2" /><!--Participação nos Lucros ou Resultados -->
+			
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- fim da definição dos tipos -->
+
+	<!-- início da definição dos elementos simples -->
+	<xs:element name="cpfBeneficiario" type="tipos:cpf" />
+    <xs:element name="cpfBeneficiarioServico" type="tipos:cpfOpcional" />
+	<xs:element name="nomeBeneficiario" type="tipos:nomePF" />
+    <xs:element name="nomeBeneficiarioServico" type="tipos:nomePF" />
+	<xs:element name="anoExercicio" type="tipos:ano" />
+	<xs:element name="anoCalendario" type="tipos:ano" />
+	<xs:element name="cpfCnpjFontePagadora" type="tipos:cpfCnpj" />
+	<xs:element name="nomeFontePagadora" type="tipos:nomePJ" />
+	<xs:element name="totalRendimentoInclusiveFerias" type="tipos:valor" />
+	<xs:element name="contribuicaoPrevidenciariaOficial" type="tipos:valor" />
+	<xs:element name="impostoRetidoFonte" type="tipos:valor" />
+	<xs:element name="impostoRetidoFonteCompensadoAnosAnteriores" type="tipos:valor" />
+	<xs:element name="decimoTerceiro" type="tipos:valor" />
+	<xs:element name="irrfDecimoTerceiro" type="tipos:valor" />
+	<xs:element name="cnpjFundo" type="tipos:cnpj" />
+	<xs:element name="nomeFundo" type="tipos:nomePJ" />
+	<xs:element name="tipoFundo" type="codigoTipoFundo" />
+	<xs:element name="valorPagoFundo" type="tipos:valor" />
+	<xs:element name="valorContribuicaoPatrocinador" type="tipos:valor" /><!-- Incluido - IRPF 2016 -->
+	<xs:element name="tipoRendimentoIsento" type="codigoTipoRendimentoIsento" />
+	<xs:element name="tipoRendimentoTributacaoExclusiva" type="codigoTipoRendimentoTributacaoExclusiva" />
+	<xs:element name="cpfAlimentando" type="tipos:cpfOpcional" />
+	<xs:element name="nomeAlimentando" type="tipos:nomePF" />
+	<xs:element name="valorPagoPensaoAlimenticia" type="tipos:valor" />
+	<xs:element name="valorDecimoTerceiroPensaoAlimenticia" type="tipos:valor" />
+	<xs:element name="numeroProcessoRendimentoExigibilidadeSuspensa" type="tipos:numeroProcesso" />
+	<xs:element name="valorRendimentoExigibilidadeSuspensa" type="tipos:valor" />
+	<xs:element name="valorDepositosJudiciaisExigibilidadeSuspensa" type="tipos:valor" />
+	<xs:element name="descricaoRendimento" type="tipos:descricao" />
+	<xs:element name="valorRendimento" type="tipos:valor" />
+	<xs:element name="numeroProcesso" type="tipos:numeroProcesso" />
+	<xs:element name="numeroMeses" type="tipos:decimal_3_1" />
+	<xs:element name="mesRecebimento" type="tipos:mes" />
+	<xs:element name="despesaComAcaoJudicial" type="tipos:valor" />
+	<xs:element name="valorRRAMolestiaGrave" type="tipos:valorOpcional" />
+	<xs:element name="valorPago" type="tipos:valor" />
+	<xs:element name="valorTotalPago" type="tipos:valor" />
+	<xs:element name="cpfcnpjPrestadorServico" type="tipos:cpfCnpjOpcional" />
+	<xs:element name="nomePrestadorServico" type="tipos:nomePJOpcional" />
+	<xs:element name="valorReembolsado" type="tipos:valor" />
+	<!-- fim da definição dos elementos simples -->
+
+	<!-- início da definição dos elementos complexos -->
+	<xs:element name="header">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cpfCnpjFontePagadora" />
+				<xs:element ref="nomeFontePagadora" />
+				<xs:element ref="cpfBeneficiario" />
+				<xs:element ref="nomeBeneficiario" />
+				<xs:element ref="anoExercicio" />
+				<xs:element ref="anoCalendario" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemRendimentosTributaveisRecebidosPessoaJuridica">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="totalRendimentoInclusiveFerias" />
+				<xs:element ref="contribuicaoPrevidenciariaOficial" />
+				<xs:element ref="impostoRetidoFonte" />
+				<xs:element ref="decimoTerceiro" />
+				<xs:element ref="irrfDecimoTerceiro"  minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaRendimentosTributaveisRecebidosPessoaJuridica">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemRendimentosTributaveisRecebidosPessoaJuridica"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemPrevidenciaComplementar">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cnpjFundo" />
+				<xs:element ref="nomeFundo" />
+				<xs:element ref="tipoFundo" />
+				<xs:element ref="valorPagoFundo" />
+				<xs:element ref="valorContribuicaoPatrocinador" minOccurs="0" /><!-- Incluido - IRPF 2016 -->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaPrevidenciaComplementar">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemPrevidenciaComplementar"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemPensaoAlimenticia">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cpfAlimentando" minOccurs="0" />
+				<xs:element ref="nomeAlimentando" />
+				<xs:element ref="valorPagoPensaoAlimenticia" />
+				<xs:element ref="valorDecimoTerceiroPensaoAlimenticia" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaPensaoAlimenticia">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemPensaoAlimenticia" 
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemRendimentosIsentosNaoTributaveis">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tipoRendimentoIsento" />
+				<xs:element ref="valorRendimento" />
+                <xs:element ref="decimoTerceiro" minOccurs="0" />
+                <xs:element ref="contribuicaoPrevidenciariaOficial" minOccurs="0" /><!-- Incluido - IRPF 2016 -->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaRendimentosIsentosNaoTributaveis">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemRendimentosIsentosNaoTributaveis"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemOutrosRendimentosIsentosNaoTributaveis">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="descricaoRendimento" />
+				<xs:element ref="valorRendimento" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaOutrosRendimentosIsentosNaoTributaveis">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemOutrosRendimentosIsentosNaoTributaveis"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemRendimentosSujeitosTributacaoExclusiva">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tipoRendimentoTributacaoExclusiva" />
+				<xs:element ref="valorRendimento" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaRendimentosSujeitosTributacaoExclusiva">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemRendimentosSujeitosTributacaoExclusiva"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemOutrosRendimentosSujeitosTributacaoExclusiva">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="descricaoRendimento" />
+				<xs:element ref="valorRendimento" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaOutrosRendimentosSujeitosTributacaoExclusiva">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemOutrosRendimentosSujeitosTributacaoExclusiva"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemPensaoAlimenticiaRRA">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cpfAlimentando" minOccurs="0" />
+				<xs:element ref="nomeAlimentando" />
+				<xs:element ref="valorPago" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaPensaoAlimenticiaRRA">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemPensaoAlimenticiaRRA" 
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemRendimentosRecebidosAcumuladamente">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="numeroProcesso" minOccurs="0" />
+				<xs:element ref="numeroMeses" />
+				<xs:element ref="mesRecebimento" />
+				<xs:element ref="valorRendimento" />
+				<xs:element ref="despesaComAcaoJudicial" />
+				<xs:element ref="contribuicaoPrevidenciariaOficial" />
+				<xs:element ref="impostoRetidoFonte" />
+				<xs:element ref="valorRRAMolestiaGrave" minOccurs="0" />
+				<xs:element ref="listaPensaoAlimenticiaRRA" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaRendimentosRecebidosAcumuladamente">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemRendimentosRecebidosAcumuladamente"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemPagamentos">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cpfBeneficiarioServico" minOccurs="0" />
+				<xs:element ref="nomeBeneficiarioServico" />
+				<xs:element ref="cpfcnpjPrestadorServico" minOccurs="0" />
+				<xs:element ref="nomePrestadorServico" minOccurs="0" />
+				<xs:element ref="valorTotalPago" />
+				<xs:element ref="valorReembolsado" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaPagamentos">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemPagamentos" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemRendimentosExigibilidadeSuspensa">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="numeroProcessoRendimentoExigibilidadeSuspensa" minOccurs="0" />
+				<xs:element ref="valorRendimentoExigibilidadeSuspensa" />
+				<xs:element ref="valorDepositosJudiciaisExigibilidadeSuspensa" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaRendimentosExigibilidadeSuspensa">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemRendimentosExigibilidadeSuspensa"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="informeRendimentosFontePagadora">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header" />
+				<xs:element ref="listaRendimentosTributaveisRecebidosPessoaJuridica"
+					minOccurs="0" />
+				<xs:element ref="listaPrevidenciaComplementar" minOccurs="0" />
+				<xs:element ref="listaPensaoAlimenticia" minOccurs="0" />
+				<xs:element ref="listaRendimentosIsentosNaoTributaveis" minOccurs="0" />
+				<xs:element ref="listaOutrosRendimentosIsentosNaoTributaveis" minOccurs="0" />
+				<xs:element ref="listaRendimentosSujeitosTributacaoExclusiva" minOccurs="0" />
+				<xs:element ref="listaOutrosRendimentosSujeitosTributacaoExclusiva" minOccurs="0" />
+				<xs:element ref="listaRendimentosRecebidosAcumuladamente" minOccurs="0" />
+				<xs:element ref="listaPagamentos" minOccurs="0" />
+				<xs:element ref="listaRendimentosExigibilidadeSuspensa" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- fim da definição dos elementos complexos -->
+
+</xs:schema>

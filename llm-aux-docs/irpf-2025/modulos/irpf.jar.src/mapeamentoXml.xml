@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<Mapeamento>
+    <DeclaracaoTXT TipoArquivo="/DemonstrativoGCAPIRPF">
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/idDemonstrativo">
+            <Campo Nome="cpfDeclarante" atributoObjetoNegocio="declarantes[].cpf"/>
+            <Campo Nome="nomeDeclarante" atributoObjetoNegocio="declarantes[].nome"/>
+            <Campo Nome="paisDeclarante" atributoObjetoNegocio="declarantes[].paisDeclarante"/>
+            <Campo Nome="dataInicioPermanencia" atributoObjetoNegocio="declarantes[].dataInicioPermanencia"/>
+            <Campo Nome="dataFimPermanencia" atributoObjetoNegocio="declarantes[].dataFimPermanencia"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel" Colecao="bensImoveis">
+            <Campo Nome="descricaoBem" atributoObjetoNegocio="bensImoveis[].descricao"/>
+            <Campo Nome="flagVendaParcial" atributoObjetoNegocio="bensImoveis[].flagVendaParcial"/>
+            <Campo Nome="valorVendaParcialAnterior" atributoObjetoNegocio="bensImoveis[].valorVendaParcialAnterior"/>
+            <Campo Nome="codNatureza" atributoObjetoNegocio="bensImoveis[].naturezaOperacao"/>
+            <Campo Nome="flagAlienacaoPrazo" atributoObjetoNegocio="bensImoveis[].indAlienacaoPrazo"/>
+            <Campo Nome="flagReforma" atributoObjetoNegocio="bensImoveis[].indReforma"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensImoveis[].custoAquisicao"/>
+            <Campo Nome="resultado1" atributoObjetoNegocio="bensImoveis[].resultado1"/>
+            <Campo Nome="percentualReducao7713" atributoObjetoNegocio="bensImoveis[].percentualReducao7713"/>
+            <Campo Nome="valorReducao7713" atributoObjetoNegocio="bensImoveis[].valorReducao7713"/>
+            <Campo Nome="resultado2" atributoObjetoNegocio="bensImoveis[].resultado2"/>
+            <Campo Nome="percentualReducaoFR1" atributoObjetoNegocio="bensImoveis[].percentualReducaoFR1"/>
+            <Campo Nome="valorReducaoFR1" atributoObjetoNegocio="bensImoveis[].valorReducaoFR1"/>
+            <Campo Nome="resultado3" atributoObjetoNegocio="bensImoveis[].resultado3"/>
+            <Campo Nome="percentualReducaoFR2" atributoObjetoNegocio="bensImoveis[].percentualReducaoFR2"/>
+            <Campo Nome="valorReducaoFR2" atributoObjetoNegocio="bensImoveis[].valorReducaoFR2"/>
+            <Campo Nome="resultado4" atributoObjetoNegocio="bensImoveis[].resultado4"/>
+            <Campo Nome="valorAplicado" atributoObjetoNegocio="bensImoveis[].valorAplicado"/>
+            <Campo Nome="percentualAplicado" atributoObjetoNegocio="bensImoveis[].percentualAplicado"/>
+            <Campo Nome="valorReducaoValorAlienacao" atributoObjetoNegocio="bensImoveis[].valorReducaoValorAlienacao"/>
+            <Campo Nome="resultado5" atributoObjetoNegocio="bensImoveis[].resultado5"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensImoveis[].impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensImoveis[].impostoPago"/>
+            <Campo Nome="valorRecebidoAnosAnteriores" atributoObjetoNegocio="bensImoveis[].valorRecebidoAnosAnteriores"/>
+            <Campo Nome="dataRecebimentoUltimaParcela" atributoObjetoNegocio="bensImoveis[].dataRecebimentoUltimaParcela"/>
+            <Campo Nome="flagRecebimentoUltimaParcela" atributoObjetoNegocio="bensImoveis[].indRecebimentoUltimaParcela"/>
+            <Campo Nome="percentualDiferimento" atributoObjetoNegocio="bensImoveis[].colCPGC.percentualDiferimento"/>
+            <Campo Nome="flagConjuntoBensSuperiorAoLimiteIsencao" atributoObjetoNegocio="bensImoveis[].indConjuntoBensSuperiorAoLimiteIsencao"/>
+            <Campo Nome="aliquotaEfetiva" atributoObjetoNegocio="bensImoveis[].aliquotaEfetiva"/>
+            <Campo Nome="dataAquisicao" atributoObjetoNegocio="bensImoveis[].dadosApuracao.dataAquisicao"/>
+            <Campo Nome="dataAlienacao" atributoObjetoNegocio="bensImoveis[].dadosApuracao.dataAlienacao"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensImoveis[].dadosApuracao.alienacao"/>
+            <Campo Nome="valorTorna" atributoObjetoNegocio="bensImoveis[].dadosApuracao.custoPermuta"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensImoveis[].custoCorretagem"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensImoveis[].valorLiquidoAlienacao"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/colAdquirente"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/colAdquirente/ITEM-br.gov.serpro.gcap.negocio.entidades.adquirente.ItemDadosAdquirente" Colecao="bensImoveis[].adquirentes">
+            <Campo Nome="cpfCnpj" atributoObjetoNegocio="bensImoveis[].adquirentes[].ni"/>
+            <Campo Nome="nome" atributoObjetoNegocio="bensImoveis[].adquirentes[].nome"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/endereco">
+            <Campo Nome="tipoLogradouro" atributoObjetoNegocio="bensImoveis[].tipoLogradouro"/>
+            <Campo Nome="logradouro" atributoObjetoNegocio="bensImoveis[].enderecoLogradouro"/>
+            <Campo Nome="numero" atributoObjetoNegocio="bensImoveis[].enderecoNumero"/>
+            <Campo Nome="complemento" atributoObjetoNegocio="bensImoveis[].enderecoComplemento"/>
+            <Campo Nome="bairro" atributoObjetoNegocio="bensImoveis[].enderecoBairro"/>
+            <Campo Nome="uf" atributoObjetoNegocio="bensImoveis[].enderecoUF"/>
+            <Campo Nome="municipio" atributoObjetoNegocio="bensImoveis[].enderecoMunicipio"/>
+            <Campo Nome="cep" atributoObjetoNegocio="bensImoveis[].enderecoCEP"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/colCustoAquisicao"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/colCustoAquisicao/ITEM-br.gov.serpro.gcap.negocio.entidades.itemDados.ItemDadosCustoAquisicao" Colecao="bensImoveis[].colCustoAquisicao">
+            <Campo Nome="ano" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].ano"/>
+            <Campo Nome="mes" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].mes"/>
+            <Campo Nome="valorParcela" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].valorParcela"/>
+            <Campo Nome="coeficienteCusto" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].coeficienteCusto"/>
+            <Campo Nome="valorGanhoBrutoParcela" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].valorGanhoBrutoParcela"/>
+            <Campo Nome="percentualReducao7713" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].percentualReducao7713"/>
+            <Campo Nome="valorReducao7713" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].valorReducao7713"/>
+            <Campo Nome="percentualReducaoFR1" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].percentualReducaoFR1"/>
+            <Campo Nome="valorReducaoFR1" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].valorReducaoFR1"/>
+            <Campo Nome="percentualReducaoFR2" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].percentualReducaoFR2"/>
+            <Campo Nome="valorReducaoFR2" atributoObjetoNegocio="bensImoveis[].colCustoAquisicao[].valorReducaoFR2"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/colCPGC"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/colCPGC/ITEM-br.gov.serpro.gcap.negocio.entidades.itemDados.ItemDadosCPGC" Colecao="bensImoveis[].colCPGC">
+            <Campo Nome="mesRecebimento" atributoObjetoNegocio="bensImoveis[].colCPGC[].mesRecebimento"/>
+            <Campo Nome="valorRecebido" atributoObjetoNegocio="bensImoveis[].colCPGC[].valorRecebido"/>
+            <Campo Nome="ganhoCapital" atributoObjetoNegocio="bensImoveis[].colCPGC[].ganhoCapital"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensImoveis[].colCPGC[].impostoDevido"/>
+            <Campo Nome="impostoPago2" atributoObjetoNegocio="bensImoveis[].colCPGC[].impostoPago"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/consolidacao">
+            <Campo Nome="impPagarDifAnosAnteriores" atributoObjetoNegocio="bensImoveis[].consolidacao.impPagarDifAnosAnteriores"/>
+            <Campo Nome="impPagarRefExercicio" atributoObjetoNegocio="bensImoveis[].consolidacao.impPagarRefExercicio"/>
+            <Campo Nome="impPagarTotal" atributoObjetoNegocio="bensImoveis[].consolidacao.impPagarTotal"/>
+            <Campo Nome="impPagarDevidoRefExercicio" atributoObjetoNegocio="bensImoveis[].consolidacao.impPagarDevidoRefExercicio"/>
+            <Campo Nome="impPagarDifAnosPosteriores" atributoObjetoNegocio="bensImoveis[].consolidacao.impPagarDifAnosPosteriores"/>
+            <Campo Nome="impPagoTotal" atributoObjetoNegocio="bensImoveis[].consolidacao.impPagoTotal"/>
+            <Campo Nome="rendIsentosTotal" atributoObjetoNegocio="bensImoveis[].consolidacao.rendIsentosTotal"/>
+            <Campo Nome="rendTribExclusivaTotal" atributoObjetoNegocio="bensImoveis[].consolidacao.rendTribExclusivaTotal"/>
+            <Campo Nome="IRNaFonte" atributoObjetoNegocio="bensImoveis[].consolidacao.impRetidoFonte"/>
+            <Campo Nome="aliquotaEfetiva" atributoObjetoNegocio="bensImoveis[].consolidacao.aliquotaEfetiva"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensImoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensimoveis.ItemDadosBemImovel/itemDadosPerguntas">
+            <Campo Nome="flagPropriedadeOutroImov" atributoObjetoNegocio="bensImoveis[].indPropriedadeOutroImov"/>
+            <Campo Nome="flagOutraAlienacao" atributoObjetoNegocio="bensImoveis[].indOutraAlienacao"/>
+            <Campo Nome="flagMP252" atributoObjetoNegocio="bensImoveis[].indMP252"/>
+            <Campo Nome="flagImovelResidencial" atributoObjetoNegocio="bensImoveis[].indImovelResidencial"/>
+        </Registro>
+		
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensmoveis.ItemDadosBemMovel" Colecao="bensMoveis">
+            <Campo Nome="descricaoBem" atributoObjetoNegocio="bensMoveis[].descricao"/>
+            <Campo Nome="codNatureza" atributoObjetoNegocio="bensMoveis[].naturezaOperacao"/>
+            <Campo Nome="flagAlienacaoPrazo" atributoObjetoNegocio="bensMoveis[].indAlienacaoPrazo"/>
+            <Campo Nome="flagVendaParcial" atributoObjetoNegocio="bensMoveis[].flagVendaParcial"/>
+            <Campo Nome="valorVendaParcialAnterior" atributoObjetoNegocio="bensMoveis[].valorVendaParcialAnterior"/>
+            <Campo Nome="flagConjuntoBensSuperiorAoLimiteIsencao" atributoObjetoNegocio="bensMoveis[].indConjuntoBensSuperiorAoLimiteIsencao"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensMoveis[].custoAquisicao"/>
+            <Campo Nome="resultado1" atributoObjetoNegocio="bensMoveis[].resultado1"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensMoveis[].impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensMoveis[].impostoPago"/>
+            <Campo Nome="valorRecebidoAnosAnteriores" atributoObjetoNegocio="bensMoveis[].valorRecebidoAnosAnteriores"/>
+            <Campo Nome="dataRecebimentoUltimaParcela" atributoObjetoNegocio="bensMoveis[].dataRecebimentoUltimaParcela"/>
+            <Campo Nome="flagRecebimentoUltimaParcela" atributoObjetoNegocio="bensMoveis[].indRecebimentoUltimaParcela"/>
+            <Campo Nome="percentualDiferimento" atributoObjetoNegocio="bensMoveis[].colCPGC.percentualDiferimento"/>
+            <Campo Nome="aliquotaEfetiva" atributoObjetoNegocio="bensMoveis[].aliquotaEfetiva"/>
+            <Campo Nome="dataAquisicao" atributoObjetoNegocio="bensMoveis[].dadosApuracao.dataAquisicao"/>
+            <Campo Nome="dataAlienacao" atributoObjetoNegocio="bensMoveis[].dadosApuracao.dataAlienacao"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensMoveis[].dadosApuracao.alienacao"/>
+            <Campo Nome="valorTorna" atributoObjetoNegocio="bensMoveis[].dadosApuracao.custoPermuta"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensMoveis[].custoCorretagem"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensMoveis[].valorLiquidoAlienacao"/>
+            <Campo Nome="flagSemRegistroPublico" atributoObjetoNegocio="bensMoveis[].flagSemRegistroPublico"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensmoveis.ItemDadosBemMovel/colAdquirente"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensmoveis.ItemDadosBemMovel/colAdquirente/ITEM-br.gov.serpro.gcap.negocio.entidades.adquirente.ItemDadosAdquirente" Colecao="bensMoveis[].adquirentes">
+            <Campo Nome="cpfCnpj" atributoObjetoNegocio="bensMoveis[].adquirentes[].ni"/>
+            <Campo Nome="nome" atributoObjetoNegocio="bensMoveis[].adquirentes[].nome"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensmoveis.ItemDadosBemMovel/colCPGC"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensmoveis.ItemDadosBemMovel/colCPGC/ITEM-br.gov.serpro.gcap.negocio.entidades.itemDados.ItemDadosCPGC" Colecao="bensMoveis[].colCPGC">
+            <Campo Nome="mesRecebimento" atributoObjetoNegocio="bensMoveis[].colCPGC[].mesRecebimento"/>
+            <Campo Nome="valorRecebido" atributoObjetoNegocio="bensMoveis[].colCPGC[].valorRecebido"/>
+            <Campo Nome="ganhoCapital" atributoObjetoNegocio="bensMoveis[].colCPGC[].ganhoCapital"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensMoveis[].colCPGC[].impostoDevido"/>
+            <Campo Nome="impostoPago2" atributoObjetoNegocio="bensMoveis[].colCPGC[].impostoPago"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/bensMoveis/ITEM-br.gov.serpro.gcap.negocio.entidades.bensmoveis.ItemDadosBemMovel/consolidacao">
+            <Campo Nome="impPagarDifAnosAnteriores" atributoObjetoNegocio="bensMoveis[].consolidacao.impPagarDifAnosAnteriores"/>
+            <Campo Nome="impPagarRefExercicio" atributoObjetoNegocio="bensMoveis[].consolidacao.impPagarRefExercicio"/>
+            <Campo Nome="impPagarTotal" atributoObjetoNegocio="bensMoveis[].consolidacao.impPagarTotal"/>
+            <Campo Nome="impPagarDevidoRefExercicio" atributoObjetoNegocio="bensMoveis[].consolidacao.impPagarDevidoRefExercicio"/>
+            <Campo Nome="impPagarDifAnosPosteriores" atributoObjetoNegocio="bensMoveis[].consolidacao.impPagarDifAnosPosteriores"/>
+            <Campo Nome="impPagoTotal" atributoObjetoNegocio="bensMoveis[].consolidacao.impPagoTotal"/>
+            <Campo Nome="rendIsentosTotal" atributoObjetoNegocio="bensMoveis[].consolidacao.rendIsentosTotal"/>
+            <Campo Nome="rendTribExclusivaTotal" atributoObjetoNegocio="bensMoveis[].consolidacao.rendTribExclusivaTotal"/>
+            <Campo Nome="IRNaFonte" atributoObjetoNegocio="bensMoveis[].consolidacao.impRetidoFonte"/>
+            <Campo Nome="aliquotaEfetiva" atributoObjetoNegocio="bensMoveis[].consolidacao.aliquotaEfetiva"/>
+        </Registro>
+
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias" Colecao="participacoesSocietarias">
+            <Campo Nome="nomeSociedade" atributoObjetoNegocio="participacoesSocietarias[].descricao"/>
+            <Campo Nome="CNPJSociedade" atributoObjetoNegocio="participacoesSocietarias[].CNPJSociedade"/>
+            <Campo Nome="uf" atributoObjetoNegocio="participacoesSocietarias[].uf"/>
+            <Campo Nome="municipio" atributoObjetoNegocio="participacoesSocietarias[].municipio"/>
+            <Campo Nome="dataAlienacao" atributoObjetoNegocio="participacoesSocietarias[].dataAlienacao"/>
+            <Campo Nome="especieDeParticipacaoTransicao" atributoObjetoNegocio="participacoesSocietarias[].especie"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="participacoesSocietarias[].valorAlienacao"/>
+            <Campo Nome="flagAlienacaoPrazo" atributoObjetoNegocio="participacoesSocietarias[].indAlienacaoPrazo"/>
+            <Campo Nome="flagVendaParcial" atributoObjetoNegocio="participacoesSocietarias[].flagVendaParcial"/>
+            <Campo Nome="valorVendaParcialAnterior" atributoObjetoNegocio="participacoesSocietarias[].valorVendaParcialAnterior"/>
+            <Campo Nome="flagConjuntoBensSuperiorAoLimiteIsencao" atributoObjetoNegocio="participacoesSocietarias[].indConjuntoBensSuperiorAoLimiteIsencao"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="participacoesSocietarias[].custoAquisicao"/>
+            <Campo Nome="resultado1" atributoObjetoNegocio="participacoesSocietarias[].resultado1"/>
+            <Campo Nome="aliquotaEfetiva" atributoObjetoNegocio="participacoesSocietarias[].aliquotaEfetiva"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="participacoesSocietarias[].impostoDevido"/>
+            <Campo Nome="impostoRendaFonte" atributoObjetoNegocio="participacoesSocietarias[].impostoRendaFonte"/>
+            <Campo Nome="impostoDevidoAposComp" atributoObjetoNegocio="participacoesSocietarias[].impostoAposComp"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="participacoesSocietarias[].impostoPago"/>
+            <Campo Nome="valorRecebidoAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias[].valorRecebidoAnosAnteriores"/>
+            <Campo Nome="dataRecebimentoUltimaParcela" atributoObjetoNegocio="participacoesSocietarias[].dataRecebimentoUltimaParcela"/>
+            <Campo Nome="flagRecebimentoUltimaParcela" atributoObjetoNegocio="participacoesSocietarias[].indRecebimentoUltimaParcela"/>
+            <Campo Nome="percentualDiferimento" atributoObjetoNegocio="participacoesSocietarias[].colCPGC.percentualDiferimento"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="participacoesSocietarias[].custoCorretagem"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="participacoesSocietarias[].valorLiquidoAlienacao"/>
+            <Campo Nome="flagTransmissaoCausaMortis" atributoObjetoNegocio="participacoesSocietarias[].indTransmissaoCausaMortis"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/colAdquirente"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/colAdquirente/ITEM-br.gov.serpro.gcap.negocio.entidades.adquirente.ItemDadosAdquirente" Colecao="participacoesSocietarias[].adquirentes">
+            <Campo Nome="cpfCnpj" atributoObjetoNegocio="participacoesSocietarias[].adquirentes[].ni"/>
+            <Campo Nome="nome" atributoObjetoNegocio="participacoesSocietarias[].adquirentes[].nome"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/colGCapQuota"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/colGCapQuota/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.PSocietariasCustoAquisicao" Colecao="participacoesSocietarias[].colGCapQuota">
+            <Campo Nome="codigoEspecie" atributoObjetoNegocio="participacoesSocietarias[].colGCapQuota[].codigoEspecie"/>
+            <Campo Nome="quantidadeAlienada" atributoObjetoNegocio="participacoesSocietarias[].colGCapQuota[].quantidadeAlienada"/>
+            <Campo Nome="valorPonderado" atributoObjetoNegocio="participacoesSocietarias[].colGCapQuota[].valorPonderado"/>
+            <Campo Nome="valorCusto" atributoObjetoNegocio="participacoesSocietarias[].colGCapQuota[].valorCusto"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/colCPGC"/>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/colCPGC/ITEM-br.gov.serpro.gcap.negocio.entidades.itemDados.ItemDadosCPGC" Colecao="participacoesSocietarias[].colCPGC">
+            <Campo Nome="mesRecebimento" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].mesRecebimento"/>
+            <Campo Nome="valorRecebido" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].valorRecebido"/>
+            <Campo Nome="ganhoCapital" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].ganhoCapital"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].impostoDevido"/>
+            <Campo Nome="impostoRendaFonte2" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].impostoRendaFonte"/>
+            <Campo Nome="impostoAposComp" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].impostoAposComp"/>
+            <Campo Nome="impostoPago2" atributoObjetoNegocio="participacoesSocietarias[].colCPGC[].impostoPago"/>
+        </Registro>
+        <Registro Nome="/DemonstrativoGCAPIRPF/demonstrativo/participacoesSocietarias/ITEM-br.gov.serpro.gcap.negocio.entidades.psocietarias.ItemDadosPSocietarias/consolidacao">
+            <Campo Nome="impPagarDifAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impPagarDifAnosAnteriores"/>
+            <Campo Nome="impPagarRefExercicio" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impPagarRefExercicio"/>
+            <Campo Nome="impPagarTotal" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impPagarTotal"/>
+            <Campo Nome="impPagarDevidoRefExercicio" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impPagarDevidoRefExercicio"/>
+            <Campo Nome="impPagarDifAnosPosteriores" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impPagarDifAnosPosteriores"/>
+            <Campo Nome="impPagoTotal" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impPagoTotal"/>
+            <Campo Nome="rendIsentosTotal" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.rendIsentosTotal"/>
+            <Campo Nome="rendTribExclusivaTotal" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.rendTribExclusivaTotal"/>
+            <Campo Nome="IRNaFonte" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impRetidoFonte"/>
+            <Campo Nome="aliquotaEfetiva" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.aliquotaEfetiva"/>
+        </Registro>
+    </DeclaracaoTXT>
+
+    <!-- Informe de Rendimentos Recebidos de PJ -->
+    <DeclaracaoTXT TipoArquivo="/informeRendimentosFontePagadora">
+        <Registro Nome="/informeRendimentosFontePagadora/header">
+            <Campo Nome="cpfCnpjFontePagadora" atributoObjetoNegocio="header.cpfCnpjFontePagadora"/>
+            <Campo Nome="nomeFontePagadora" atributoObjetoNegocio="header.nomeFontePagadora"/>
+            <Campo Nome="cpfBeneficiario" atributoObjetoNegocio="header.cpfeBeneficiario"/>
+            <Campo Nome="nomeBeneficiario" atributoObjetoNegocio="header.nomeBeneficiario"/>
+            <Campo Nome="anoExercicio" atributoObjetoNegocio="header.anoExercicio"/>
+            <Campo Nome="anoCalendario" atributoObjetoNegocio="header.anoCalendario"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaRendimentosTributaveisRecebidosPessoaJuridica/itemRendimentosTributaveisRecebidosPessoaJuridica" Colecao="colecaoRendimentosPessoaJuridica">
+            <Campo Nome="totalRendimentoInclusiveFerias" atributoObjetoNegocio="colecaoRendimentosPessoaJuridica[].rendRecebidoPJ"/>
+            <Campo Nome="contribuicaoPrevidenciariaOficial" atributoObjetoNegocio="colecaoRendimentosPessoaJuridica[].contribuicaoPrevOficial"/>
+            <Campo Nome="impostoRetidoFonte" atributoObjetoNegocio="colecaoRendimentosPessoaJuridica[].impostoRetidoFonte"/>
+            <Campo Nome="decimoTerceiro" atributoObjetoNegocio="colecaoRendimentosPessoaJuridica[].decimoTerceiro"/>
+            <Campo Nome="irrfDecimoTerceiro" atributoObjetoNegocio="colecaoRendimentosPessoaJuridica[].irrfDecimoTerceiro"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaPrevidenciaComplementar/itemPrevidenciaComplementar" Colecao="colecaoPagamentosPrevidenciaComplementar">
+            <Campo Nome="cnpjFundo" atributoObjetoNegocio="colecaoPagamentosPrevidenciaComplementar[].niPrestadorServico"/>
+            <Campo Nome="nomeFundo" atributoObjetoNegocio="colecaoPagamentosPrevidenciaComplementar[].nomePrestadorServico"/>
+            <Campo Nome="tipoFundo" atributoObjetoNegocio="colecaoPagamentosPrevidenciaComplementar[].codigo"/>
+            <Campo Nome="valorPagoFundo" atributoObjetoNegocio="colecaoPagamentosPrevidenciaComplementar[].valorPago"/>
+            <Campo Nome="valorContribuicaoPatrocinador" atributoObjetoNegocio="colecaoPagamentosPrevidenciaComplementar[].valorContribuicaoPatrocinador"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaPensaoAlimenticia/itemPensaoAlimenticia" Colecao="colecaoPagamentosPensaoAlimenticia">
+            <Campo Nome="cpfAlimentando" atributoObjetoNegocio="colecaoPagamentosPensaoAlimenticia[].cpfBeneficiario"/>
+            <Campo Nome="nomeAlimentando" atributoObjetoNegocio="colecaoPagamentosPensaoAlimenticia[].nomeBeneficiario"/>
+            <Campo Nome="valorPagoPensaoAlimenticia" atributoObjetoNegocio="colecaoPagamentosPensaoAlimenticia[].valorPago"/>
+            <Campo Nome="valorDecimoTerceiroPensaoAlimenticia" atributoObjetoNegocio="colecaoPagamentosPensaoAlimenticia[].valorDecimoTerceiro"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaRendimentosIsentosNaoTributaveis/itemRendimentosIsentosNaoTributaveis" Colecao="rendimentosIsentos">
+            <Campo Nome="tipoRendimentoIsento" atributoObjetoNegocio="rendimentosIsentos[].codigo"/>
+            <Campo Nome="valorRendimento" atributoObjetoNegocio="rendimentosIsentos[].valor"/>
+            <Campo Nome="decimoTerceiro" atributoObjetoNegocio="rendimentosIsentos[].decimoTerceiro"/>
+            <Campo Nome="impostoRetidoFonte" atributoObjetoNegocio="rendimentosIsentos[].impostoRendaRetidoFonte"/>
+            <Campo Nome="irrfDecimoTerceiro" atributoObjetoNegocio="rendimentosIsentos[].impostoRendaRetidoFonteDecimoTerceiro"/>
+            <Campo Nome="contribuicaoPrevidenciariaOficial" atributoObjetoNegocio="rendimentosIsentos[].previdenciaOficial"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaOutrosRendimentosIsentosNaoTributaveis/itemOutrosRendimentosIsentosNaoTributaveis" Colecao="rendimentosIsentos">
+            <Campo Nome="descricaoRendimento" atributoObjetoNegocio="rendimentosIsentos[].descricao"/>
+            <Campo Nome="valorRendimento" atributoObjetoNegocio="rendimentosIsentos[].valor"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaRendimentosSujeitosTributacaoExclusiva/itemRendimentosSujeitosTributacaoExclusiva" Colecao="rendimentosTributacaoExclusiva">
+            <Campo Nome="tipoRendimentoTributacaoExclusiva" atributoObjetoNegocio="rendimentosTributacaoExclusiva[].codigo"/>
+            <Campo Nome="valorRendimento" atributoObjetoNegocio="rendimentosTributacaoExclusiva[].valor"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaOutrosRendimentosSujeitosTributacaoExclusiva/itemOutrosRendimentosSujeitosTributacaoExclusiva" Colecao="rendimentosTributacaoExclusiva">
+            <Campo Nome="descricaoRendimento" atributoObjetoNegocio="rendimentosTributacaoExclusiva[].descricao"/>
+            <Campo Nome="valorRendimento" atributoObjetoNegocio="rendimentosTributacaoExclusiva[].valor"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaRendimentosRecebidosAcumuladamente/itemRendimentosRecebidosAcumuladamente" Colecao="colecaoRendimentosRecebidosAcumuladamente">
+            <Campo Nome="numeroMeses" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].numMeses"/>
+            <Campo Nome="mesRecebimento" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].mesRecebimento"/>
+            <Campo Nome="valorRendimento" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].rendRecebidos"/>
+            <Campo Nome="despesaComAcaoJudicial" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].despesaJudicial"/>
+            <Campo Nome="contribuicaoPrevidenciariaOficial" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].contribuicaoPrevOficial"/>
+            <Campo Nome="impostoRetidoFonte" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].impostoRetidoFonte"/>
+            <Campo Nome="valorRRAMolestiaGrave" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].valorRRAMolestiaGrave"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaRendimentosRecebidosAcumuladamente/itemRendimentosRecebidosAcumuladamente/listaPensaoAlimenticiaRRA/itemPensaoAlimenticiaRRA" Colecao="colecaoRendimentosRecebidosAcumuladamente[].pensaoAlimenticiaQuadroAuxiliar">
+            <Campo Nome="cpfAlimentando" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].pensaoAlimenticiaQuadroAuxiliar[].cpfAlimentando"/>
+            <Campo Nome="nomeAlimentando" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].pensaoAlimenticiaQuadroAuxiliar[].alimentando"/>
+            <Campo Nome="valorPago" atributoObjetoNegocio="colecaoRendimentosRecebidosAcumuladamente[].pensaoAlimenticiaQuadroAuxiliar[].valor"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaPagamentos/itemPagamentos" Colecao="pagamentos">
+            <Campo Nome="cpfBeneficiarioServico" atributoObjetoNegocio="pagamentos[].cpfBeneficiario"/>
+            <Campo Nome="nomeBeneficiarioServico" atributoObjetoNegocio="pagamentos[].nomeBeneficiario"/>
+            <Campo Nome="cpfcnpjPrestadorServico" atributoObjetoNegocio="pagamentos[].niPrestadorServico"/>
+            <Campo Nome="nomePrestadorServico" atributoObjetoNegocio="pagamentos[].nomePrestadorServico"/>
+            <Campo Nome="valorTotalPago" atributoObjetoNegocio="pagamentos[].valorPago"/>
+            <Campo Nome="valorReembolsado" atributoObjetoNegocio="pagamentos[].valorReembolsado"/>
+        </Registro>
+        <Registro Nome="/informeRendimentosFontePagadora/listaRendimentosExigibilidadeSuspensa/itemRendimentosExigibilidadeSuspensa" Colecao="colecaoRendimentosExigibilidadeSuspensa">
+            <Campo Nome="valorRendimentoExigibilidadeSuspensa" atributoObjetoNegocio="colecaoRendimentosExigibilidadeSuspensa[].rendExigSuspensa"/>
+            <Campo Nome="valorDepositosJudiciaisExigibilidadeSuspensa" atributoObjetoNegocio="colecaoRendimentosExigibilidadeSuspensa[].depositoJudicial"/>
+        </Registro>
+    </DeclaracaoTXT>
+    
+	<!-- Informe de Plano de Saude -->    
+    <DeclaracaoTXT TipoArquivo="/informePlanoSaude">
+        <Registro Nome="/informePlanoSaude/header">
+            <Campo Nome="cnpjPlanoSaude" atributoObjetoNegocio="header.cnpjOperadoraPlanoSaude"/>
+            <Campo Nome="nomePlanoSaude" atributoObjetoNegocio="header.nomeOperadoraPlanoSaude"/>
+            <Campo Nome="cpfBeneficiario" atributoObjetoNegocio="header.cpfContribuinte"/>
+            <Campo Nome="nomeBeneficiario" atributoObjetoNegocio="header.nomeContribuinte"/>
+            <Campo Nome="anoExercicio" atributoObjetoNegocio="header.anoExercicio"/>
+            <Campo Nome="anoCalendario" atributoObjetoNegocio="header.anoCalendario"/>
+        </Registro>
+        <Registro Nome="/informePlanoSaude/listaPagamentoPremio/itemPagamentoPremio" Colecao="colecaoValorPago">
+            <Campo Nome="cpfBeneficiarioPagamentoPremio" atributoObjetoNegocio="colecaoValorPago[].cpfBeneficiario"/>
+            <Campo Nome="nomeBeneficiarioPagamentoPremio" atributoObjetoNegocio="colecaoValorPago[].nomeBeneficiario"/>
+            <Campo Nome="valorPagoPagamentoPremio" atributoObjetoNegocio="colecaoValorPago[].valorPago"/>
+        </Registro>
+        <Registro Nome="/informePlanoSaude/listaReembolso/itemReembolso" Colecao="colecaoValorReembolsado">
+            <Campo Nome="cpfBeneficiarioReembolso" atributoObjetoNegocio="colecaoValorReembolsado[].cpfBeneficiario"/>
+            <Campo Nome="nomeBeneficiarioReembolso" atributoObjetoNegocio="colecaoValorReembolsado[].nomeBeneficiario"/>
+            <Campo Nome="cpfcnpjPrestadorServico" atributoObjetoNegocio="colecaoValorReembolsado[].cpfCnpjPrestadorServico"/>
+            <Campo Nome="nomePrestadorServico" atributoObjetoNegocio="colecaoValorReembolsado[].nomePrestadorServico"/>
+            <Campo Nome="ValorTotalPago" atributoObjetoNegocio="colecaoValorReembolsado[].valorPago"/>
+            <Campo Nome="valorReembolsado" atributoObjetoNegocio="colecaoValorReembolsado[].valorReembolsado"/>
+        </Registro>
+    </DeclaracaoTXT>
+</Mapeamento>

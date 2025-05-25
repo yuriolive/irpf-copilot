@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TABELA xmlns="http://www.receita.fazenda.gov.br/declaracao">
+    <ITEM COL1="USDT" COL2="Tether"/>
+    <ITEM COL1="USDC" COL2="USD Coin"/>
+    <ITEM COL1="BRZ" COL2="Brazilian Digital Token"/>
+    <ITEM COL1="BUSD" COL2="Binance USD "/>
+    <ITEM COL1="DAI" COL2="DAI"/>
+    <ITEM COL1="TUSD" COL2="True USD"/>
+    <ITEM COL1="GUSD" COL2="Gemini USD"/>
+    <ITEM COL1="USDP" COL2="Paxos USD"/>
+    <ITEM COL1="PAXG" COL2="Paxos Gold"/>
+    <ITEM COL1="BTG DOL" COL2="BTG Pactual USD"/>
+    <ITEM COL1="999" COL2="Outras Stablecoins"/>
+    <ITEM CRC="1707296499" VIGENCIA="20240112"/>
+</TABELA>

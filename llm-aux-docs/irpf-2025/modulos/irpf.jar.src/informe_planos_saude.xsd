@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tipos="http://www.receita.fazenda.gov.br/Tipos" elementFormDefault="qualified">
+
+	<!-- importação dos tipos e elementos comuns -->
+	<xs:import schemaLocation="informe_tipos.xsd" namespace="http://www.receita.fazenda.gov.br/Tipos" />
+
+	<!-- início da definição dos elementos simples -->
+	<xs:element name="cpfBeneficiario" type="tipos:cpf" />
+	<xs:element name="nomeBeneficiario" type="tipos:nomePF" />
+	<xs:element name="anoExercicio" type="tipos:ano" />
+	<xs:element name="anoCalendario" type="tipos:ano" />
+	<xs:element name="cnpjPlanoSaude" type="tipos:cnpj" />
+	<xs:element name="nomePlanoSaude" type="tipos:nomePJ" />
+	<xs:element name="cpfBeneficiarioPagamentoPremio" type="tipos:cpfOpcional" />
+	<xs:element name="nomeBeneficiarioPagamentoPremio" type="tipos:nomePF" />
+	<xs:element name="valorPagoPagamentoPremio" type="tipos:valor" />
+	<xs:element name="cpfBeneficiarioReembolso" type="tipos:cpfOpcional" />
+	<xs:element name="nomeBeneficiarioReembolso" type="tipos:nomePF" />
+	<xs:element name="cpfcnpjPrestadorServico" type="tipos:cpfCnpjOpcional" />
+	<xs:element name="nomePrestadorServico" type="tipos:nomePJOpcional" />
+	<xs:element name="valorTotalPago" type="tipos:valor" />
+	<xs:element name="valorReembolsado" type="tipos:valor" />
+	<!-- fim da definição dos elementos simples -->
+
+	<!-- início da definição dos elementos complexos -->
+	<xs:element name="header">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cnpjPlanoSaude" />
+				<xs:element ref="nomePlanoSaude" />
+				<xs:element ref="cpfBeneficiario" />
+				<xs:element ref="nomeBeneficiario" />
+				<xs:element ref="anoExercicio" />
+				<xs:element ref="anoCalendario" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemPagamentoPremio">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cpfBeneficiarioPagamentoPremio" minOccurs="0" />
+				<xs:element ref="nomeBeneficiarioPagamentoPremio" />
+				<xs:element ref="valorPagoPagamentoPremio" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaPagamentoPremio">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemPagamentoPremio" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="itemReembolso">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="cpfBeneficiarioReembolso" minOccurs="0" />
+				<xs:element ref="nomeBeneficiarioReembolso" />
+				<xs:element ref="cpfcnpjPrestadorServico" minOccurs="0" />
+				<xs:element ref="nomePrestadorServico" minOccurs="0" />
+				<xs:element ref="valorTotalPago" />
+				<xs:element ref="valorReembolsado" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="listaReembolso">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="itemReembolso" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name="informePlanoSaude">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header" />
+				<xs:element ref="listaPagamentoPremio" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="listaReembolso" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

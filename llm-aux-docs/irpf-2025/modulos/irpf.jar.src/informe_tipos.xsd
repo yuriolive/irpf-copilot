@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.receita.fazenda.gov.br/Tipos"
+	targetNamespace="http://www.receita.fazenda.gov.br/Tipos" elementFormDefault="qualified">
+
+	<!-- início da definição dos tipos comuns -->
+	<xs:simpleType name="ano">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{4}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:simpleType name="data">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{2}/\d{2}/\d{4}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:simpleType name="mes">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="(0[1-9])|(1[0-2])" />
+		</xs:restriction>
+	</xs:simpleType>
+        
+	<xs:simpleType name="descricao">
+		<xs:restriction base="xs:token">
+			<xs:minLength value="1" />
+			<xs:maxLength value="60" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="valor">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{1,11},\d{2}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="valorOpcional">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="|(\d{1,11},\d{2})" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="cpf">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{11}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="cpfOpcional">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="|\d{11}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="cnpj">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{14}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="cpfCnpj">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{11}|\d{14}" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="cpfCnpjOpcional">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="|\d{11}|\d{14}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="nomePF">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="[\p{L}\s^\n]{1,60}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="nomePJ">
+		<xs:restriction base="xs:token">
+			<xs:minLength value="1" />
+			<xs:maxLength value="60" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="nomePJOpcional">
+		<xs:restriction base="xs:token">
+			<xs:minLength value="0" />
+			<xs:maxLength value="60" />
+		</xs:restriction>
+	</xs:simpleType>
+        
+    <xs:simpleType name="numeroProcesso">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="|\d{1,20}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="decimal_3_1">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="\d{1,3}(,\d{1})?" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- fim da definição dos tipos comuns -->
+
+</xs:schema>

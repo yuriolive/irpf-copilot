@@ -1,0 +1,1127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<Mapeamento>
+    
+    <DeclaracaoTXT TipoArquivo="/classe">
+        <!-- ==========================Identificador do Demonstrativo==========================-->
+        <Registro Nome="/classe/copiaIdentificador">
+            <Campo Nome="cpf" atributoObjetoNegocio="idDemonstrativo.cpf"/>
+            <Campo Nome="dataInicioPermanencia" atributoObjetoNegocio="idDemonstrativo.dataInicioPermanencia"/>
+            <Campo Nome="dataFimPermanencia" atributoObjetoNegocio="idDemonstrativo.dataFimPermanencia"/>
+            <Campo Nome="exercicio" atributoObjetoNegocio="idDemonstrativo.exercicio"/>
+            <Campo Nome="nome" atributoObjetoNegocio="idDemonstrativo.nome"/>
+            <Campo Nome="paisDeclarante" atributoObjetoNegocio="idDemonstrativo.paisDeclarante"/>
+            <Campo Nome="dddDeclarante" atributoObjetoNegocio="idDemonstrativo.dddDeclarante"/>
+            <Campo Nome="telefoneDeclarante" atributoObjetoNegocio="idDemonstrativo.telefoneDeclarante"/>
+            <Campo Nome="territorioParaisoFiscal" atributoObjetoNegocio="idDemonstrativo.territorioParaisoFiscal"/>
+        </Registro>
+        
+        <!-- ==========================Bens Imóveis==========================-->
+        <Registro Nome="/classe/bensImoveis">
+            <Campo Nome="totalImpostoDevidoAnoAtual" atributoObjetoNegocio="bensImoveis.totalImpostoDevidoAnoAtual"/>
+            <Campo Nome="totalImpostoDiferidoAnosAnteriores" atributoObjetoNegocio="bensImoveis.totalImpostoDiferidoAnosAnteriores"/>
+            <Campo Nome="totalImpostoDiferidoAnosPosteriores" atributoObjetoNegocio="bensImoveis.totalImpostoDiferidoAnosPosteriores"/>
+            <Campo Nome="totalImpostoPagoBrasil" atributoObjetoNegocio="bensImoveis.totalImpostoPagoBrasil"/>
+            <Campo Nome="totalImpostoPagoExterior" atributoObjetoNegocio="bensImoveis.totalImpostoPagoExterior"/>
+            <Campo Nome="totalImpostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="bensImoveis.totalImpostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="totalImpostoTotal" atributoObjetoNegocio="bensImoveis.totalImpostoTotal"/>
+            <Campo Nome="totalRendIsentosNaoTributaveisBrasil" atributoObjetoNegocio="bensImoveis.totalRendIsentosNaoTributaveisBrasil"/>
+            <Campo Nome="totalRendIsentosNaoTributaveisExterior" atributoObjetoNegocio="bensImoveis.totalRendIsentosNaoTributaveisExterior"/>
+            <Campo Nome="totalRendSujeitosTributacaoBrasil" atributoObjetoNegocio="bensImoveis.totalRendSujeitosTributacaoBrasil"/>
+            <Campo Nome="totalRendSujeitosTributacaoExterior" atributoObjetoNegocio="bensImoveis.totalRendSujeitosTributacaoExterior"/>
+            <Campo Nome="totalValorIRF" atributoObjetoNegocio="bensImoveis.totalValorIRF"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item" Colecao="bensImoveis">
+            <Campo Nome="alienacaoAPrazo" atributoObjetoNegocio="bensImoveis[].alienacaoAPrazo"/>
+            <Campo Nome="alienacaoAnoAnterior" atributoObjetoNegocio="bensImoveis[].alienacaoAnoAnterior"/>
+            <Campo Nome="alienacaoParcial" atributoObjetoNegocio="bensImoveis[].alienacaoParcial"/>
+            <Campo Nome="bemGrandeValor" atributoObjetoNegocio="bensImoveis[].bemGrandeValor"/>
+            <Campo Nome="bemGrandeValorOperacao" atributoObjetoNegocio="bensImoveis[].bemGrandeValorOperacao"/>
+            <Campo Nome="corretagemAnosAnteriores" atributoObjetoNegocio="bensImoveis[].corretagemAnosAnteriores"/>
+            <Campo Nome="cotacaoDolarDataAlienacao" atributoObjetoNegocio="bensImoveis[].cotacaoDolarDataAlienacao"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensImoveis[].custoCorretagem"/>
+            <Campo Nome="dataAlienacao" atributoObjetoNegocio="bensImoveis[].dataAlienacao"/>
+            <Campo Nome="dataRecebimentoUltimaParcela" atributoObjetoNegocio="bensImoveis[].dataRecebimentoUltimaParcela"/>
+            <Campo Nome="dataTransitoJulgado" atributoObjetoNegocio="bensImoveis[].dataTransitoJulgado"/>
+            <Campo Nome="ganhoCapitalAlienacaoAnterior" atributoObjetoNegocio="bensImoveis[].ganhoCapitalAlienacaoAnterior"/>
+            <Campo Nome="motivoTransmissaoCausaMortisDecisaoJudicial" atributoObjetoNegocio="bensImoveis[].motivoTransmissaoCausaMortisDecisaoJudicial"/>
+            <Campo Nome="natureza" atributoObjetoNegocio="bensImoveis[].natureza"/>
+            <Campo Nome="numeroItem" atributoObjetoNegocio="bensImoveis[].numeroItem"/>
+            <Campo Nome="paisAcordo" atributoObjetoNegocio="bensImoveis[].paisAcordo"/>
+            <Campo Nome="recebimentoUltimaParcelaAnoAnterior" atributoObjetoNegocio="bensImoveis[].recebimentoUltimaParcelaAnoAnterior"/>
+            <Campo Nome="temUltimaParcela" atributoObjetoNegocio="bensImoveis[].temUltimaParcela"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensImoveis[].valorAlienacao"/>
+            <Campo Nome="valorAlienacaoDolar" atributoObjetoNegocio="bensImoveis[].valorAlienacaoDolar"/>
+            <Campo Nome="valorAlienacaoReal" atributoObjetoNegocio="bensImoveis[].valorAlienacaoReal"/>
+            <Campo Nome="valorAplicado" atributoObjetoNegocio="bensImoveis[].valorAplicado"/>
+            <Campo Nome="valorCorretagemDolar" atributoObjetoNegocio="bensImoveis[].valorCorretagemDolar"/>
+            <Campo Nome="valorCorretagemReal" atributoObjetoNegocio="bensImoveis[].valorCorretagemReal"/>
+            <Campo Nome="valorImpostoExteriorReal" atributoObjetoNegocio="bensImoveis[].valorImpostoExteriorReal"/>
+            <Campo Nome="valorLiquidoRecebidoAnosAnteriores" atributoObjetoNegocio="bensImoveis[].valorLiquidoRecebidoAnosAnteriores"/>
+            <Campo Nome="valorRecebidoAnosAnteriores" atributoObjetoNegocio="bensImoveis[].valorRecebidoAnosAnteriores"/>
+            <Campo Nome="inCobranca" atributoObjetoNegocio="bensImoveis[].inCobranca"/>
+            <Campo Nome="dataVencimentoTCM" atributoObjetoNegocio="bensImoveis[].dataVencimentoTCM"/>
+            <Campo Nome="paisResidencia" atributoObjetoNegocio="bensImoveis[].paisResidencia"/>
+            <Campo Nome="territorioParaisoFiscal" atributoObjetoNegocio="bensImoveis[].territorioParaisoFiscal"/>
+        </Registro>	
+
+        <Registro Nome="/classe/bensImoveis/item/bemImovel">
+			<Campo Nome="especificacao" atributoObjetoNegocio="bensImoveis[].bemImovel.especificacao"/>
+            <Campo Nome="bemAdquiridoNoBrasil" atributoObjetoNegocio="bensImoveis[].bemImovel.bemAdquiridoNoBrasil"/>
+		</Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/bemImovel/aquisicao">
+            <Campo Nome="cotacaoDolarDataAquisicao" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.cotacaoDolarDataAquisicao"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicao"/>
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoOrigemNacionalDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTorna" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoTorna"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoTornaOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMNDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoTornaOrigemMNDolar"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMNReal" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoTornaOrigemMNReal"/>
+            <Campo Nome="custoAquisicaoTotalDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.custoAquisicaoTotalDolar"/>
+            <Campo Nome="dataAquisicao" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.dataAquisicao"/>
+            <Campo Nome="houveReforma" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.houveReforma"/>
+            <Campo Nome="origemRendimentos" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.origemRendimentos"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.percentualCustoAquisicaoOrigemME"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemNacional" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.percentualCustoAquisicaoOrigemNacional"/>
+            <Campo Nome="moedaEstrangeira" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.moedaEstrangeira"/>
+            <Campo Nome="residenteBrasilAplicacaoExterior" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.residenteBrasilAplicacaoExterior"/>
+        </Registro>
+
+        <Registro Nome="/classe/bensImoveis/item/bemImovel/aquisicao/parcelasAquisicao">
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.percentualCustoAquisicaoOrigemME"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemNacional" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.percentualCustoAquisicaoOrigemNacional"/>
+            <Campo Nome="totalCustoAquisicao" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.totalCustoAquisicao"/>
+            <Campo Nome="totalCustoAquisicaoDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.totalCustoAquisicaoDolar"/>
+            <Campo Nome="totalCustoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.totalCustoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="totalCustoAquisicaoOrigemMNDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.totalCustoAquisicaoOrigemMNDolar"/>
+            <Campo Nome="totalCustoAquisicaoOrigemMNReal" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao.totalCustoAquisicaoOrigemMNReal"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/bemImovel/aquisicao/parcelasAquisicao/item" Colecao="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao">
+            <Campo Nome="cotacaoDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].cotacaoDolar"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].custoAquisicao"/>
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].custoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].custoAquisicaoOrigemNacionalDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].custoAquisicaoOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTotalDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].custoAquisicaoTotalDolar"/>
+            <Campo Nome="data" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].data"/>
+            <Campo Nome="indice" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].indice"/>
+            <Campo Nome="percentualCustoTotal" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].percentualCustoTotal"/>
+            <Campo Nome="percentualCustoTotalDolar" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].percentualCustoTotalDolar"/>
+            <Campo Nome="percentualCustoTotalReal" atributoObjetoNegocio="bensImoveis[].bemImovel.aquisicao.parcelasAquisicao[].percentualCustoTotalReal"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/bemImovel/endereco">
+			<Campo Nome="bairro" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.bairro"/>	
+			<Campo Nome="bairroEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.bairroEx"/>
+            <Campo Nome="cep" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.cep"/>	
+			<Campo Nome="cidadeEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.cidadeEx"/>
+            <Campo Nome="codigoPostalEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.codigoPostalEx"/>
+            <Campo Nome="complemento" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.complemento"/>	
+			<Campo Nome="complementoEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.complementoEx"/>
+            <Campo Nome="logradouro" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.logradouro"/>	
+			<Campo Nome="logradouroEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.logradouroEx"/>
+            <Campo Nome="municipio" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.municipio"/>	
+			<Campo Nome="numero" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.numero"/>	
+			<Campo Nome="numeroEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.numeroEx"/>
+            <Campo Nome="paisEx" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.paisEx"/>
+            <Campo Nome="tipoLogradouro" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.tipoLogradouro"/>	
+			<Campo Nome="uf" atributoObjetoNegocio="bensImoveis[].bemImovel.endereco.uf"/>					
+       </Registro>
+       
+       <Registro Nome="/classe/bensImoveis/item/bemImovel/adquirentes/item" Colecao="bensImoveis[].bemImovel.adquirentes">
+			<Campo Nome="cpfCnpj" atributoObjetoNegocio="bensImoveis[].bemImovel.adquirentes[].cpfCnpj"/>
+			<Campo Nome="nome" atributoObjetoNegocio="bensImoveis[].bemImovel.adquirentes[].nome"/>		
+		</Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/apuracao">
+			<Campo Nome="cotacaoDolarOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.cotacaoDolarOrigemME"/>
+            <Campo Nome="cotacaoDolarOrigemNacional" atributoObjetoNegocio="bensImoveis[].apuracao.cotacaoDolarOrigemNacional"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensImoveis[].apuracao.custoAquisicao"/>
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracao.custoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].apuracao.custoAquisicaoOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTorna" atributoObjetoNegocio="bensImoveis[].apuracao.custoAquisicaoTorna"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracao.custoAquisicaoTornaOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracao.custoAquisicaoTornaOrigemMNReal"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensImoveis[].apuracao.custoCorretagem"/>
+            <Campo Nome="custoCorretagemDolar" atributoObjetoNegocio="bensImoveis[].apuracao.custoCorretagemDolar"/>
+            <Campo Nome="custoCorretagemOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].apuracao.custoCorretagemOrigemNacionalDolar"/>
+            <Campo Nome="custoCorretagemOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracao.custoCorretagemOrigemMEDolar"/>
+            <Campo Nome="ganhoCapital1" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital1"/>
+            <Campo Nome="ganhoCapital1OrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital1OrigemMEDolar"/>
+            <Campo Nome="ganhoCapital1OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital1OrigemMEReal"/>
+            <Campo Nome="ganhoCapital1OrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital1OrigemNacionalReal"/>
+            <Campo Nome="ganhoCapital2" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital2"/>
+            <Campo Nome="ganhoCapital2OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital2OrigemMEReal"/>
+            <Campo Nome="ganhoCapital2OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital2OrigemMNReal"/>
+            <Campo Nome="ganhoCapital3" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital3"/>
+            <Campo Nome="ganhoCapital3OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital3OrigemMEReal"/>
+            <Campo Nome="ganhoCapital3OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital3OrigemMNReal"/>
+            <Campo Nome="ganhoCapital4" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital4"/>
+            <Campo Nome="ganhoCapital4OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital4OrigemMEReal"/>
+            <Campo Nome="ganhoCapital4OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital4OrigemMNReal"/>
+            <Campo Nome="ganhoCapital5" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital5"/>
+            <Campo Nome="ganhoCapital5OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital5OrigemMEReal"/>
+            <Campo Nome="ganhoCapital5OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapital5OrigemMNReal"/>
+            <Campo Nome="ganhoCapitalTotalExterior" atributoObjetoNegocio="bensImoveis[].apuracao.ganhoCapitalTotalExterior"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualCustoAquisicaoOrigemME"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualCustoAquisicaoOrigemMN"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="percentualReducaoBemPequenoValor" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoBemPequenoValor"/>
+            <Campo Nome="percentualReducaoBemPequenoValorOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoBemPequenoValorOrigemME"/>
+            <Campo Nome="percentualReducaoBemPequenoValorOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoBemPequenoValorOrigemMN"/>
+            <Campo Nome="percentualReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei11196FR1"/>
+            <Campo Nome="percentualReducaoLei11196FR1OrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei11196FR1OrigemME"/>
+            <Campo Nome="percentualReducaoLei11196FR1OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei11196FR1OrigemMN"/>
+            <Campo Nome="percentualReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei11196FR2"/>
+            <Campo Nome="percentualReducaoLei11196FR2OrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei11196FR2OrigemME"/>
+            <Campo Nome="percentualReducaoLei11196FR2OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei11196FR2OrigemMN"/>
+            <Campo Nome="percentualReducaoLei7713" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei7713"/>
+            <Campo Nome="percentualReducaoLei7713OrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei7713OrigemME"/>
+            <Campo Nome="percentualReducaoLei7713OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoLei7713OrigemMN"/>
+            <Campo Nome="percentualReducaoUnicoImovel" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoUnicoImovel"/>
+            <Campo Nome="percentualReducaoUnicoImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoUnicoImovelOrigemME"/>
+            <Campo Nome="percentualReducaoUnicoImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.percentualReducaoUnicoImovelOrigemMN"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensImoveis[].apuracao.valorAlienacao"/>
+            <Campo Nome="valorAlienacaoDolar" atributoObjetoNegocio="bensImoveis[].apuracao.valorAlienacaoDolar"/>
+            <Campo Nome="valorAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracao.valorAlienacaoOrigemMEDolar"/>
+            <Campo Nome="valorAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].apuracao.valorAlienacaoOrigemNacionalDolar"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensImoveis[].apuracao.valorLiquidoAlienacao"/>
+            <Campo Nome="valorLiquidoAlienacaoDolar" atributoObjetoNegocio="bensImoveis[].apuracao.valorLiquidoAlienacaoDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracao.valorLiquidoAlienacaoOrigemMEDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].apuracao.valorLiquidoAlienacaoOrigemNacionalDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].apuracao.valorLiquidoAlienacaoOrigemNacionalReal"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="valorReducaoBemPequenoValor" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoBemPequenoValor"/>
+            <Campo Nome="valorReducaoBemPequenoValorOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoBemPequenoValorOrigemME"/>
+            <Campo Nome="valorReducaoBemPequenoValorOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoBemPequenoValorOrigemMN"/>
+            <Campo Nome="valorReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei11196FR1"/>
+            <Campo Nome="valorReducaoLei11196FR1OrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei11196FR1OrigemME"/>
+            <Campo Nome="valorReducaoLei11196FR1OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei11196FR1OrigemMN"/>
+            <Campo Nome="valorReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei11196FR2"/>
+            <Campo Nome="valorReducaoLei11196FR2OrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei11196FR2OrigemME"/>
+            <Campo Nome="valorReducaoLei11196FR2OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei11196FR2OrigemMN"/>
+            <Campo Nome="valorReducaoLei7713" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei7713"/>
+            <Campo Nome="valorReducaoLei7713OrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei7713OrigemME"/>
+            <Campo Nome="valorReducaoLei7713OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoLei7713OrigemMN"/>
+            <Campo Nome="valorReducaoUnicoImovel" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoUnicoImovel"/>
+            <Campo Nome="valorReducaoUnicoImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoUnicoImovelOrigemME"/>
+            <Campo Nome="valorReducaoUnicoImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.valorReducaoUnicoImovelOrigemMN"/>
+		</Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/apuracao/parcelasCustoAquisicao/item" Colecao="bensImoveis[].apuracao.parcelasCustoAquisicao">
+			<Campo Nome="data" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].data"/>
+            <Campo Nome="indice" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].indice"/>
+            <Campo Nome="percentualCustoTotal" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].percentualCustoTotal"/>
+            <Campo Nome="percentualCustoTotalDolar" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].percentualCustoTotalDolar"/>
+            <Campo Nome="percentualCustoTotalReal" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].percentualCustoTotalReal"/>
+            <Campo Nome="percentualReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].percentualReducaoLei11196FR1"/>
+            <Campo Nome="percentualReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].percentualReducaoLei11196FR2"/>
+            <Campo Nome="percentualReducaoLei7713" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].percentualReducaoLei7713"/>
+            <Campo Nome="valorPassivelReducao" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].valorPassivelReducao"/>
+            <Campo Nome="valorPassivelReducaoOrigemME" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].valorPassivelReducaoOrigemME"/>
+            <Campo Nome="valorPassivelReducaoOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracao.parcelasCustoAquisicao[].valorPassivelReducaoOrigemMN"/>
+		</Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/apuracaoFinal">
+            <Campo Nome="cotacaoDolarOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.cotacaoDolarOrigemME"/>
+            <Campo Nome="cotacaoDolarOrigemNacional" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.cotacaoDolarOrigemNacional"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoAquisicao"/>
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoAquisicaoOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTorna" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoAquisicaoTorna"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoAquisicaoTornaOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoAquisicaoTornaOrigemMNReal"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoCorretagem"/>
+            <Campo Nome="custoCorretagemDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoCorretagemDolar"/>
+            <Campo Nome="custoCorretagemOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoCorretagemOrigemNacionalDolar"/>
+            <Campo Nome="custoCorretagemOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.custoCorretagemOrigemMEDolar"/>
+            <Campo Nome="ganhoCapital1" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital1"/>
+            <Campo Nome="ganhoCapital1OrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital1OrigemMEDolar"/>
+            <Campo Nome="ganhoCapital1OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital1OrigemMEReal"/>
+            <Campo Nome="ganhoCapital1OrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital1OrigemNacionalReal"/>
+            <Campo Nome="ganhoCapital2" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital2"/>
+            <Campo Nome="ganhoCapital2OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital2OrigemMEReal"/>
+            <Campo Nome="ganhoCapital2OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital2OrigemMNReal"/>
+            <Campo Nome="ganhoCapital3" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital3"/>
+            <Campo Nome="ganhoCapital3OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital3OrigemMEReal"/>
+            <Campo Nome="ganhoCapital3OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital3OrigemMNReal"/>
+            <Campo Nome="ganhoCapital4" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital4"/>
+            <Campo Nome="ganhoCapital4OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital4OrigemMEReal"/>
+            <Campo Nome="ganhoCapital4OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital4OrigemMNReal"/>
+            <Campo Nome="ganhoCapital5" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital5"/>
+            <Campo Nome="ganhoCapital5OrigemMEReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital5OrigemMEReal"/>
+            <Campo Nome="ganhoCapital5OrigemMNReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapital5OrigemMNReal"/>
+            <Campo Nome="ganhoCapitalTotalExterior" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.ganhoCapitalTotalExterior"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualCustoAquisicaoOrigemME"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualCustoAquisicaoOrigemMN"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="percentualReducaoBemPequenoValor" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoBemPequenoValor"/>
+            <Campo Nome="percentualReducaoBemPequenoValorOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoBemPequenoValorOrigemME"/>
+            <Campo Nome="percentualReducaoBemPequenoValorOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoBemPequenoValorOrigemMN"/>
+            <Campo Nome="percentualReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei11196FR1"/>
+            <Campo Nome="percentualReducaoLei11196FR1OrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei11196FR1OrigemME"/>
+            <Campo Nome="percentualReducaoLei11196FR1OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei11196FR1OrigemMN"/>
+            <Campo Nome="percentualReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei11196FR2"/>
+            <Campo Nome="percentualReducaoLei11196FR2OrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei11196FR2OrigemME"/>
+            <Campo Nome="percentualReducaoLei11196FR2OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei11196FR2OrigemMN"/>
+            <Campo Nome="percentualReducaoLei7713" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei7713"/>
+            <Campo Nome="percentualReducaoLei7713OrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei7713OrigemME"/>
+            <Campo Nome="percentualReducaoLei7713OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoLei7713OrigemMN"/>
+            <Campo Nome="percentualReducaoUnicoImovel" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoUnicoImovel"/>
+            <Campo Nome="percentualReducaoUnicoImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoUnicoImovelOrigemME"/>
+            <Campo Nome="percentualReducaoUnicoImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.percentualReducaoUnicoImovelOrigemMN"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorAlienacao"/>
+            <Campo Nome="valorAlienacaoDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorAlienacaoDolar"/>
+            <Campo Nome="valorAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorAlienacaoOrigemMEDolar"/>
+            <Campo Nome="valorAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorAlienacaoOrigemNacionalDolar"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorLiquidoAlienacao"/>
+            <Campo Nome="valorLiquidoAlienacaoDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorLiquidoAlienacaoDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorLiquidoAlienacaoOrigemMEDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorLiquidoAlienacaoOrigemNacionalDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorLiquidoAlienacaoOrigemNacionalReal"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="valorReducaoBemPequenoValor" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoBemPequenoValor"/>
+            <Campo Nome="valorReducaoBemPequenoValorOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoBemPequenoValorOrigemME"/>
+            <Campo Nome="valorReducaoBemPequenoValorOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoBemPequenoValorOrigemMN"/>
+            <Campo Nome="valorReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei11196FR1"/>
+            <Campo Nome="valorReducaoLei11196FR1OrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei11196FR1OrigemME"/>
+            <Campo Nome="valorReducaoLei11196FR1OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei11196FR1OrigemMN"/>
+            <Campo Nome="valorReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei11196FR2"/>
+            <Campo Nome="valorReducaoLei11196FR2OrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei11196FR2OrigemME"/>
+            <Campo Nome="valorReducaoLei11196FR2OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei11196FR2OrigemMN"/>
+            <Campo Nome="valorReducaoLei7713" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei7713"/>
+            <Campo Nome="valorReducaoLei7713OrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei7713OrigemME"/>
+            <Campo Nome="valorReducaoLei7713OrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoLei7713OrigemMN"/>
+            <Campo Nome="valorReducaoUnicoImovel" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoUnicoImovel"/>
+            <Campo Nome="valorReducaoUnicoImovelOrigemME" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoUnicoImovelOrigemME"/>
+            <Campo Nome="valorReducaoUnicoImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].apuracaoFinal.valorReducaoUnicoImovelOrigemMN"/>
+        </Registro>
+        
+         <Registro Nome="/classe/bensImoveis/item/perguntas">
+			<Campo Nome="imovelResidencial" atributoObjetoNegocio="bensImoveis[].perguntas.imovelResidencial"/>				
+			<Campo Nome="mP252" atributoObjetoNegocio="bensImoveis[].perguntas.mP252"/>
+                        <Campo Nome="mP252Parte2" atributoObjetoNegocio="bensImoveis[].perguntas.mP252Parte2"/>
+			<Campo Nome="outraAlienacao" atributoObjetoNegocio="bensImoveis[].perguntas.outraAlienacao"/>
+			<Campo Nome="propriedadeOutroImovel" atributoObjetoNegocio="bensImoveis[].perguntas.propriedadeOutroImovel"/>
+                        <Campo Nome="mP252PrimeiraAlienacao" atributoObjetoNegocio="bensImoveis[].perguntas.mP252PrimeiraAlienacao"/>
+                        <Campo Nome="dataPrimeiraAlienacao" atributoObjetoNegocio="bensImoveis[].perguntas.dataPrimeiraAlienacao"/>
+		</Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/colecaoParcelaAlienacao">
+            <Campo Nome="custoAquisicaoProporcionalOrigemMEDolarTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoAquisicaoProporcionalOrigemMEDolarTotal"/>
+            <Campo Nome="custoAquisicaoProporcionalOrigemNacionalRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoAquisicaoProporcionalOrigemNacionalRealTotal"/>
+            <Campo Nome="custoAquisicaoProporcionalTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoAquisicaoProporcionalTotal"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemMEDolarTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoAquisicaoTornaProporcionalOrigemMEDolarTotal"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemNacionalRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoAquisicaoTornaProporcionalOrigemNacionalRealTotal"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoAquisicaoTornaProporcionalTotal"/>
+            <Campo Nome="custoCorretagemDolarTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoCorretagemDolarTotal"/>
+            <Campo Nome="custoCorretagemTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.custoCorretagemTotal"/>
+            <Campo Nome="ganho1ProporcionalTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganho1ProporcionalTotal"/>
+            <Campo Nome="ganho5ProporcionalTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganho5ProporcionalTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalMEDolarTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalMEDolarTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalMERealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalMERealTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalNacionalRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalNacionalRealTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalRealTotal"/>
+            <Campo Nome="ganhoCapital2ProporcionalOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital2ProporcionalOrigemME"/>
+            <Campo Nome="ganhoCapital2ProporcionalOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital2ProporcionalOrigemMN"/>
+            <Campo Nome="ganhoCapital3ProporcionalOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital3ProporcionalOrigemME"/>
+            <Campo Nome="ganhoCapital3ProporcionalOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital3ProporcionalOrigemMN"/>
+            <Campo Nome="ganhoCapital4ProporcionalOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital4ProporcionalOrigemME"/>
+            <Campo Nome="ganhoCapital4ProporcionalOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital4ProporcionalOrigemMN"/>
+            <Campo Nome="ganhoCapital5ProporcionalMERealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital5ProporcionalMERealTotal"/>
+            <Campo Nome="ganhoCapital5ProporcionalNacionalRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital5ProporcionalNacionalRealTotal"/>
+            <Campo Nome="ganhoCapital5ProporcionalRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.ganhoCapital5ProporcionalRealTotal"/>
+            <Campo Nome="impostoDevido2Total" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.impostoDevido2Total"/>
+            <Campo Nome="impostoDevidoTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.impostoDevidoTotal"/>
+            <Campo Nome="impostoPagoExteriorTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.impostoPagoExteriorTotal"/>
+            <Campo Nome="impostoPagoTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.impostoPagoTotal"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="percentualReducaoBemPequenoValorOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoBemPequenoValorOrigemME"/>
+            <Campo Nome="percentualReducaoBemPequenoValorOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoBemPequenoValorOrigemMN"/>
+            <Campo Nome="percentualReducaoLei11196FR1OrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoLei11196FR1OrigemME"/>
+            <Campo Nome="percentualReducaoLei11196FR1OrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoLei11196FR1OrigemMN"/>
+            <Campo Nome="percentualReducaoLei11196FR2OrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoLei11196FR2OrigemME"/>
+            <Campo Nome="percentualReducaoLei11196FR2OrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoLei11196FR2OrigemMN"/>
+            <Campo Nome="percentualReducaoLei7713OrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoLei7713OrigemME"/>
+            <Campo Nome="percentualReducaoLei7713OrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoLei7713OrigemMN"/>
+            <Campo Nome="percentualReducaoUnicoImovelOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoUnicoImovelOrigemME"/>
+            <Campo Nome="percentualReducaoUnicoImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.percentualReducaoUnicoImovelOrigemMN"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorInformadoReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovelOrigemAmbas" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorInformadoReducaoAplicacaoOutroImovelOrigemAmbas"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorInformadoReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorInformadoReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="valorLiquidoAlienacaoDolarTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorLiquidoAlienacaoDolarTotal"/>
+            <Campo Nome="valorLiquidoAlienacaoRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorLiquidoAlienacaoRealTotal"/>
+            <Campo Nome="valorLiquidoAlienacaoTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorLiquidoAlienacaoTotal"/>
+            <Campo Nome="valorRecebidoDolarTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorRecebidoDolarTotal"/>
+            <Campo Nome="valorRecebidoRealTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorRecebidoRealTotal"/>
+            <Campo Nome="valorRecebidoTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorRecebidoTotal"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemAmbas" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoAplicacaoOutroImovelOrigemAmbas"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoAplicacaoOutroImovelOrigemME"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoAplicacaoOutroImovelOrigemMN"/>
+            <Campo Nome="valorReducaoBemPequenoValorOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoBemPequenoValorOrigemME"/>
+            <Campo Nome="valorReducaoBemPequenoValorOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoBemPequenoValorOrigemMN"/>
+            <Campo Nome="valorReducaoLei11196FR1OrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoLei11196FR1OrigemME"/>
+            <Campo Nome="valorReducaoLei11196FR1OrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoLei11196FR1OrigemMN"/>
+            <Campo Nome="valorReducaoLei11196FR2OrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoLei11196FR2OrigemME"/>
+            <Campo Nome="valorReducaoLei11196FR2OrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoLei11196FR2OrigemMN"/>
+            <Campo Nome="valorReducaoLei7713OrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoLei7713OrigemME"/>
+            <Campo Nome="valorReducaoLei7713OrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoLei7713OrigemMN"/>
+            <Campo Nome="valorReducaoUnicoImovelOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoUnicoImovelOrigemME"/>
+            <Campo Nome="valorReducaoUnicoImovelOrigemMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao.valorReducaoUnicoImovelOrigemMN"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/colecaoParcelaAlienacao/item" Colecao="bensImoveis[].colecaoParcelaAlienacao">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].aliquotaMedia"/>
+            <Campo Nome="cotacaoDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].cotacaoDolar"/>
+            <Campo Nome="custoAquisicaoProporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoAquisicaoProporcional"/>
+            <Campo Nome="custoAquisicaoProporcionalOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoAquisicaoProporcionalOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoProporcionalOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoAquisicaoProporcionalOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTornaProporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcional"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcionalOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcionalOrigemNacionalReal"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoCorretagem"/>
+            <Campo Nome="custoCorretagemDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].custoCorretagemDolar"/>
+            <Campo Nome="dataRecebimento" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].dataRecebimento"/>
+            <Campo Nome="ganhoCapital1Proporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital1Proporcional"/>
+            <Campo Nome="ganhoCapital1ProporcionalOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalOrigemMEDolar"/>
+            <Campo Nome="ganhoCapital1ProporcionalOrigemMEReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalOrigemMEReal"/>
+            <Campo Nome="ganhoCapital1ProporcionalOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalOrigemNacionalReal"/>
+            <Campo Nome="ganhoCapital1ProporcionalTotalReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalTotalReal"/>
+            <Campo Nome="ganhoCapital2Proporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital2Proporcional"/>
+            <Campo Nome="ganhoCapital2ProporcionalME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital2ProporcionalME"/>
+            <Campo Nome="ganhoCapital2ProporcionalMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital2ProporcionalMN"/>
+            <Campo Nome="ganhoCapital3Proporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital3Proporcional"/>
+            <Campo Nome="ganhoCapital3ProporcionalME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital3ProporcionalME"/>
+            <Campo Nome="ganhoCapital3ProporcionalMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital3ProporcionalMN"/>
+            <Campo Nome="ganhoCapital4Proporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital4Proporcional"/>
+            <Campo Nome="ganhoCapital4ProporcionalME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital4ProporcionalME"/>
+            <Campo Nome="ganhoCapital4ProporcionalMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital4ProporcionalMN"/>
+            <Campo Nome="ganhoCapital5Proporcional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital5Proporcional"/>
+            <Campo Nome="ganhoCapital5ProporcionalME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital5ProporcionalME"/>
+            <Campo Nome="ganhoCapital5ProporcionalMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital5ProporcionalMN"/>
+            <Campo Nome="ganhoCapital5ProporcionalTotalReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapital5ProporcionalTotalReal"/>
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ganhoCapitalTotal"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].impostoDevido"/>
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].impostoDevido2"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].impostoPago"/>
+            <Campo Nome="impostoPagoExterior" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].impostoPagoExterior"/>
+            <Campo Nome="irrfLei110332004" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].irrfLei110332004"/>
+            <Campo Nome="percentualGanho" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualGanho"/>
+            <Campo Nome="percentualGanhoOrigemME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualGanhoOrigemME"/>
+            <Campo Nome="percentualGanhoOrigemNacional" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualGanhoOrigemNacional"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoAplicacaoOutroImovelME"/>
+            <Campo Nome="percentualReducaoAplicacaoOutroImovelMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoAplicacaoOutroImovelMN"/>
+            <Campo Nome="percentualReducaoBemPequenoValor" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValor"/>
+            <Campo Nome="percentualReducaoBemPequenoValorME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValorME"/>
+            <Campo Nome="percentualReducaoBemPequenoValorMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValorMN"/>
+            <Campo Nome="percentualReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei11196FR1"/>
+            <Campo Nome="percentualReducaoLei11196FR1ME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei11196FR1ME"/>
+            <Campo Nome="percentualReducaoLei11196FR1MN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei11196FR1MN"/>
+            <Campo Nome="percentualReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei11196FR2"/>
+            <Campo Nome="percentualReducaoLei11196FR2ME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei11196FR2ME"/>
+            <Campo Nome="percentualReducaoLei11196FR2MN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei11196FR2MN"/>
+            <Campo Nome="percentualReducaoLei7713" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei7713"/>
+            <Campo Nome="percentualReducaoLei7713ME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei7713ME"/>
+            <Campo Nome="percentualReducaoLei7713MN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoLei7713MN"/>
+            <Campo Nome="percentualReducaoUnicoImovel" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoUnicoImovel"/>
+            <Campo Nome="percentualReducaoUnicoImovelME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoUnicoImovelME"/>
+            <Campo Nome="percentualReducaoUnicoImovelMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].percentualReducaoUnicoImovelMN"/>
+            <Campo Nome="ultimaParcela" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].ultimaParcela"/>
+            <Campo Nome="valorAjuste" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorAjuste"/>
+            <Campo Nome="valorAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorAlienacaoOrigemMEDolar"/>
+            <Campo Nome="valorAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorAlienacaoOrigemNacionalDolar"/>
+            <Campo Nome="valorAlienacaoOrigemNacionalReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorAlienacaoOrigemNacionalReal"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorInformadoReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovelAmbas" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorInformadoReducaoAplicacaoOutroImovelAmbas"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovelME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorInformadoReducaoAplicacaoOutroImovelME"/>
+            <Campo Nome="valorInformadoReducaoAplicacaoOutroImovelMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorInformadoReducaoAplicacaoOutroImovelMN"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorLiquidoAlienacao"/>
+            <Campo Nome="valorLiquidoAlienacaoDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorLiquidoAlienacaoDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorLiquidoAlienacaoReal"/>
+            <Campo Nome="valorRecebido" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorRecebido"/>
+            <Campo Nome="valorRecebidoDolar" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorRecebidoDolar"/>
+            <Campo Nome="valorRecebidoReal" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorRecebidoReal"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovel" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoAplicacaoOutroImovel"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoAplicacaoOutroImovelME"/>
+            <Campo Nome="valorReducaoAplicacaoOutroImovelMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoAplicacaoOutroImovelMN"/>
+            <Campo Nome="valorReducaoBemPequenoValor" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValor"/>
+            <Campo Nome="valorReducaoBemPequenoValorME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValorME"/>
+            <Campo Nome="valorReducaoBemPequenoValorMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValorMN"/>
+            <Campo Nome="valorReducaoLei11196FR1" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei11196FR1"/>
+            <Campo Nome="valorReducaoLei11196FR1ME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei11196FR1ME"/>
+            <Campo Nome="valorReducaoLei11196FR1MN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei11196FR1MN"/>
+            <Campo Nome="valorReducaoLei11196FR2" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei11196FR2"/>
+            <Campo Nome="valorReducaoLei11196FR2ME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei11196FR2ME"/>
+            <Campo Nome="valorReducaoLei11196FR2MN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei11196FR2MN"/>
+            <Campo Nome="valorReducaoLei7713" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei7713"/>
+            <Campo Nome="valorReducaoLei7713ME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei7713ME"/>
+            <Campo Nome="valorReducaoLei7713MN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoLei7713MN"/>
+            <Campo Nome="valorReducaoUnicoImovel" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoUnicoImovel"/>
+            <Campo Nome="valorReducaoUnicoImovelME" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoUnicoImovelME"/>
+            <Campo Nome="valorReducaoUnicoImovelMN" atributoObjetoNegocio="bensImoveis[].colecaoParcelaAlienacao[].valorReducaoUnicoImovelMN"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/calculoImposto">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="bensImoveis[].calculoImposto.aliquotaMedia" />
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="bensImoveis[].calculoImposto.ganhoCapitalTotal" />
+            <Campo Nome="iRRFLei110332004" atributoObjetoNegocio="bensImoveis[].calculoImposto.iRRFLei110332004" />
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensImoveis[].calculoImposto.impostoDevido" />
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="bensImoveis[].calculoImposto.impostoDevido2" />
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensImoveis[].calculoImposto.impostoPago" />
+            <Campo Nome="totalImpostoPagoExteriorPassivelCompensacao" atributoObjetoNegocio="bensImoveis[].calculoImposto.totalImpostoPagoExteriorPassivelCompensacao" />
+            <Campo Nome="faixasCalculoImposto" atributoObjetoNegocio="bensImoveis[].calculoImposto.faixasCalculoImposto" />
+        </Registro>
+        
+        <Registro Nome="/classe/bensImoveis/item/ajuste">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="bensImoveis[].ajuste.aliquotaMedia"/>
+            <Campo Nome="faixasCalculoImposto" atributoObjetoNegocio="bensImoveis[].ajuste.faixasCalculoImposto"/>
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="bensImoveis[].ajuste.ganhoCapitalTotal"/>
+            <Campo Nome="iRRFLei110332004" atributoObjetoNegocio="bensImoveis[].ajuste.iRRFLei110332004"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensImoveis[].ajuste.impostoDevido"/>
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="bensImoveis[].ajuste.impostoDevido2"/>
+            <Campo Nome="impostoDevidoRelativoParcelasAnteriores" atributoObjetoNegocio="bensImoveis[].ajuste.impostoDevidoRelativoParcelasAnteriores"/>
+            <Campo Nome="saldoImpostoDevidoNoBrasil" atributoObjetoNegocio="bensImoveis[].ajuste.saldoImpostoDevidoNoBrasil"/>
+            <Campo Nome="impostoPagoExterior" atributoObjetoNegocio="bensImoveis[].ajuste.impostoPagoExterior"/>
+            <Campo Nome="impostoDevidoNoBrasilRelativoParcelasAnteriores" atributoObjetoNegocio="bensImoveis[].ajuste.impostoDevidoNoBrasilRelativoParcelasAnteriores"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensImoveis[].ajuste.impostoPago"/>
+            <Campo Nome="saldoImpostoDevido" atributoObjetoNegocio="bensImoveis[].ajuste.saldoImpostoDevido"/>
+            <Campo Nome="totalImpostoPagoExteriorPassivelCompensacao" atributoObjetoNegocio="bensImoveis[].ajuste.totalImpostoPagoExteriorPassivelCompensacao"/>
+	</Registro>	
+        
+        <Registro Nome="/classe/bensImoveis/item/consolidacao">
+            <Campo Nome="impostoDevidoAnoAtual" atributoObjetoNegocio="bensImoveis[].consolidacao.impostoDevidoAnoAtual"/>
+            <Campo Nome="impostoDiferidoAnosAnteriores" atributoObjetoNegocio="bensImoveis[].consolidacao.impostoDiferidoAnosAnteriores"/>
+            <Campo Nome="impostoDiferidoAnosPosteriores" atributoObjetoNegocio="bensImoveis[].consolidacao.impostoDiferidoAnosPosteriores"/>
+            <Campo Nome="impostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="bensImoveis[].consolidacao.impostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="impostoTotal" atributoObjetoNegocio="bensImoveis[].consolidacao.impostoTotal"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="bensImoveis[].consolidacao.totalImpostoPago"/>
+            <Campo Nome="totalRendIsentosNaoTributaveis" atributoObjetoNegocio="bensImoveis[].consolidacao.totalRendIsentosNaoTributaveis"/>
+            <Campo Nome="totalRendSujeitosTributacao" atributoObjetoNegocio="bensImoveis[].consolidacao.totalRendSujeitosTributacao"/>
+            <Campo Nome="valorIRF" atributoObjetoNegocio="bensImoveis[].consolidacao.valorIRF"/>
+		</Registro>
+        
+        <!-- ==========================Bens Móveis==========================-->
+        <Registro Nome="/classe/bensMoveis">
+            <Campo Nome="totalImpostoDevidoAnoAtual" atributoObjetoNegocio="bensMoveis.totalImpostoDevidoAnoAtual"/>
+            <Campo Nome="totalImpostoDiferidoAnosAnteriores" atributoObjetoNegocio="bensMoveis.totalImpostoDiferidoAnosAnteriores"/>
+            <Campo Nome="totalImpostoDiferidoAnosPosteriores" atributoObjetoNegocio="bensMoveis.totalImpostoDiferidoAnosPosteriores"/>
+            <Campo Nome="totalImpostoPagoBrasil" atributoObjetoNegocio="bensMoveis.totalImpostoPagoBrasil"/>
+            <Campo Nome="totalImpostoPagoExterior" atributoObjetoNegocio="bensMoveis.totalImpostoPagoExterior"/>
+            <Campo Nome="totalImpostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="bensMoveis.totalImpostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="totalImpostoTotal" atributoObjetoNegocio="bensMoveis.totalImpostoTotal"/>
+            <Campo Nome="totalRendIsentosNaoTributaveisBrasil" atributoObjetoNegocio="bensMoveis.totalRendIsentosNaoTributaveisBrasil"/>
+            <Campo Nome="totalRendIsentosNaoTributaveisExterior" atributoObjetoNegocio="bensMoveis.totalRendIsentosNaoTributaveisExterior"/>
+            <Campo Nome="totalRendSujeitosTributacaoBrasil" atributoObjetoNegocio="bensMoveis.totalRendSujeitosTributacaoBrasil"/>
+            <Campo Nome="totalRendSujeitosTributacaoExterior" atributoObjetoNegocio="bensMoveis.totalRendSujeitosTributacaoExterior"/>
+            <Campo Nome="totalValorIRF" atributoObjetoNegocio="bensMoveis.totalValorIRF"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensMoveis/item" Colecao="bensMoveis">
+            <Campo Nome="alienacaoAPrazo" atributoObjetoNegocio="bensMoveis[].alienacaoAPrazo"/>
+            <Campo Nome="alienacaoAnoAnterior" atributoObjetoNegocio="bensMoveis[].alienacaoAnoAnterior"/>
+            <Campo Nome="alienacaoParcial" atributoObjetoNegocio="bensMoveis[].alienacaoParcial"/>
+            <Campo Nome="bemGrandeValor" atributoObjetoNegocio="bensMoveis[].bemGrandeValor"/>
+            <Campo Nome="bemGrandeValorOperacao" atributoObjetoNegocio="bensMoveis[].bemGrandeValorOperacao"/>
+            <Campo Nome="corretagemAnosAnteriores" atributoObjetoNegocio="bensMoveis[].corretagemAnosAnteriores"/>
+            <Campo Nome="cotacaoDolarDataAlienacao" atributoObjetoNegocio="bensMoveis[].cotacaoDolarDataAlienacao"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensMoveis[].custoCorretagem"/>
+            <Campo Nome="dataAlienacao" atributoObjetoNegocio="bensMoveis[].dataAlienacao"/>
+            <Campo Nome="dataRecebimentoUltimaParcela" atributoObjetoNegocio="bensMoveis[].dataRecebimentoUltimaParcela"/>
+            <Campo Nome="dataTransitoJulgado" atributoObjetoNegocio="bensMoveis[].dataTransitoJulgado"/>
+            <Campo Nome="ganhoCapitalAlienacaoAnterior" atributoObjetoNegocio="bensMoveis[].ganhoCapitalAlienacaoAnterior"/>
+            <Campo Nome="motivoTransmissaoCausaMortisDecisaoJudicial" atributoObjetoNegocio="bensMoveis[].motivoTransmissaoCausaMortisDecisaoJudicial"/>
+            <Campo Nome="natureza" atributoObjetoNegocio="bensMoveis[].natureza"/>
+            <Campo Nome="numeroItem" atributoObjetoNegocio="bensMoveis[].numeroItem"/>
+            <Campo Nome="paisAcordo" atributoObjetoNegocio="bensMoveis[].paisAcordo"/>
+            <Campo Nome="recebimentoUltimaParcelaAnoAnterior" atributoObjetoNegocio="bensMoveis[].recebimentoUltimaParcelaAnoAnterior"/>
+            <Campo Nome="temUltimaParcela" atributoObjetoNegocio="bensMoveis[].temUltimaParcela"/>
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensMoveis[].valorAlienacao"/>
+            <Campo Nome="valorAlienacaoDolar" atributoObjetoNegocio="bensMoveis[].valorAlienacaoDolar"/>
+            <Campo Nome="valorAlienacaoReal" atributoObjetoNegocio="bensMoveis[].valorAlienacaoReal"/>
+            <Campo Nome="valorAplicado" atributoObjetoNegocio="bensMoveis[].valorAplicado"/>
+            <Campo Nome="valorCorretagemDolar" atributoObjetoNegocio="bensMoveis[].valorCorretagemDolar"/>
+            <Campo Nome="valorCorretagemReal" atributoObjetoNegocio="bensMoveis[].valorCorretagemReal"/>
+            <Campo Nome="valorImpostoExteriorReal" atributoObjetoNegocio="bensMoveis[].valorImpostoExteriorReal"/>
+            <Campo Nome="valorLiquidoRecebidoAnosAnteriores" atributoObjetoNegocio="bensMoveis[].valorLiquidoRecebidoAnosAnteriores"/>
+            <Campo Nome="valorRecebidoAnosAnteriores" atributoObjetoNegocio="bensMoveis[].valorRecebidoAnosAnteriores"/>
+            <Campo Nome="inCobranca" atributoObjetoNegocio="bensMoveis[].inCobranca"/>
+            <Campo Nome="dataVencimentoTCM" atributoObjetoNegocio="bensMoveis[].dataVencimentoTCM"/>
+            <Campo Nome="paisResidencia" atributoObjetoNegocio="bensMoveis[].paisResidencia"/>
+            <Campo Nome="territorioParaisoFiscal" atributoObjetoNegocio="bensMoveis[].territorioParaisoFiscal"/>
+        </Registro>
+
+        <Registro Nome="/classe/bensMoveis/item/bemMovel">
+			<Campo Nome="especificacao" atributoObjetoNegocio="bensMoveis[].bemMovel.especificacao"/>
+            <Campo Nome="bemAdquiridoNoBrasil" atributoObjetoNegocio="bensMoveis[].bemMovel.bemAdquiridoNoBrasil"/>
+            <Campo Nome="sujeitoRegistroPublico" atributoObjetoNegocio="bensMoveis[].bemMovel.sujeitoRegistroPublico"/>
+		</Registro>
+        
+        <Registro Nome="/classe/bensMoveis/item/bemMovel/aquisicao">
+            <Campo Nome="cotacaoDolarDataAquisicao" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.cotacaoDolarDataAquisicao"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicao"/>
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoOrigemNacionalDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTorna" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoTorna"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoTornaOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMNDolar" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoTornaOrigemMNDolar"/>
+            <Campo Nome="custoAquisicaoTornaOrigemMNReal" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoTornaOrigemMNReal"/>
+            <Campo Nome="custoAquisicaoTotalDolar" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.custoAquisicaoTotalDolar"/>
+            <Campo Nome="dataAquisicao" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.dataAquisicao"/>
+            <Campo Nome="houveReforma" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.houveReforma"/>
+            <Campo Nome="origemRendimentos" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.origemRendimentos"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.percentualCustoAquisicaoOrigemME"/>
+            <Campo Nome="percentualCustoAquisicaoOrigemNacional" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.percentualCustoAquisicaoOrigemNacional"/>
+            <Campo Nome="moedaEstrangeira" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.moedaEstrangeira"/>
+            <Campo Nome="residenteBrasilAplicacaoExterior" atributoObjetoNegocio="bensMoveis[].bemMovel.aquisicao.residenteBrasilAplicacaoExterior"/>
+        </Registro>	
+        
+        <Registro Nome="/classe/bensMoveis/item/bemMovel/adquirentes/item" Colecao="bensMoveis[].bemMovel.adquirentes">
+			<Campo Nome="cpfCnpj" atributoObjetoNegocio="bensMoveis[].bemMovel.adquirentes[].cpfCnpj"/>
+			<Campo Nome="nome" atributoObjetoNegocio="bensMoveis[].bemMovel.adquirentes[].nome"/>		
+		</Registro>
+        
+        <Registro Nome="/classe/bensMoveis/item/apuracao">
+			<Campo Nome="cotacaoDolarOrigemME" atributoObjetoNegocio="bensMoveis[].apuracao.cotacaoDolarOrigemME" />
+            <Campo Nome="cotacaoDolarOrigemNacional" atributoObjetoNegocio="bensMoveis[].apuracao.cotacaoDolarOrigemNacional" />
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensMoveis[].apuracao.custoAquisicao" />
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracao.custoAquisicaoOrigemMEDolar" />
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].apuracao.custoAquisicaoOrigemNacionalReal" />
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensMoveis[].apuracao.custoCorretagem" />
+            <Campo Nome="custoCorretagemDolar" atributoObjetoNegocio="bensMoveis[].apuracao.custoCorretagemDolar" />
+            <Campo Nome="custoCorretagemOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].apuracao.custoCorretagemOrigemNacionalDolar" />
+            <Campo Nome="custoCorretagemOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracao.custoCorretagemOrigemMEDolar" />
+            <Campo Nome="ganhoCapital1" atributoObjetoNegocio="bensMoveis[].apuracao.ganhoCapital1" />
+            <Campo Nome="ganhoCapital1OrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracao.ganhoCapital1OrigemMEDolar" />
+            <Campo Nome="ganhoCapital1OrigemMEReal" atributoObjetoNegocio="bensMoveis[].apuracao.ganhoCapital1OrigemMEReal" />
+            <Campo Nome="ganhoCapital1OrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].apuracao.ganhoCapital1OrigemNacionalReal" />
+            <Campo Nome="ganhoCapitalTotalExterior" atributoObjetoNegocio="bensMoveis[].apuracao.ganhoCapitalTotalExterior" />
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensMoveis[].apuracao.percentualCustoAquisicaoOrigemME" />
+            <Campo Nome="percentualCustoAquisicaoOrigemMN" atributoObjetoNegocio="bensMoveis[].apuracao.percentualCustoAquisicaoOrigemMN" />
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensMoveis[].apuracao.valorAlienacao" />
+            <Campo Nome="valorAlienacaoDolar" atributoObjetoNegocio="bensMoveis[].apuracao.valorAlienacaoDolar" />
+            <Campo Nome="valorAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracao.valorAlienacaoOrigemMEDolar" />
+            <Campo Nome="valorAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].apuracao.valorAlienacaoOrigemNacionalDolar" />
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensMoveis[].apuracao.valorLiquidoAlienacao" />
+            <Campo Nome="valorLiquidoAlienacaoDolar" atributoObjetoNegocio="bensMoveis[].apuracao.valorLiquidoAlienacaoDolar" />
+            <Campo Nome="valorLiquidoAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracao.valorLiquidoAlienacaoOrigemMEDolar" />
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].apuracao.valorLiquidoAlienacaoOrigemNacionalDolar" />
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].apuracao.valorLiquidoAlienacaoOrigemNacionalReal" />
+		</Registro>
+        
+        <Registro Nome="/classe/bensMoveis/item/calculoImposto">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="bensMoveis[].calculoImposto.aliquotaMedia" />
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="bensMoveis[].calculoImposto.ganhoCapitalTotal" />
+            <Campo Nome="iRRFLei110332004" atributoObjetoNegocio="bensMoveis[].calculoImposto.iRRFLei110332004" />
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensMoveis[].calculoImposto.impostoDevido" />
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="bensMoveis[].calculoImposto.impostoDevido2" />
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensMoveis[].calculoImposto.impostoPago" />
+            <Campo Nome="totalImpostoPagoExteriorPassivelCompensacao" atributoObjetoNegocio="bensMoveis[].calculoImposto.totalImpostoPagoExteriorPassivelCompensacao" />
+            <Campo Nome="faixasCalculoImposto" atributoObjetoNegocio="bensMoveis[].calculoImposto.faixasCalculoImposto" />
+	</Registro>
+        
+        <Registro Nome="/classe/bensMoveis/item/colecaoParcelaAlienacao">
+            <Campo Nome="custoAquisicaoProporcionalOrigemMEDolarTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoAquisicaoProporcionalOrigemMEDolarTotal"/>
+            <Campo Nome="custoAquisicaoProporcionalOrigemNacionalRealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoAquisicaoProporcionalOrigemNacionalRealTotal"/>
+            <Campo Nome="custoAquisicaoProporcionalTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoAquisicaoProporcionalTotal"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemMEDolarTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoAquisicaoTornaProporcionalOrigemMEDolarTotal"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemNacionalRealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoAquisicaoTornaProporcionalOrigemNacionalRealTotal"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoAquisicaoTornaProporcionalTotal"/>
+            <Campo Nome="custoCorretagemDolarTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoCorretagemDolarTotal"/>
+            <Campo Nome="custoCorretagemTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.custoCorretagemTotal"/>
+            <Campo Nome="ganho1ProporcionalTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.ganho1ProporcionalTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalMEDolarTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalMEDolarTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalMERealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalMERealTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalNacionalRealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalNacionalRealTotal"/>
+            <Campo Nome="ganhoCapital1ProporcionalRealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.ganhoCapital1ProporcionalRealTotal"/>
+            <Campo Nome="impostoDevido2Total" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.impostoDevido2Total"/>
+            <Campo Nome="impostoDevidoTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.impostoDevidoTotal"/>
+            <Campo Nome="impostoPagoExteriorTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.impostoPagoExteriorTotal"/>
+            <Campo Nome="impostoPagoTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.impostoPagoTotal"/>
+            <Campo Nome="valorLiquidoAlienacaoDolarTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.valorLiquidoAlienacaoDolarTotal"/>
+            <Campo Nome="valorLiquidoAlienacaoRealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.valorLiquidoAlienacaoRealTotal"/>
+            <Campo Nome="valorLiquidoAlienacaoTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.valorLiquidoAlienacaoTotal"/>
+            <Campo Nome="valorRecebidoDolarTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.valorRecebidoDolarTotal"/>
+            <Campo Nome="valorRecebidoRealTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.valorRecebidoRealTotal"/>
+            <Campo Nome="valorRecebidoTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao.valorRecebidoTotal"/>
+        </Registro>
+        
+        <Registro Nome="/classe/bensMoveis/item/colecaoParcelaAlienacao/item" Colecao="bensMoveis[].colecaoParcelaAlienacao">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].aliquotaMedia"/>
+            <Campo Nome="cotacaoDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].cotacaoDolar"/>
+            <Campo Nome="custoAquisicaoProporcional" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoAquisicaoProporcional"/>
+            <Campo Nome="custoAquisicaoProporcionalOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoAquisicaoProporcionalOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoProporcionalOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoAquisicaoProporcionalOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTornaProporcional" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcional"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcionalOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoTornaProporcionalOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcionalOrigemNacionalReal"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoCorretagem"/>
+            <Campo Nome="custoCorretagemDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].custoCorretagemDolar"/>
+            <Campo Nome="dataRecebimento" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].dataRecebimento"/>
+            <Campo Nome="ganhoCapital1Proporcional" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ganhoCapital1Proporcional"/>
+            <Campo Nome="ganhoCapital1ProporcionalOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalOrigemMEDolar"/>
+            <Campo Nome="ganhoCapital1ProporcionalOrigemMEReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalOrigemMEReal"/>
+            <Campo Nome="ganhoCapital1ProporcionalOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalOrigemNacionalReal"/>
+            <Campo Nome="ganhoCapital1ProporcionalTotalReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ganhoCapital1ProporcionalTotalReal"/>
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ganhoCapitalTotal"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].impostoDevido"/>
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].impostoDevido2"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].impostoPago"/>
+            <Campo Nome="impostoPagoExterior" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].impostoPagoExterior"/>
+            <Campo Nome="irrfLei110332004" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].irrfLei110332004"/>
+            <Campo Nome="percentualGanho" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].percentualGanho"/>
+            <Campo Nome="percentualGanhoOrigemME" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].percentualGanhoOrigemME"/>
+            <Campo Nome="percentualGanhoOrigemNacional" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].percentualGanhoOrigemNacional"/>
+            <Campo Nome="percentualReducaoBemPequenoValor" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValor"/>
+            <Campo Nome="percentualReducaoBemPequenoValorME" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValorME"/>
+            <Campo Nome="percentualReducaoBemPequenoValorMN" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValorMN"/>
+            <Campo Nome="ultimaParcela" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].ultimaParcela"/>
+            <Campo Nome="valorAjuste" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorAjuste"/>
+            <Campo Nome="valorAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorAlienacaoOrigemMEDolar"/>
+            <Campo Nome="valorAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorAlienacaoOrigemNacionalDolar"/>
+            <Campo Nome="valorAlienacaoOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorAlienacaoOrigemNacionalReal"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorLiquidoAlienacao"/>
+            <Campo Nome="valorLiquidoAlienacaoDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorLiquidoAlienacaoDolar"/>
+            <Campo Nome="valorLiquidoAlienacaoReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorLiquidoAlienacaoReal"/>
+            <Campo Nome="valorRecebido" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorRecebido"/>
+            <Campo Nome="valorRecebidoDolar" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorRecebidoDolar"/>
+            <Campo Nome="valorRecebidoReal" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorRecebidoReal"/>
+            <Campo Nome="valorReducaoBemPequenoValor" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValor"/>
+            <Campo Nome="valorReducaoBemPequenoValorME" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValorME"/>
+            <Campo Nome="valorReducaoBemPequenoValorMN" atributoObjetoNegocio="bensMoveis[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValorMN"/>
+        </Registro>
+
+        <Registro Nome="/classe/bensMoveis/item/apuracaoFinal">
+            <Campo Nome="cotacaoDolarOrigemME" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.cotacaoDolarOrigemME" />
+            <Campo Nome="cotacaoDolarOrigemNacional" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.cotacaoDolarOrigemNacional" />
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoAquisicao" />
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoAquisicaoOrigemMEDolar" />
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoAquisicaoOrigemNacionalReal" />
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoCorretagem" />
+            <Campo Nome="custoCorretagemDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoCorretagemDolar" />
+            <Campo Nome="custoCorretagemOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoCorretagemOrigemNacionalDolar" />
+            <Campo Nome="custoCorretagemOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.custoCorretagemOrigemMEDolar" />
+            <Campo Nome="ganhoCapital1" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.ganhoCapital1" />
+            <Campo Nome="ganhoCapital1OrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.ganhoCapital1OrigemMEDolar" />
+            <Campo Nome="ganhoCapital1OrigemMEReal" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.ganhoCapital1OrigemMEReal" />
+            <Campo Nome="ganhoCapital1OrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.ganhoCapital1OrigemNacionalReal" />
+            <Campo Nome="ganhoCapitalTotalExterior" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.ganhoCapitalTotalExterior" />
+            <Campo Nome="percentualCustoAquisicaoOrigemME" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.percentualCustoAquisicaoOrigemME" />
+            <Campo Nome="percentualCustoAquisicaoOrigemMN" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.percentualCustoAquisicaoOrigemMN" />
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorAlienacao" />
+            <Campo Nome="valorAlienacaoDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorAlienacaoDolar" />
+            <Campo Nome="valorAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorAlienacaoOrigemMEDolar" />
+            <Campo Nome="valorAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorAlienacaoOrigemNacionalDolar" />
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorLiquidoAlienacao" />
+            <Campo Nome="valorLiquidoAlienacaoDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorLiquidoAlienacaoDolar" />
+            <Campo Nome="valorLiquidoAlienacaoOrigemMEDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorLiquidoAlienacaoOrigemMEDolar" />
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalDolar" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorLiquidoAlienacaoOrigemNacionalDolar" />
+            <Campo Nome="valorLiquidoAlienacaoOrigemNacionalReal" atributoObjetoNegocio="bensMoveis[].apuracaoFinal.valorLiquidoAlienacaoOrigemNacionalReal" />
+        </Registro>
+
+        <Registro Nome="/classe/bensMoveis/item/ajuste">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="bensMoveis[].ajuste.aliquotaMedia"/>
+            <Campo Nome="faixasCalculoImposto" atributoObjetoNegocio="bensMoveis[].ajuste.faixasCalculoImposto"/>
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="bensMoveis[].ajuste.ganhoCapitalTotal"/>
+            <Campo Nome="iRRFLei110332004" atributoObjetoNegocio="bensMoveis[].ajuste.iRRFLei110332004"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="bensMoveis[].ajuste.impostoDevido"/>
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="bensMoveis[].ajuste.impostoDevido2"/>
+            <Campo Nome="impostoDevidoRelativoParcelasAnteriores" atributoObjetoNegocio="bensMoveis[].ajuste.impostoDevidoRelativoParcelasAnteriores"/>
+            <Campo Nome="saldoImpostoDevidoNoBrasil" atributoObjetoNegocio="bensMoveis[].ajuste.saldoImpostoDevidoNoBrasil"/>
+            <Campo Nome="impostoPagoExterior" atributoObjetoNegocio="bensMoveis[].ajuste.impostoPagoExterior"/>
+            <Campo Nome="impostoDevidoNoBrasilRelativoParcelasAnteriores" atributoObjetoNegocio="bensMoveis[].ajuste.impostoDevidoNoBrasilRelativoParcelasAnteriores"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="bensMoveis[].ajuste.impostoPago"/>
+            <Campo Nome="saldoImpostoDevido" atributoObjetoNegocio="bensMoveis[].ajuste.saldoImpostoDevido"/>
+            <Campo Nome="totalImpostoPagoExteriorPassivelCompensacao" atributoObjetoNegocio="bensMoveis[].ajuste.totalImpostoPagoExteriorPassivelCompensacao"/>
+		</Registro>	
+        
+        <Registro Nome="/classe/bensMoveis/item/consolidacao">
+            <Campo Nome="impostoDevidoAnoAtual" atributoObjetoNegocio="bensMoveis[].consolidacao.impostoDevidoAnoAtual"/>
+            <Campo Nome="impostoDiferidoAnosAnteriores" atributoObjetoNegocio="bensMoveis[].consolidacao.impostoDiferidoAnosAnteriores"/>
+            <Campo Nome="impostoDiferidoAnosPosteriores" atributoObjetoNegocio="bensMoveis[].consolidacao.impostoDiferidoAnosPosteriores"/>
+            <Campo Nome="impostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="bensMoveis[].consolidacao.impostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="impostoTotal" atributoObjetoNegocio="bensMoveis[].consolidacao.impostoTotal"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="bensMoveis[].consolidacao.totalImpostoPago"/>
+            <Campo Nome="totalRendIsentosNaoTributaveis" atributoObjetoNegocio="bensMoveis[].consolidacao.totalRendIsentosNaoTributaveis"/>
+            <Campo Nome="totalRendSujeitosTributacao" atributoObjetoNegocio="bensMoveis[].consolidacao.totalRendSujeitosTributacao"/>
+            <Campo Nome="valorIRF" atributoObjetoNegocio="bensMoveis[].consolidacao.valorIRF"/>
+		</Registro>
+        
+        <!-- ==========================Participações Societárias==========================-->
+        
+        <Registro Nome="/classe/participacoesSocietarias">
+            <Campo Nome="totalImpostoDevidoAnoAtual" atributoObjetoNegocio="participacoesSocietarias.totalImpostoDevidoAnoAtual"/>
+            <Campo Nome="totalImpostoDiferidoAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias.totalImpostoDiferidoAnosAnteriores"/>
+            <Campo Nome="totalImpostoDiferidoAnosPosteriores" atributoObjetoNegocio="participacoesSocietarias.totalImpostoDiferidoAnosPosteriores"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="participacoesSocietarias.totalImpostoPago"/>
+            <Campo Nome="totalImpostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="participacoesSocietarias.totalImpostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="totalImpostoTotal" atributoObjetoNegocio="participacoesSocietarias.totalImpostoTotal"/>
+            <Campo Nome="totalRendIsentosNaoTributaveis" atributoObjetoNegocio="participacoesSocietarias.totalRendIsentosNaoTributaveis"/>
+            <Campo Nome="totalRendSujeitosTributacao" atributoObjetoNegocio="participacoesSocietarias.totalRendSujeitosTributacao"/>
+            <Campo Nome="totalValorIRF" atributoObjetoNegocio="participacoesSocietarias.totalValorIRF"/>
+        </Registro>
+        
+        <Registro Nome="/classe/participacoesSocietarias/item" Colecao="participacoesSocietarias">
+            <Campo Nome="alienacaoAPrazo" atributoObjetoNegocio="participacoesSocietarias[].alienacaoAPrazo" />
+            <Campo Nome="alienacaoAPrazoPartSocAux" atributoObjetoNegocio="participacoesSocietarias[].alienacaoAPrazoPartSocAux" />
+            <Campo Nome="alienacaoAnoAnterior" atributoObjetoNegocio="participacoesSocietarias[].alienacaoAnoAnterior" />
+            <Campo Nome="alienacaoParcial" atributoObjetoNegocio="participacoesSocietarias[].alienacaoParcial" />
+            <Campo Nome="bemGrandeValor" atributoObjetoNegocio="participacoesSocietarias[].bemGrandeValor" />
+            <Campo Nome="bemGrandeValorOperacao" atributoObjetoNegocio="participacoesSocietarias[].bemGrandeValorOperacao"/>
+            <Campo Nome="corretagemAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias[].corretagemAnosAnteriores" />
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="participacoesSocietarias[].custoCorretagem" />
+            <Campo Nome="dataAlienacao" atributoObjetoNegocio="participacoesSocietarias[].dataAlienacao" />
+            <Campo Nome="dataRecebimentoUltimaParcela" atributoObjetoNegocio="participacoesSocietarias[].dataRecebimentoUltimaParcela" />
+            <Campo Nome="dataTransitoJulgado" atributoObjetoNegocio="participacoesSocietarias[].dataTransitoJulgado" />
+            <Campo Nome="ganhoCapitalAlienacaoAnterior" atributoObjetoNegocio="participacoesSocietarias[].ganhoCapitalAlienacaoAnterior" />
+            <Campo Nome="motivoTransmissaoCausaMortisDecisaoJudicial" atributoObjetoNegocio="participacoesSocietarias[].motivoTransmissaoCausaMortisDecisaoJudicial" />
+            <Campo Nome="natureza" atributoObjetoNegocio="participacoesSocietarias[].natureza" />
+            <Campo Nome="numeroItem" atributoObjetoNegocio="participacoesSocietarias[].numeroItem" />
+            <Campo Nome="recebimentoUltimaParcelaAnoAnterior" atributoObjetoNegocio="participacoesSocietarias[].recebimentoUltimaParcelaAnoAnterior" />
+            <Campo Nome="temUltimaParcela" atributoObjetoNegocio="participacoesSocietarias[].temUltimaParcela" />
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="participacoesSocietarias[].valorAlienacao" />
+            <Campo Nome="valorLiquidoRecebidoAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias[].valorLiquidoRecebidoAnosAnteriores" />
+            <Campo Nome="valorRecebidoAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias[].valorRecebidoAnosAnteriores" />
+            <Campo Nome="dataVencimentoTCM" atributoObjetoNegocio="participacoesSocietarias[].dataVencimentoTCM"/>
+            <Campo Nome="paisResidencia" atributoObjetoNegocio="participacoesSocietarias[].paisResidencia"/>
+            <Campo Nome="territorioParaisoFiscal" atributoObjetoNegocio="participacoesSocietarias[].territorioParaisoFiscal"/>
+        </Registro>
+        
+		<Registro Nome="/classe/participacoesSocietarias/item/participacaoSocietaria">
+			<Campo Nome="cnpj" atributoObjetoNegocio="participacoesSocietarias[].participacaoSocietaria.cnpj" />
+            <Campo Nome="especie" atributoObjetoNegocio="participacoesSocietarias[].participacaoSocietaria.especie" />
+            <Campo Nome="nome" atributoObjetoNegocio="participacoesSocietarias[].participacaoSocietaria.nome" />
+            <Campo Nome="uf" atributoObjetoNegocio="participacoesSocietarias[].participacaoSocietaria.uf" />
+            <Campo Nome="municipio" atributoObjetoNegocio="participacoesSocietarias[].participacaoSocietaria.municipio" />
+		</Registro>
+        
+        <Registro Nome="/classe/participacoesSocietarias/item/adquirentes/item" Colecao="participacoesSocietarias[].adquirentes">
+			<Campo Nome="cpfCnpj" atributoObjetoNegocio="participacoesSocietarias[].adquirentes[].cpfCnpj"/>
+			<Campo Nome="nome" atributoObjetoNegocio="participacoesSocietarias[].adquirentes[].nome"/>		
+		</Registro>
+        
+        <Registro Nome="/classe/participacoesSocietarias/item/colecaoParcelaAquisicaoParticipacaoSocietaria">
+            <Campo Nome="custoAquisicaoTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria.custoAquisicaoTotal"/>
+            <Campo Nome="custoMedioTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria.custoMedioTotal"/>
+            <Campo Nome="quantidadeQuotasTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria.quantidadeQuotasTotal"/>
+        </Registro>
+        
+        <Registro Nome="/classe/participacoesSocietarias/item/colecaoParcelaAquisicaoParticipacaoSocietaria/item" Colecao="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria">
+			<Campo Nome="cotacaoDolar" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].cotacaoDolar"/>
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].custoAquisicao"/>
+            <Campo Nome="custoAquisicaoOrigemMEDolar" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].custoAquisicaoOrigemMEDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalDolar" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].custoAquisicaoOrigemNacionalDolar"/>
+            <Campo Nome="custoAquisicaoOrigemNacionalReal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].custoAquisicaoOrigemNacionalReal"/>
+            <Campo Nome="custoAquisicaoTotalDolar" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].custoAquisicaoTotalDolar"/>
+            <Campo Nome="custoMedio" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].custoMedio"/>
+            <Campo Nome="data" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].data"/>
+            <Campo Nome="especieAquisicao" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].especieAquisicao"/>
+            <Campo Nome="indice" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].indice"/>
+            <Campo Nome="percentualCustoTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].percentualCustoTotal"/>
+            <Campo Nome="percentualCustoTotalDolar" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].percentualCustoTotalDolar"/>
+            <Campo Nome="percentualCustoTotalReal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].percentualCustoTotalReal"/>
+            <Campo Nome="quantidadeQuotas" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].quantidadeQuotas"/>
+		</Registro>
+        
+        <!--Registro Nome="/classe/participacoesSocietarias/item/colecaoParcelaAquisicaoParticipacaoSocietaria/item/participacaoSocietariaAlienada/operacoesParticipacaoSocietaria/item" Colecao="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria">
+			<Campo Nome="custoAlienacao" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].custoAlienacao"/>
+            <Campo Nome="custoMedio" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].custoMedio"/>
+            <Campo Nome="data" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].data"/>
+            <Campo Nome="estoque" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].estoque"/>
+            <Campo Nome="quantidade" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].quantidade"/>
+            <Campo Nome="saldo" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].saldo"/>
+            <Campo Nome="tipo" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].tipo"/>
+            <Campo Nome="valor" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAquisicaoParticipacaoSocietaria[].participacaoSocietariaAlienada.operacoesParticipacaoSocietaria[].valor"/>
+		</Registro-->
+        
+        <Registro Nome="/classe/participacoesSocietarias/item/apuracao">
+            <Campo Nome="custoAquisicao" atributoObjetoNegocio="participacoesSocietarias[].apuracao.custoAquisicao" />
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="participacoesSocietarias[].apuracao.custoCorretagem" />
+            <Campo Nome="ganhoCapital1" atributoObjetoNegocio="participacoesSocietarias[].apuracao.ganhoCapital1" />
+            <Campo Nome="valorAlienacao" atributoObjetoNegocio="participacoesSocietarias[].apuracao.valorAlienacao" />
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="participacoesSocietarias[].apuracao.valorLiquidoAlienacao" />
+	</Registro>
+        
+	<Registro Nome="/classe/participacoesSocietarias/item/calculoImposto">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.aliquotaMedia" />
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.ganhoCapitalTotal" />
+            <Campo Nome="iRRFLei110332004" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.iRRFLei110332004" />
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.impostoDevido" />
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.impostoDevido2" />
+            <Campo Nome="impostoPago" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.impostoPago" />
+            <Campo Nome="totalImpostoPagoExteriorPassivelCompensacao" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.totalImpostoPagoExteriorPassivelCompensacao" />
+            <Campo Nome="faixasCalculoImposto" atributoObjetoNegocio="participacoesSocietarias[].calculoImposto.faixasCalculoImposto" />
+        </Registro>
+
+        <Registro Nome="/classe/participacoesSocietarias/item/colecaoParcelaAlienacao">
+            <Campo Nome="custoAquisicaoProporcionalTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.custoAquisicaoProporcionalTotal"/>
+            <Campo Nome="custoCorretagemTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.custoCorretagemTotal"/>
+            <Campo Nome="ganhoProporcionalTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.ganhoProporcionalTotal"/>
+            <Campo Nome="impostoDevido2Total" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.impostoDevido2Total"/>
+            <Campo Nome="impostoDevidoTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.impostoDevidoTotal"/>
+            <Campo Nome="impostoPagoTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.impostoPagoTotal"/>
+            <Campo Nome="irrfLei110332004Total" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.irrfLei110332004Total"/>
+            <Campo Nome="valorLiquidoAlienacaoTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.valorLiquidoAlienacaoTotal"/>
+            <Campo Nome="valorRecebidoTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao.valorRecebidoTotal"/>
+        </Registro>
+
+        <Registro Nome="/classe/participacoesSocietarias/item/colecaoParcelaAlienacao/item" Colecao="participacoesSocietarias[].colecaoParcelaAlienacao">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].aliquotaMedia"/>
+            <Campo Nome="custoAquisicaoProporcional" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].custoAquisicaoProporcional"/>
+            <Campo Nome="custoAquisicaoTornaProporcional" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].custoAquisicaoTornaProporcional"/>
+            <Campo Nome="custoCorretagem" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].custoCorretagem"/>
+            <Campo Nome="dataRecebimento" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].dataRecebimento"/>
+            <Campo Nome="ganhoCapital1Proporcional" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].ganhoCapital1Proporcional"/>
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].ganhoCapitalTotal"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].impostoDevido"/>
+            <Campo Nome="impostoDevido2" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].impostoDevido2"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].impostoPago"/>
+            <Campo Nome="irrfLei110332004" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].irrfLei110332004"/>
+            <Campo Nome="percentualGanho" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].percentualGanho"/>
+            <Campo Nome="percentualReducaoBemPequenoValor" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].percentualReducaoBemPequenoValor"/>
+            <Campo Nome="ultimaParcela" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].ultimaParcela"/>
+            <Campo Nome="valorLiquidoAlienacao" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].valorLiquidoAlienacao"/>
+            <Campo Nome="valorRecebido" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].valorRecebido"/>
+            <Campo Nome="valorReducaoBemPequenoValor" atributoObjetoNegocio="participacoesSocietarias[].colecaoParcelaAlienacao[].valorReducaoBemPequenoValor"/>
+        </Registro>
+
+        <Registro Nome="/classe/participacoesSocietarias/item/consolidacao">
+            <Campo Nome="impostoDevidoAnoAtual" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impostoDevidoAnoAtual"/>
+            <Campo Nome="impostoDiferidoAnosAnteriores" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impostoDiferidoAnosAnteriores"/>
+            <Campo Nome="impostoDiferidoAnosPosteriores" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impostoDiferidoAnosPosteriores"/>
+            <Campo Nome="impostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="impostoTotal" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.impostoTotal"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.totalImpostoPago"/>
+            <Campo Nome="totalRendIsentosNaoTributaveis" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.totalRendIsentosNaoTributaveis"/>
+            <Campo Nome="totalRendSujeitosTributacao" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.totalRendSujeitosTributacao"/>
+            <Campo Nome="valorIRF" atributoObjetoNegocio="participacoesSocietarias[].consolidacao.valorIRF"/>
+        </Registro>
+        
+        <!-- ==========================Moeda em Espécie==========================-->
+        <Registro Nome="/classe/moedasAlienadas">
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="moedasAlienadas.aliquotaMedia"/>
+            <Campo Nome="ganhoCapitalTotal" atributoObjetoNegocio="moedasAlienadas.ganhoCapitalTotal"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="moedasAlienadas.impostoDevido"/>
+        </Registro>
+        
+        <Registro Nome="/classe/moedasAlienadas/item" Colecao="moedasAlienadas">
+            <Campo Nome="custoMedioInicial" atributoObjetoNegocio="moedasAlienadas[].custoMedioInicial"/>
+            <Campo Nome="estoqueInicial" atributoObjetoNegocio="moedasAlienadas[].estoqueInicial"/>
+            <Campo Nome="moeda" atributoObjetoNegocio="moedasAlienadas[].moeda"/>
+            <Campo Nome="saldoInicial" atributoObjetoNegocio="moedasAlienadas[].saldoInicial"/>
+        </Registro>
+
+        <Registro Nome="/classe/moedasAlienadas/item/operacoesEspecie">
+            <Campo Nome="estoqueInicial" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie.estoqueInicial"/>
+            <Campo Nome="saldoInicial" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie.saldoInicial"/>
+            <Campo Nome="custoMedioInicial" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie.custoMedioInicial"/>
+            <Campo Nome="totalGanhoCapital" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie.totalGanhoCapital"/>
+            <Campo Nome="totalQtdAdquirida" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie.totalQtdAdquirida"/>
+            <Campo Nome="totalQtdAlienada" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie.totalQtdAlienada"/>
+        </Registro>    
+        
+        <Registro Nome="/classe/moedasAlienadas/item/operacoesEspecie/item" Colecao="moedasAlienadas[].operacoesEspecie">
+            <Campo Nome="custoAlienacao" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].custoAlienacao"/>
+            <Campo Nome="custoMedio" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].custoMedio"/>
+            <Campo Nome="data" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].data"/>
+            <Campo Nome="estoque" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].estoque"/>
+            <Campo Nome="ganhoCapital" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].ganhoCapital"/>
+            <Campo Nome="niAdquirente" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].niAdquirente"/>
+            <Campo Nome="nomeAdquirente" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].nomeAdquirente"/>
+            <Campo Nome="quantidade" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].quantidade"/>
+            <Campo Nome="saldo" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].saldo"/>
+            <Campo Nome="tipo"  atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].tipo"/>
+            <Campo Nome="valor" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].valor"/>
+            <Campo Nome="cotacaoDolar" atributoObjetoNegocio="moedasAlienadas[].operacoesEspecie[].cotacaoDolar"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/janeiro" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.janeiro.impostoPago"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/fevereiro" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.fevereiro.impostoPago"/>
+        </Registro>
+        
+       <Registro Nome="/classe/totalizacaoMoedasAlienadas/marco" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.marco.impostoPago"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/abril" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.abril.impostoPago"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/maio" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.maio.impostoPago"/>
+        </Registro>
+                                    
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/junho" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.junho.impostoPago"/>
+        </Registro>
+
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/julho" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.julho.impostoPago"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/agosto" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.agosto.impostoPago"/>
+        </Registro>
+        
+       <Registro Nome="/classe/totalizacaoMoedasAlienadas/setembro" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.setembro.impostoPago"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/outubro" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.outubro.impostoPago"/>
+        </Registro>
+        
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/novembro" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.novembro.impostoPago"/>
+        </Registro>
+                                    
+        <Registro Nome="/classe/totalizacaoMoedasAlienadas/dezembro" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro">
+            <Campo Nome="mes" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.mes"/>
+            <Campo Nome="alienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.alienacoesDolar"/>
+            <Campo Nome="alienacoesConsolidadasDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.alienacoesConsolidadasDolar"/>
+            <Campo Nome="ganhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.ganhosCapital"/>
+            <Campo Nome="ganhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.ganhosCapitalTributavel"/>
+            <Campo Nome="aliquotaMedia" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.aliquotaMedia"/>
+            <Campo Nome="impostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.impostoDevido"/>
+            <Campo Nome="impostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.dezembro.impostoPago"/>
+        </Registro>
+        
+        <!--Registro Nome="/classe/totalizacaoMoedasAlienadas" atributoObjetoNegocio="totalizacaoMoedasAlienadas">
+            <Campo Nome="totalAlienacoesDolar" atributoObjetoNegocio="totalizacaoMoedasAlienadas.totalAlienacoesDolar"/>
+            <Campo Nome="totalAlienacoesDolarConsolidado" atributoObjetoNegocio="totalizacaoMoedasAlienadas.totalAlienacoesDolarConsolidado"/>
+            <Campo Nome="totalGanhosCapital" atributoObjetoNegocio="totalizacaoMoedasAlienadas.totalGanhosCapital"/>
+            <Campo Nome="totalGanhosCapitalTributavel" atributoObjetoNegocio="totalizacaoMoedasAlienadas.totalGanhosCapitalTributavel"/>
+            <Campo Nome="totalImpostoDevido" atributoObjetoNegocio="totalizacaoMoedasAlienadas.totalImpostoDevido"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="totalizacaoMoedasAlienadas.totalImpostoPago"/>
+        </Registro-->
+        
+        <!-- ==========================Consolidação Geral==========================-->
+        <Registro Nome="/classe/consolidacaoBrasil">
+            <Campo Nome="impostoDevidoAnoAtual" atributoObjetoNegocio="consolidacaoBrasil.impostoDevidoAnoAtual"/>
+            <Campo Nome="impostoDiferidoAnosAnteriores" atributoObjetoNegocio="consolidacaoBrasil.impostoDiferidoAnosAnteriores"/>
+            <Campo Nome="impostoDiferidoAnosPosteriores" atributoObjetoNegocio="consolidacaoBrasil.impostoDiferidoAnosPosteriores"/>
+            <Campo Nome="impostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="consolidacaoBrasil.impostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="impostoTotal" atributoObjetoNegocio="consolidacaoBrasil.impostoTotal"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="consolidacaoBrasil.totalImpostoPago"/>
+            <Campo Nome="totalRendIsentosNaoTributaveis" atributoObjetoNegocio="consolidacaoBrasil.totalRendIsentosNaoTributaveis"/>
+            <Campo Nome="totalRendSujeitosTributacao" atributoObjetoNegocio="consolidacaoBrasil.totalRendSujeitosTributacao"/>
+            <Campo Nome="valorIRF" atributoObjetoNegocio="consolidacaoBrasil.valorIRF"/>
+        </Registro>
+        
+        <Registro Nome="/classe/consolidacaoExterior">
+            <Campo Nome="impostoDevidoAnoAtual" atributoObjetoNegocio="consolidacaoExterior.impostoDevidoAnoAtual"/>
+            <Campo Nome="impostoDiferidoAnosAnteriores" atributoObjetoNegocio="consolidacaoExterior.impostoDiferidoAnosAnteriores"/>
+            <Campo Nome="impostoDiferidoAnosPosteriores" atributoObjetoNegocio="consolidacaoExterior.impostoDiferidoAnosPosteriores"/>
+            <Campo Nome="impostoReferenteAlienacaoAnoAtual" atributoObjetoNegocio="consolidacaoExterior.impostoReferenteAlienacaoAnoAtual"/>
+            <Campo Nome="impostoTotal" atributoObjetoNegocio="consolidacaoExterior.impostoTotal"/>
+            <Campo Nome="totalImpostoPago" atributoObjetoNegocio="consolidacaoExterior.totalImpostoPago"/>
+            <Campo Nome="totalRendIsentosNaoTributaveis" atributoObjetoNegocio="consolidacaoExterior.totalRendIsentosNaoTributaveis"/>
+            <Campo Nome="totalRendSujeitosTributacao" atributoObjetoNegocio="consolidacaoExterior.totalRendSujeitosTributacao"/>
+            <Campo Nome="valorIRF" atributoObjetoNegocio="consolidacaoExterior.valorIRF"/>
+        </Registro>
+        
+    </DeclaracaoTXT>
+    
+</Mapeamento>
