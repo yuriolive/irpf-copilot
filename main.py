@@ -90,7 +90,7 @@ def display_help():
     table.add_row("status", "Mostra status do sistema e arquivos")
     table.add_row("list-dbk", "Lista arquivos DBK disponíveis")
     table.add_row("list-informes", "Lista informes disponíveis na pasta informes/")
-    table.add_row("test-pdf", "Testa extração de PDF do informe padrão")
+    table.add_row("test-pdf", "Testa extração de PDF do primeiro informe disponível")
     table.add_row("test-pdf <arquivo>", "Testa extração de um informe específico")
     table.add_row("backup <arquivo>", "Cria backup de um arquivo DBK")
     table.add_row("validate <arquivo>", "Valida checksums de um arquivo DBK")
@@ -99,7 +99,7 @@ def display_help():
     console.print(table)
     console.print("\n[yellow]Exemplos de perguntas:[/yellow]")
     console.print("• 'Leia o arquivo DBK original e me mostre um resumo'")
-    console.print("• 'Analise o informe 99Pay e extraia os dados bancários'") 
+    console.print("• 'Analise o informe do Itaú e extraia os dados para o IRPF'") 
     console.print("• 'Liste todos os informes disponíveis na pasta'")
     console.print("• 'Validar o checksum do arquivo gerado'")
     console.print("• 'Listar todos os registros R21 na declaração'")
@@ -314,34 +314,26 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
                         console.print(f"\n[dim]Texto extraído (primeiros 200 caracteres): {text[:200]}...[/dim]")
                 else:
                     console.print(f"[red]❌ Erro na extração: {parsed.get('error', 'Erro desconhecido')}[/red]")
-                    
             except json.JSONDecodeError:
                 console.print("[red]❌ Erro ao processar resposta da ferramenta[/red]")
                 console.print(result)
         else:
-            # If no specific file, run the basic test
-            # Capture stdout to display nicely in rich console
-            import io
-            from contextlib import redirect_stdout
+            # Find first available informes file
+            informes_dir = Path("informes")
+            if not informes_dir.exists():
+                console.print("[red]Pasta informes/ não encontrada[/red]")
+                return
+                
+            # Prefer PDFs, but accept any file if no PDFs available
+            test_file = next((f for f in informes_dir.glob("*.pdf")), 
+                          next((f for f in informes_dir.iterdir()), None))
             
-            # Capture output
-            f = io.StringIO()
-            with redirect_stdout(f):
-                run_pdf_test()
-            
-            # Format and display captured output
-            output = f.getvalue()
-            for line in output.split('\n'):
-                if '✅' in line:
-                    console.print(f"[green]{line}[/green]")
-                elif '❌' in line:
-                    console.print(f"[red]{line}[/red]")
-                elif '⚠️' in line:
-                    console.print(f"[yellow]{line}[/yellow]")
-                elif '🧪' in line or '📄' in line or '🔍' in line:
-                    console.print(f"[blue]{line}[/blue]")
-                else:
-                    console.print(line)
+            if not test_file:
+                console.print("[red]Nenhum arquivo encontrado na pasta informes/[/red]")
+                return
+                
+            console.print(f"[blue]Testando extração com o arquivo:[/blue] {test_file.name}")
+            test_pdf_extraction(str(test_file))
             
     except Exception as e:
         logger.error(f"Error testing PDF extraction: {e}")
@@ -408,14 +400,36 @@ def handle_special_commands(user_input: str) -> bool:
     elif command == "test-pdf" or command == "test-extraction":
         test_pdf_extraction()
         return True
-    
     elif command.startswith("test-pdf "):
         file_name = command[9:].strip()
-        file_path = Path("informes") / file_name
+        
+        # Check if name is a pattern or partial match
+        informes_dir = Path("informes")
+        if not informes_dir.exists():
+            console.print("[red]Pasta informes/ não encontrada[/red]")
+            return True
+            
+        # Try exact match first
+        file_path = informes_dir / file_name
         if file_path.exists():
             test_pdf_extraction(str(file_path))
+            return True
+            
+        # If not found, try partial match
+        matches = list(informes_dir.glob(f"*{file_name}*"))
+        
+        if matches:
+            if len(matches) == 1:
+                # Single match found
+                test_pdf_extraction(str(matches[0]))
+            else:
+                # Multiple matches found
+                console.print(f"[yellow]Múltiplos arquivos encontrados para '{file_name}':[/yellow]")
+                for i, match in enumerate(matches, 1):
+                    console.print(f"[cyan]{i}.[/cyan] {match.name}")
+                console.print("\n[yellow]Use o nome completo do arquivo para especificar.[/yellow]")
         else:
-            console.print(f"[red]Arquivo não encontrado: {file_name}[/red]")
+            console.print(f"[red]Nenhum arquivo correspondente a '{file_name}' encontrado na pasta informes/[/red]")
         return True
     
     elif command.startswith("backup "):

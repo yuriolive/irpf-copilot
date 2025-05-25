@@ -151,11 +151,9 @@ def test_pdf_extraction():
         if not informes_dir.exists() or not any(informes_dir.iterdir()):
             print("⚠️  No files found in informes/ directory")
             return False
-            
-        # Look for 99Pay informe or any other
-        test_file = next((f for f in informes_dir.glob("*") if "99pay" in f.name.lower()), None)
-        if not test_file:
-            test_file = next(informes_dir.iterdir(), None)
+        # Get the first available PDF file, or any file if no PDFs
+        test_file = next((f for f in informes_dir.glob("*.pdf")), 
+                      next((f for f in informes_dir.iterdir()), None))
             
         if not test_file:
             print("❌ No test file found in informes/ directory")
