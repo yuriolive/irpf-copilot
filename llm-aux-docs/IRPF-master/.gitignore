@@ -1,7 +1,0 @@
-CSharp/Docs
-*.suo
-bin
-obj
-.svn
-.vs
-CSharp/IRPFTests/Auxiliar.cs

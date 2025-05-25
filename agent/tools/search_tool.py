@@ -8,10 +8,20 @@ local e na internet sobre especificações do IRPF e formato DBK.
 import os
 import json
 import glob
+import logging
 from typing import Dict, Any
 from langchain.tools import BaseTool
 from pydantic import Field
-import logging
+
+# Import utilities from utils package
+from ..utils import (
+    parse_json_input,
+    format_error_response,
+    format_success_response,
+    find_workspace_root,
+    validate_file_path,
+    WorkspacePathManager
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,41 +65,26 @@ class SearchTool(BaseTool):
     """
     
     # Configuração dos diretórios de documentação
-    docs_base_dir: str = Field(default="llm-aux-docs", exclude=True)
+    path_manager: WorkspacePathManager = Field(default_factory=WorkspacePathManager, exclude=True)
+    docs_base_dir: str = Field(default="", exclude=True)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Configurar diretório base da documentação
-        workspace_root = self._find_workspace_root()
-        object.__setattr__(self, 'docs_base_dir', os.path.join(workspace_root, "llm-aux-docs"))
-    
-    def _find_workspace_root(self) -> str:
-        """Encontra o diretório raiz do workspace."""
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        
-        # Procurar pelo diretório que contém llm-aux-docs
-        while current_dir != os.path.dirname(current_dir):  # Não chegou na raiz do sistema
-            if os.path.exists(os.path.join(current_dir, "llm-aux-docs")):
-                return current_dir
-            current_dir = os.path.dirname(current_dir)
-        
-        # Fallback para diretório atual
-        return os.getcwd()
+        self.path_manager = WorkspacePathManager()
+        self.docs_base_dir = os.path.join(self.path_manager.workspace_root, "llm-aux-docs")
     
     def _run(self, query: str) -> str:
         """Executa operação de busca baseada no JSON de entrada."""
         try:
-            # Parse da entrada JSON
-            try:
-                input_data = json.loads(query)
-                operation = input_data.get('operation')
-            except json.JSONDecodeError:
-                return "❌ Erro: Entrada deve ser um JSON válido. Exemplo: {\"operation\": \"search_local\", \"query\": \"checksum\"}"
+            # Parse JSON input
+            parse_result = parse_json_input(query)
+            if not parse_result["success"]:
+                return format_error_response(ValueError(parse_result["error"]), "parse_input")
             
-            if not operation:
-                return "❌ Erro: 'operation' é obrigatório"
+            input_data = parse_result["data"]
+            operation = input_data.get("operation", "")
             
-            # Roteamento de operações
+            # Route to appropriate operation
             if operation == "search_local":
                 return self._search_local(input_data)
             elif operation == "search_specs":
@@ -99,350 +94,251 @@ class SearchTool(BaseTool):
             elif operation == "get_doc_content":
                 return self._get_doc_content(input_data)
             else:
-                return f"❌ Erro: Operação '{operation}' não suportada. Operações disponíveis: search_local, search_specs, list_docs, get_doc_content"
-        
+                return format_error_response(
+                    ValueError(f"Operação desconhecida: {operation}"), 
+                    "invalid_operation"
+                )
+                
         except Exception as e:
-            logger.error(f"Erro na execução do SearchTool: {e}")
-            return f"❌ Erro interno: {str(e)}"
+            logger.error(f"Erro no SearchTool: {str(e)}", exc_info=True)
+            return format_error_response(e, "search_tool")
     
     def _search_local(self, input_data: Dict[str, Any]) -> str:
         """Busca na documentação local por palavras-chave."""
         query = input_data.get('query')
         if not query:
-            return "❌ Erro: 'query' é obrigatório para search_local"
+            return format_error_response(
+                ValueError("Query de busca é obrigatória para search_local"), 
+                "search_local"
+            )
         
         try:
-            if not os.path.exists(self.docs_base_dir):
-                return f"❌ Erro: Diretório de documentação não encontrado: {self.docs_base_dir}"
-            
+            # Normalize query
+            query = query.lower()
             results = []
-            query_lower = query.lower()
             
-            # Buscar em arquivos markdown
-            md_files = glob.glob(os.path.join(self.docs_base_dir, "**", "*.md"), recursive=True)
-            
-            for file_path in md_files:
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    # Verificar se a query está presente
-                    if query_lower in content.lower():
+            # Search in all documents in llm-aux-docs
+            for root, _, files in os.walk(self.docs_base_dir):
+                for file in files:
+                    if file.endswith(('.md', '.txt', '.pdf', '.xml')):
+                        file_path = os.path.join(root, file)
                         rel_path = os.path.relpath(file_path, self.docs_base_dir)
                         
-                        # Extrair contexto relevante
-                        lines = content.split('\\n')
-                        relevant_lines = []
+                        # For textual files, search content
+                        if file.endswith(('.md', '.txt', '.xml')):
+                            try:
+                                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                                    content = f.read().lower()
+                                    if query in content:
+                                        results.append({
+                                            'path': rel_path,
+                                            'match_type': 'content',
+                                            'relevance': 'high' if content.count(query) > 2 else 'medium'
+                                        })
+                            except Exception as e:
+                                logger.warning(f"Erro ao ler arquivo {file_path}: {str(e)}")
                         
-                        for i, line in enumerate(lines):
-                            if query_lower in line.lower():
-                                # Adicionar contexto (2 linhas antes e depois)
-                                start = max(0, i - 2)
-                                end = min(len(lines), i + 3)
-                                context = '\\n'.join(lines[start:end])
-                                relevant_lines.append(f"Linha {i+1}: {context}")
-                        
-                        results.append({
-                            "file": rel_path,
-                            "matches": len(relevant_lines),
-                            "context": relevant_lines[:3]  # Primeiros 3 matches
-                        })
-                
-                except Exception as e:
-                    logger.warning(f"Erro ao ler arquivo {file_path}: {e}")
-                    continue
+                        # For all files, search in filename
+                        if query in file.lower():
+                            results.append({
+                                'path': rel_path,
+                                'match_type': 'filename',
+                                'relevance': 'high'
+                            })
             
-            # Buscar em PDFs (básico - apenas nome do arquivo)
-            pdf_files = glob.glob(os.path.join(self.docs_base_dir, "**", "*.pdf"), recursive=True)
-            for file_path in pdf_files:
-                file_name = os.path.basename(file_path).lower()
-                if query_lower in file_name:
-                    rel_path = os.path.relpath(file_path, self.docs_base_dir)
-                    results.append({
-                        "file": rel_path,
-                        "matches": 1,
-                        "context": [f"Arquivo PDF: {file_name}"]
-                    })
+            # Sort results by relevance
+            results.sort(key=lambda x: 0 if x['relevance'] == 'high' else 1)
             
-            # Formatar resposta
-            if not results:
-                return f"🔍 **Busca por '{query}'**: Nenhum resultado encontrado na documentação local."
-            
-            response = f"🔍 **Resultados da busca por '{query}'** ({len(results)} arquivo(s) encontrado(s)):\\n\\n"
-            
-            for i, result in enumerate(results[:10], 1):  # Limitar a 10 resultados
-                response += f"**{i}. {result['file']}** ({result['matches']} ocorrência(s))\\n"
-                
-                for context in result['context'][:2]:  # Primeiros 2 contextos
-                    # Truncar contexto se muito longo
-                    context_clean = context.replace('\\n', ' ').strip()
-                    if len(context_clean) > 200:
-                        context_clean = context_clean[:200] + "..."
-                    response += f"   💡 {context_clean}\\n"
-                response += "\\n"
-            
-            if len(results) > 10:
-                response += f"... e mais {len(results) - 10} resultado(s)\\n"
-            
-            # Sugestões de documentos relevantes
-            response += "\\n📚 **Documentos principais recomendados:**\\n"
-            response += "- `algoritimo_checksum.md` - Algoritmos de validação\\n"
-            response += "- `leiautes/ir-2025.pdf` - Especificação oficial 2025\\n"
-            response += "- `leiautes/ir-2023.pdf` - Especificação detalhada\\n"
-            response += "- `IRPF-master/` - Código fonte de referência\\n"
-            
-            return response
+            return format_success_response({
+                'query': query,
+                'results': results,
+                'count': len(results),
+                'docs_dir': self.docs_base_dir
+            }, 'search_local')
             
         except Exception as e:
-            logger.error(f"Erro na busca local: {e}")
-            return f"❌ Erro na busca: {str(e)}"
+            logger.error(f"Erro em search_local: {str(e)}", exc_info=True)
+            return format_error_response(e, "search_local")
     
     def _search_specs(self, input_data: Dict[str, Any]) -> str:
         """Busca especificações de tipos de registro específicos."""
         record_type = input_data.get('record_type')
         if not record_type:
-            return "❌ Erro: 'record_type' é obrigatório para search_specs"
+            return format_error_response(
+                ValueError("record_type é obrigatório para search_specs"), 
+                "search_specs"
+            )
         
         # Informações conhecidas sobre tipos de registro
-        spec_info = {
+        record_type_info = {
             "IRPF": {
-                "description": "Registro de identificação da declaração (Header)",
-                "fields": [
-                    "Tipo de registro (4 chars): IRPF",
-                    "Ano da declaração (4 chars): 2025",
-                    "Ano-calendário (4 chars): 2024",
-                    "CPF do declarante (11 chars)",
-                    "Situação da declaração",
-                    "Checksum (10 chars finais)"
-                ],
-                "algorithm": "Checksum calculado com nome do arquivo + linha sem checksum (zlib.crc32)",
-                "encoding": "UTF-8 para checksum, Latin-1 para arquivo"
-            },
-            "R16": {
-                "description": "Dados do declarante",
-                "fields": [
-                    "Tipo de registro (2 chars): 16",
-                    "CPF do declarante",
-                    "Nome completo",
-                    "Data de nascimento",
-                    "Telefone, endereço e outros dados pessoais"
-                ],
-                "algorithm": "Checksum padrão (binascii.crc32)",
-                "encoding": "Latin-1"
-            },
-            "R17": {
-                "description": "Rendimentos sujeitos à tributação exclusiva/definitiva",
-                "fields": [
-                    "Tipo de registro (2 chars): 17",
-                    "Código do rendimento",
-                    "Valor dos rendimentos",
-                    "Imposto retido na fonte",
-                    "Dados da fonte pagadora"
-                ],
-                "algorithm": "Checksum padrão (binascii.crc32)",
-                "encoding": "Latin-1"
+                "description": "Header do arquivo IRPF com identificação do declarante",
+                "layout": "IRPF[AAAANNNNNNNNNNNNNNCCCCCCCCCCCCC...]500",
+                "fields": {
+                    "AAAA": "Ano da declaração (ex: 2025)",
+                    "NNNNNNNNNNNNN": "CPF do declarante",
+                    "CCCCCCCCCCCCC": "Nome do declarante"
+                },
+                "example": "IRPF2025123456789012JOAO DA SILVA..."
             },
             "R21": {
-                "description": "Rendimentos recebidos de pessoa jurídica",
-                "fields": [
-                    "Tipo de registro (2 chars): 21",
-                    "CNPJ da fonte pagadora",
-                    "Nome da fonte pagadora",
-                    "Valores de rendimentos",
-                    "Imposto retido",
-                    "13º salário, férias, etc."
-                ],
-                "algorithm": "Checksum padrão (binascii.crc32)",
-                "encoding": "Latin-1"
-            },
-            "R23": {
-                "description": "Rendimentos isentos e não tributáveis",
-                "fields": [
-                    "Tipo de registro (2 chars): 23",
-                    "Código do rendimento isento",
-                    "Valor do rendimento",
-                    "Identificação da fonte"
-                ],
-                "algorithm": "Checksum padrão (binascii.crc32)",
-                "encoding": "Latin-1"
+                "description": "Rendimentos Recebidos de PJ pelo Titular",
+                "layout": "21[campos específicos]500",
+                "fields": {
+                    "NR_REG": "21 (tipo de registro)",
+                    "NR_CPF": "CPF do contribuinte",
+                    "NR_PAGADOR": "CNPJ da fonte pagadora",
+                    "NM_PAGADOR": "Nome da fonte pagadora",
+                    "VR_RENDTO": "Valor do rendimento recebido"
+                }
             },
             "R27": {
-                "description": "Bens e direitos",
-                "fields": [
-                    "Tipo de registro (2 chars): 27",
-                    "Código do bem/direito",
-                    "Discriminação",
-                    "Situação em 31/12 do ano anterior",
-                    "Situação em 31/12 do ano-calendário"
-                ],
-                "algorithm": "Checksum padrão (binascii.crc32)",
-                "encoding": "Latin-1"
+                "description": "Declaração de bens e direitos",
+                "layout": "27[campos específicos]500",
+                "fields": {
+                    "NR_REG": "27 (tipo de registro)",
+                    "NR_CPF": "CPF do contribuinte",
+                    "CD_BEM": "Código do tipo de bem",
+                    "TX_BEM": "Descrição do bem",
+                    "VR_ANTER": "Valor em 31/12 do ano anterior",
+                    "VR_ATUAL": "Valor em 31/12 do ano calendário"
+                }
             },
             "T9": {
-                "description": "Registro de trailer - totais de registros",
-                "fields": [
-                    "Tipo de registro (2 chars): T9",
-                    "Quantidade total de registros",
-                    "Controles e totalizadores"
-                ],
-                "algorithm": "Checksum sobre primeiros 449 caracteres (binascii.crc32)",
-                "encoding": "Latin-1"
+                "description": "Trailer do arquivo com totais",
+                "layout": "T9[campos específicos]500",
+                "fields": {
+                    "total_records": "Total de registros no arquivo",
+                    "checksum_final": "Checksum final do arquivo"
+                }
             }
         }
         
-        record_type_upper = record_type.upper()
+        # Get info for the requested record type
+        record_info = record_type_info.get(record_type.upper())
+        if not record_info:
+            return format_success_response({
+                'record_type': record_type,
+                'found': False,
+                'available_types': list(record_type_info.keys()),
+                'message': f"Tipo de registro '{record_type}' não encontrado na base de conhecimento local."
+            }, 'search_specs')
         
-        if record_type_upper not in spec_info:
-            available_types = ", ".join(spec_info.keys())
-            return f"❌ Tipo de registro '{record_type}' não encontrado.\\n\\n📋 **Tipos disponíveis:** {available_types}"
-        
-        spec = spec_info[record_type_upper]
-        
-        # Resposta mais concisa e direta
-        response = f"📋 **Especificação do registro {record_type_upper}**\\n\\n"
-        response += f"**Descrição:** {spec['description']}\\n\\n"
-        response += f"**Campos principais:**\\n"
-        for field in spec['fields']:
-            response += f"- {field}\\n"
-        response += f"\\n**Algoritmo de checksum:** {spec['algorithm']}\\n"
-        response += f"**Encoding:** {spec['encoding']}\\n\\n"
-        response += f"💡 **DICA:** Use diretamente os dados do informe processado para criar registros {record_type_upper}. Não é necessário buscar mais documentação para tarefas básicas de adição/atualização."
-        
-        return response
-        
-        response = f"📋 **Especificação do registro {record_type_upper}**\\n\\n"
-        response += f"**Descrição:** {spec['description']}\\n\\n"
-        
-        response += f"**Campos principais:**\\n"
-        for field in spec['fields']:
-            response += f"- {field}\\n"
-        
-        response += f"\\n**Algoritmo de checksum:** {spec['algorithm']}\\n"
-        response += f"**Encoding:** {spec['encoding']}\\n\\n"
-        
-        # Sugestões de documentação relacionada
-        response += f"📚 **Documentação relacionada:**\\n"
-        response += f"- Para algoritmos de checksum: `algoritimo_checksum.md`\\n"
-        response += f"- Para leiaute completo: `leiautes/ir-2025.pdf` ou `leiautes/ir-2023.pdf`\\n"
-        response += f"- Para implementação de referência: `IRPF-master/CSharp/IRPF.Lib/Classes_DEC/`\\n"
-        
-        return response
+        return format_success_response({
+            'record_type': record_type,
+            'found': True,
+            'info': record_info
+        }, 'search_specs')
     
     def _list_docs(self, input_data: Dict[str, Any]) -> str:
-        """Lista toda a documentação disponível."""
+        """Lista toda documentação disponível."""
         try:
-            if not os.path.exists(self.docs_base_dir):
-                return f"❌ Erro: Diretório de documentação não encontrado: {self.docs_base_dir}"
-            
-            response = f"📚 **Documentação disponível em**: {self.docs_base_dir}\\n\\n"
-            
-            # Documentos principais
-            main_docs = {
-                "algoritimo_checksum.md": "Algoritmos de checksum validados pela Receita Federal",
-                "leiautes/ir-2025.pdf": "Especificação oficial do leiaute IRPF 2025",
-                "leiautes/ir-2023.pdf": "Especificação completa do leiaute IRPF 2023",
+            doc_categories = {
+                'algoritmos': [],
+                'leiautes': [],
+                'codigo_referencia': [],
+                'outros': []
             }
             
-            response += "🔥 **Documentos principais:**\\n"
-            for doc, desc in main_docs.items():
-                doc_path = os.path.join(self.docs_base_dir, doc)
-                status = "✅" if os.path.exists(doc_path) else "❌"
-                response += f"{status} `{doc}` - {desc}\\n"
-            
-            response += "\\n"
-            
-            # Código fonte de referência
-            irpf_master_dir = os.path.join(self.docs_base_dir, "IRPF-master")
-            if os.path.exists(irpf_master_dir):
-                response += "💻 **Código fonte de referência (C#):**\\n"
-                
-                classes_dir = os.path.join(irpf_master_dir, "CSharp", "IRPF.Lib", "Classes_DEC")
-                if os.path.exists(classes_dir):
-                    cs_files = glob.glob(os.path.join(classes_dir, "*.cs"))
-                    response += f"- Classes de registros: {len(cs_files)} arquivos .cs\\n"
+            # List all files recursively
+            for root, _, files in os.walk(self.docs_base_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    rel_path = os.path.relpath(file_path, self.docs_base_dir)
                     
-                    # Destacar alguns arquivos importantes
-                    important_files = ["IR_RegistroHeader.cs", "R21_RendimentosPJ.cs", "R27_BensDireitos.cs"]
-                    for file_name in important_files:
-                        file_path = os.path.join(classes_dir, file_name)
-                        if os.path.exists(file_path):
-                            response += f"  - `{file_name}` - Implementação de referência\\n"
-                
-                response += "\\n"
+                    # Skip hidden files and directories
+                    if file.startswith('.') or '/.git/' in rel_path:
+                        continue
+                    
+                    # Categorize files
+                    if 'algoritmo' in file.lower() or 'checksum' in file.lower():
+                        doc_categories['algoritmos'].append(rel_path)
+                    elif 'leiaute' in rel_path.lower() or '.pdf' in file.lower():
+                        doc_categories['leiautes'].append(rel_path)
+                    elif 'IRPF-master' in rel_path or any(ext in file.lower() for ext in ['.cs', '.java', '.py', '.xml']):
+                        doc_categories['codigo_referencia'].append(rel_path)
+                    else:
+                        doc_categories['outros'].append(rel_path)
             
-            # Listar outros arquivos encontrados
-            all_files = []
-            for ext in ['*.md', '*.pdf', '*.txt']:
-                all_files.extend(glob.glob(os.path.join(self.docs_base_dir, "**", ext), recursive=True))
+            # Sort each category alphabetically
+            for category in doc_categories:
+                doc_categories[category].sort()
             
-            if all_files:
-                response += f"📁 **Todos os arquivos encontrados ({len(all_files)}):**\\n"
-                
-                # Agrupar por tipo
-                md_files = [f for f in all_files if f.endswith('.md')]
-                pdf_files = [f for f in all_files if f.endswith('.pdf')]
-                other_files = [f for f in all_files if not f.endswith(('.md', '.pdf'))]
-                
-                if md_files:
-                    response += f"\\n📝 **Markdown ({len(md_files)}):**\\n"
-                    for file_path in sorted(md_files)[:10]:
-                        rel_path = os.path.relpath(file_path, self.docs_base_dir)
-                        response += f"- `{rel_path}`\\n"
-                
-                if pdf_files:
-                    response += f"\\n📄 **PDFs ({len(pdf_files)}):**\\n"
-                    for file_path in sorted(pdf_files)[:10]:
-                        rel_path = os.path.relpath(file_path, self.docs_base_dir)
-                        response += f"- `{rel_path}`\\n"
-                
-                if other_files:
-                    response += f"\\n📋 **Outros ({len(other_files)}):**\\n"
-                    for file_path in sorted(other_files)[:5]:
-                        rel_path = os.path.relpath(file_path, self.docs_base_dir)
-                        response += f"- `{rel_path}`\\n"
-            
-            response += "\\n💡 **Como usar:**\\n"
-            response += "- Use `search_local` para buscar por palavras-chave\\n"
-            response += "- Use `search_specs` para informações sobre tipos de registro\\n"
-            response += "- Use `get_doc_content` para ler conteúdo completo\\n"
-            
-            return response
+            return format_success_response({
+                'docs_dir': self.docs_base_dir,
+                'categories': doc_categories,
+                'total_files': sum(len(files) for files in doc_categories.values())
+            }, 'list_docs')
             
         except Exception as e:
-            logger.error(f"Erro ao listar documentação: {e}")
-            return f"❌ Erro ao listar documentação: {str(e)}"
+            logger.error(f"Erro em list_docs: {str(e)}", exc_info=True)
+            return format_error_response(e, "list_docs")
     
     def _get_doc_content(self, input_data: Dict[str, Any]) -> str:
         """Obtém conteúdo completo de um documento específico."""
         doc_path = input_data.get('doc_path')
         if not doc_path:
-            return "❌ Erro: 'doc_path' é obrigatório para get_doc_content"
+            return format_error_response(
+                ValueError("doc_path é obrigatório para get_doc_content"), 
+                "get_doc_content"
+            )
         
-        full_path = os.path.join(self.docs_base_dir, doc_path)
-        
-        if not os.path.exists(full_path):
-            return f"❌ Erro: Documento não encontrado: {doc_path}"
+        # Construct full path, handle both relative and absolute paths
+        if os.path.isabs(doc_path):
+            full_path = doc_path
+        else:
+            full_path = os.path.join(self.docs_base_dir, doc_path)
         
         try:
-            with open(full_path, 'r', encoding='utf-8') as f:
+            # Validate path security (prevent path traversal)
+            norm_path = os.path.normpath(full_path)
+            if not norm_path.startswith(self.docs_base_dir):
+                return format_error_response(
+                    ValueError(f"Acesso negado: Caminho fora do diretório de documentação: {doc_path}"), 
+                    "get_doc_content"
+                )
+            
+            # Check if file exists
+            if not os.path.exists(norm_path):
+                return format_error_response(
+                    FileNotFoundError(f"Documento não encontrado: {doc_path}"),
+                    "get_doc_content"
+                )
+            
+            # Check if it's a directory
+            if os.path.isdir(norm_path):
+                # List files in the directory
+                files = os.listdir(norm_path)
+                return format_success_response({
+                    'is_directory': True,
+                    'path': doc_path,
+                    'files': files,
+                    'count': len(files)
+                }, 'get_doc_content')
+            
+            # Check file extension
+            _, ext = os.path.splitext(norm_path)
+            if ext.lower() not in ['.md', '.txt', '.xml', '.cs', '.java', '.py', '.json']:
+                return format_error_response(
+                    ValueError(f"Tipo de arquivo não suportado para leitura direta: {ext}"),
+                    "get_doc_content"
+                )
+            
+            # Read file content
+            with open(norm_path, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
             
-            # Limitar conteúdo se muito longo
-            max_length = 8000
-            if len(content) > max_length:
-                content = content[:max_length] + "\\n\\n... (conteúdo truncado)"
-            
-            response = f"📄 **Conteúdo de**: {doc_path}\\n\\n"
-            response += "```\\n"
-            response += content
-            response += "\\n```"
-            
-            return response
+            return format_success_response({
+                'path': doc_path,
+                'content': content,
+                'size': len(content),
+                'extension': ext
+            }, 'get_doc_content')
             
         except Exception as e:
-            logger.error(f"Erro ao ler documento {doc_path}: {e}")
-            return f"❌ Erro ao ler documento: {str(e)}"
+            logger.error(f"Erro em get_doc_content: {str(e)}", exc_info=True)
+            return format_error_response(e, "get_doc_content")
     
     async def _arun(self, query: str) -> str:
-        """Versão assíncrona do _run."""
+        """Versão assíncrona da execução."""
         return self._run(query)
