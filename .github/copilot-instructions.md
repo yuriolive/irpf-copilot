@@ -105,9 +105,14 @@ llm = ChatAnthropicVertex(
 - [ ] Salvar quais informes foram processados e poder continuar de onde parou.
 - [ ] Ler o diretório de informes e ir processando informes um a um.
 - [ ] Poder buscar na web informações sobre como declarar e mudanças na legislação.
+- [ ] Melhorar o parse dos informes para que consiga lidar com diferentes instituições
+    financeiras (exemplo Inter que tem relatório unico para aplicacoes no Brasil e no exterior, Nubank que pode ter
+    a conta corrente e conta na Nuinvest no mesmo relatório, bancos como o Itaú que tem múltiplos produtos e podem
+    também ser fontes pagadaoras de dividendos de ação, fundos fechados listados em bolsa como informes de
+    fundos imobiliários), formatos (por exemplo, alguns incompletos que necessitarão de cálculos adicionais) e tipos de informes (por exemplo, recebimentos de pessoa juridica para
+    funcionarios, socios, etc).
 
 ### ℹ️ A Validar
-- [ ] Ver se deveríamos usar a LLM diretamente para processar os PDFs.
 - [ ] Converter a documentação, laiautes e códigos de referência em C# para um formato mais amigável para as LLMs, possivelmente Markdown.
 - [ ] Criar documento com a documentação e legislação pertinente para o IRPF 2025.
 - [ ] Realizar cálculos complexos por exemplo de impostos do exterior, bolsa de valores, etc.
