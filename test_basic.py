@@ -249,10 +249,8 @@ def test_pdf_extraction():
         print(f"📄 Testing extraction with file: {test_file}")
         
         # Initialize tool
-        pdf_tool = LLMPdfTool()
-        
-        # Check if any LLM is available
-        if not (pdf_tool.gemini_llm or pdf_tool.claude_vertex_llm or pdf_tool.claude_direct_client):
+        pdf_tool = LLMPdfTool()        # Check if any LLM is available
+        if not pdf_tool.llm_manager or not pdf_tool.llm_manager.has_available_llm():
             print("⚠️  No LLM models available - skipping actual extraction")
             print("✅ LLMPdfTool initialized successfully (but no models available)")
             return True

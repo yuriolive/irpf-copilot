@@ -119,7 +119,7 @@ class LLMPdfTool(BaseTool):
                     for dbk_dir in dbk_directories:
                         dbk_path = Path(dbk_dir)
                         if dbk_path.exists():
-                            for dbk_file in dbk_path.glob("*.DBK"):
+                            for dbk_file in dbk_path.glob("*.DBK"):                              
                                 try:
                                     analysis = dbk_parser.analyze_dbk_file(str(dbk_file))
                                     if analysis and not analysis.get('error'):
@@ -129,7 +129,7 @@ class LLMPdfTool(BaseTool):
                                                 if not cpf_declarante_irpf:
                                                     cpf_declarante_irpf = record.get('cpf', '').strip()
                                                 if not ano_calendario:
-                                                    ano_calendario = record.get('year', '').strip()
+                                                    ano_calendario = record.get('ano_calendario', '').strip()
                                                 logger.info(f"Usando informações do DBK {dbk_file}: CPF {cpf_declarante_irpf}, Ano {ano_calendario}")
                                                 break
                                         if cpf_declarante_irpf and ano_calendario:

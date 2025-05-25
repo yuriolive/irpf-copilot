@@ -140,11 +140,10 @@ class DbkParser:
                             result["is_valid"] = False
                     except Exception as e:
                         result["validation_errors"].append(f"Linha {i+1}: Erro ao validar checksum: {e}")
-                        result["is_valid"] = False
-                # Extrair informações específicas por tipo
+                        result["is_valid"] = False                # Extrair informações específicas por tipo
                 if record_type == "IRPF":
-                    record_info["year"] = line_clean[8:12] if len(line_clean) > 12 else "N/A"
-                    record_info["tax_year"] = line_clean[12:16] if len(line_clean) > 16 else "N/A"
+                    record_info["exercicio"] = line_clean[8:12] if len(line_clean) > 12 else "N/A"      # Ano do exercício (2025) - posições 8-12
+                    record_info["ano_calendario"] = line_clean[12:16] if len(line_clean) > 16 else "N/A" # Ano calendário (2024) - posições 12-16
                     # CPF: remover zeros à esquerda
                     cpf_raw = line_clean[20:31] if len(line_clean) > 31 else "N/A"
                     record_info["cpf"] = cpf_raw.lstrip('0') if cpf_raw != "N/A" else "N/A"
@@ -294,13 +293,12 @@ class DbkParser:
                 if not is_valid_checksum:
                     errors.append('Invalid checksum')
             except Exception as e:
-                errors.append(f'Checksum validation error: {str(e)}')
-          # Extract type-specific basic info
+                errors.append(f'Checksum validation error: {str(e)}')          # Extract type-specific basic info
         if record_type == 'IRPF' and len(line) >= 31:
             cpf_raw = line[20:31] if len(line) > 31 else ''
             data.update({
-                'year': line[8:12] if len(line) > 12 else '',
-                'tax_year': line[12:16] if len(line) > 16 else '',
+                'exercicio': line[8:12] if len(line) > 12 else '',      # Ano do exercício (2025) - posições 8-12
+                'ano_calendario': line[12:16] if len(line) > 16 else '', # Ano calendário (2024) - posições 12-16
                 'cpf': cpf_raw.lstrip('0') if cpf_raw else ''  # Remove zeros à esquerda
             })
         elif record_type.startswith('R') and len(line) >= 20:

@@ -332,14 +332,13 @@ A ferramenta buscará automaticamente nos DBK disponíveis e também tentará ex
             parser = DbkParser()
             analysis = parser.analyze_dbk_file(file_path)
             
-            if analysis and not analysis.get('error'):
-                # Extrair CPF e ano calendário do header IRPF
+            if analysis and not analysis.get('error'):                # Extrair CPF e ano calendário do header IRPF
                 for record in analysis.get('records', []):
                     if record.get('record_type') == 'IRPF':
                         self.current_dbk_info = {
                             'cpf_declarante': record.get('cpf', '').strip(),
-                            'ano_calendario': record.get('year', '').strip(),
-                            'ano_exercicio': record.get('tax_year', '').strip(),
+                            'ano_calendario': record.get('ano_calendario', '').strip(),  # Ano calendário (2024) - rendimentos
+                            'ano_exercicio': record.get('exercicio', '').strip(),       # Ano exercício (2025) - declaração
                             'file_path': file_path
                         }
                         logger.info(f"DBK info extraída: CPF {self.current_dbk_info['cpf_declarante']}, "
