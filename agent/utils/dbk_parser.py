@@ -256,10 +256,17 @@ class DbkParser:
                 errors.append(f'Error extracting field {field_name}: {str(e)}')
         
         # Validate checksum if present
-        if checksum and record_type != 'IRPF':  # Header doesn't use standard checksum
+        if checksum:
             try:
-                if not validar_checksum_automatico(line):
-                    errors.append('Invalid checksum')
+                # For IRPF records, we need the filename for checksum validation
+                if record_type == 'IRPF':
+                    # Extract filename from the parsed data context (will be passed separately)
+                    # For now, skip IRPF checksum validation in record parsing
+                    pass
+                else:
+                    # For other records, use standard validation
+                    if not validar_checksum_automatico(line):
+                        errors.append('Invalid checksum')
             except Exception as e:
                 errors.append(f'Checksum validation error: {str(e)}')
         
@@ -276,25 +283,9 @@ class DbkParser:
     
     def _identify_record_type(self, line: str) -> str:
         """Identify the record type from the line content."""
-        if line.startswith('IRPF'):
-            return 'IRPF'
-        elif line.startswith('R16'):
-            return 'R16'
-        elif line.startswith('R17'):
-            return 'R17'
-        elif line.startswith('R21'):
-            return 'R21'
-        elif line.startswith('R27'):
-            return 'R27'
-        elif line.startswith('T9'):
-            return 'T9'
-        else:
-            # Try to identify by position if it's a known 2-3 character pattern
-            if len(line) >= 3:
-                prefix = line[:3]
-                if prefix.startswith('R') and prefix[1:].isdigit():
-                    return prefix
-            return line[:4] if len(line) >= 4 else line
+        # Use the same logic as in checksum.py for consistency
+        from .checksum import detectar_tipo_registro
+        return detectar_tipo_registro(line)
     
     def write_dbk_file(self, data: Dict[str, Any], file_path: Path, 
                        create_backup: bool = True) -> bool:

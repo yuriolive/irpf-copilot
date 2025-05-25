@@ -298,6 +298,18 @@ class SearchTool(BaseTool):
         
         spec = spec_info[record_type_upper]
         
+        # Resposta mais concisa e direta
+        response = f"📋 **Especificação do registro {record_type_upper}**\\n\\n"
+        response += f"**Descrição:** {spec['description']}\\n\\n"
+        response += f"**Campos principais:**\\n"
+        for field in spec['fields']:
+            response += f"- {field}\\n"
+        response += f"\\n**Algoritmo de checksum:** {spec['algorithm']}\\n"
+        response += f"**Encoding:** {spec['encoding']}\\n\\n"
+        response += f"💡 **DICA:** Use diretamente os dados do informe processado para criar registros {record_type_upper}. Não é necessário buscar mais documentação para tarefas básicas de adição/atualização."
+        
+        return response
+        
         response = f"📋 **Especificação do registro {record_type_upper}**\\n\\n"
         response += f"**Descrição:** {spec['description']}\\n\\n"
         

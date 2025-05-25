@@ -127,26 +127,48 @@ def detectar_tipo_registro(linha: str) -> str:
     """
     Detecta o tipo de registro baseado no início da linha.
     
+    Com base na documentação oficial, há muitos tipos de registro (R16 até R91).
+    Apenas IRPF (header) e T9 (trailer) têm algoritmos de checksum específicos.
+    Todos os outros registros Rxx usam o algoritmo padrão.
+    
     Args:
         linha: Linha do arquivo DBK
         
     Returns:
-        Tipo do registro: 'IRPF', 'T9', '27', ou 'DESCONHECIDO'
+        Tipo do registro: 'IRPF', 'T9', ou 'Rxx' (onde xx é o número), ou 'DESCONHECIDO'
     """
     linha_clean = linha.strip()
     
+    if not linha_clean:
+        return 'DESCONHECIDO'
+    
+    # Registros especiais
     if linha_clean.startswith('IRPF'):
         return 'IRPF'
     elif linha_clean.startswith('T9'):
         return 'T9'
-    elif linha_clean.startswith('27'):
-        return '27'
-    else:
-        return 'DESCONHECIDO'
+    
+    # Registros Rxx genéricos - detectar padrão numérico no início
+    # Podem começar direto com números ou com 'R' + números
+    if linha_clean.startswith('R') and len(linha_clean) >= 3:
+        # Formato 'Rxx' 
+        if linha_clean[1:3].isdigit():
+            return linha_clean[:3]  # Retorna 'Rxx'
+    elif len(linha_clean) >= 2:
+        # Formato direto com números 'xx'
+        if linha_clean[:2].isdigit():
+            return f'R{linha_clean[:2]}'  # Normaliza para 'Rxx'
+    
+    return 'DESCONHECIDO'
 
 def calcular_checksum_automatico(linha: str, nome_arquivo: str | None = None) -> str:
     """
     Calcula o checksum automaticamente baseado no tipo de registro.
+    
+    Conforme documentação oficial:
+    - IRPF (header): Algoritmo específico com nome do arquivo
+    - T9 (trailer): Algoritmo específico (primeiros 449 chars)
+    - Todos os registros Rxx: Algoritmo padrão (linha sem checksum)
     
     Args:
         linha: Linha completa do arquivo DBK
@@ -166,8 +188,9 @@ def calcular_checksum_automatico(linha: str, nome_arquivo: str | None = None) ->
         return calcular_checksum_irpf(nome_arquivo, linha)
     elif tipo == 'T9':
         return calcular_checksum_t9(linha)
-    elif tipo == '27':
-        payload = linha[:-10]  # Remove checksum
+    elif tipo.startswith('R') and tipo != 'DESCONHECIDO':
+        # TODOS os registros Rxx (R16, R17, R18...R91) usam o algoritmo padrão
+        payload = linha[:-10]  # Remove checksum (últimos 10 chars)
         return calcular_checksum_dbk(payload)
     else:
         raise ValueError(f"Tipo de registro não suportado: {tipo}")

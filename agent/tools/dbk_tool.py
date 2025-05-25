@@ -197,7 +197,26 @@ class DbkTool(BaseTool):
             
             if validation_errors:
                 response += f"\\n⚠️ **Erros de validação encontrados ({len(validation_errors)}):**\\n"
-                for error in validation_errors[:5]:  # Mostrar apenas os primeiros 5
+                # Agrupar erros por tipo para resumir
+                error_types = {}
+                for error in validation_errors:
+                    if "DESCONHECIDO" in error:
+                        error_types["DESCONHECIDO"] = error_types.get("DESCONHECIDO", 0) + 1
+                    else:
+                        error_types["Outros"] = error_types.get("Outros", 0) + 1
+                
+                if "DESCONHECIDO" in error_types:
+                    response += f"- {error_types['DESCONHECIDO']} registros com formato desconhecido (possível corrupção ou formato não padrão)\\n"
+                if "Outros" in error_types:
+                    response += f"- {error_types['Outros']} outros erros de validação\\n"
+                
+                # Mostrar apenas alguns exemplos específicos
+                specific_errors = [e for e in validation_errors if "DESCONHECIDO" not in e][:3]
+                for error in specific_errors:
+                    response += f"- {error}\\n"
+                
+                if len(validation_errors) > 5:
+                    response += f"... e mais {len(validation_errors) - 5} erro(s)\\n"
                     response += f"- {error}\\n"
                 if len(validation_errors) > 5:
                     response += f"... e mais {len(validation_errors) - 5} erro(s)\\n"

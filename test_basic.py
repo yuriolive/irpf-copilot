@@ -41,7 +41,7 @@ def test_checksum_functions():
     logger.debug("Starting checksum function tests")
     
     try:
-        from agent.utils.checksum import calcular_checksum_automatico, validar_checksum_automatico
+        from agent.utils.checksum import calcular_checksum_automatico, validar_checksum_automatico, detectar_tipo_registro
         logger.debug("Successfully imported checksum functions")
         
         # Test with a sample T9 line (recognized record type)
@@ -59,6 +59,9 @@ def test_checksum_functions():
         print(f"✅ Checksum validation working: {is_valid}")
         logger.debug(f"Validation result: {is_valid}")
         
+        # Test record type detection fixes
+        test_record_type_detection()
+        
         if DEBUG_MODE:
             # Add debug breakpoint for inspection
             import pdb; pdb.set_trace() if os.getenv('PDB_BREAK') else None
@@ -67,6 +70,56 @@ def test_checksum_functions():
     except Exception as e:
         print(f"❌ Checksum test failed: {e}")
         logger.error(f"Checksum test failed: {e}", exc_info=True)
+        return False
+
+def test_record_type_detection():
+    """Test the improved record type detection."""
+    print("\n🧪 Testing improved record type detection...")
+    
+    try:
+        from agent.utils.checksum import detectar_tipo_registro
+        
+        test_cases = [
+            ("IRPF20252024031753227376...", "IRPF"),
+            ("16     00001317532273761FULANO...", "R16"),
+            ("27     00001AB000000000000...", "R27"),
+            ("T9000000001000000000000...", "T9"),
+            ("17     000011111111111111EMPRESA...", "R17"),
+            ("21     000021111111111111EMPRESA...", "R21"),
+            ("42     00001...", "R42"),  # Outros tipos Rxx
+            ("58     00001...", "R58"),  # Tipos da documentação oficial
+            ("91     00001...", "R91"),  # Último tipo conhecido
+            ("R16    00001...", "R16"),  # Formato alternativo com R
+            ("R91    00001...", "R91"),  # Formato alternativo com R
+            ("", "DESCONHECIDO"),
+            ("ABC123", "DESCONHECIDO"),
+            ("XX     12345", "DESCONHECIDO"),
+        ]
+        
+        passed = 0
+        total = len(test_cases)
+        
+        for linha, esperado in test_cases:
+            resultado = detectar_tipo_registro(linha)
+            status = "✅" if resultado == esperado else "❌"
+            if resultado == esperado:
+                passed += 1
+            print(f"   {status} '{linha}' -> Expected: {esperado}, Got: {resultado}")
+        
+        print(f"\n✅ Record type detection: {passed}/{total} tests passed")
+        
+        if passed == total:
+            print("📋 Algoritmo de checksum simplificado:")
+            print("   ✅ APENAS 3 casos de algoritmo:")
+            print("      1. IRPF (header): nome_arquivo + linha_sem_checksum -> zlib.crc32")
+            print("      2. T9 (trailer): primeiros_449_chars -> binascii.crc32") 
+            print("      3. TODOS os Rxx (R16...R91): linha_sem_checksum -> binascii.crc32")
+            print("   ✅ Detecção dinâmica de tipos Rxx (sem hardcoding)")
+            print("   ✅ Baseado na documentação oficial da Receita Federal")
+        
+        return passed == total
+    except Exception as e:
+        print(f"❌ Record type detection test failed: {e}")
         return False
 
 def test_dbk_parser():
