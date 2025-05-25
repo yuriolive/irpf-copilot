@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug test_basic.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/test_basic.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+            "args": [],
+            "stopOnEntry": false,
+            "justMyCode": true,
+            "logToFile": false,
+            "redirectOutput": true
+        },
+        {
+            "name": "Debug test_basic.py (Verbose)",
+            "type": "debugpy", 
+            "request": "launch",
+            "program": "${workspaceFolder}/test_basic.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+            "args": [],
+            "stopOnEntry": false,
+            "justMyCode": false,
+            "logToFile": true,
+            "redirectOutput": true
+        },
+        {
+            "name": "Debug with UV",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvx",
+            "args": ["run", "python", "test_basic.py"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "stopOnEntry": false,
+            "justMyCode": true
+        }
+    ]
+}

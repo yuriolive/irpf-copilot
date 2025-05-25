@@ -109,8 +109,12 @@ llm = ChatAnthropicVertex(
     financeiras (exemplo Inter que tem relatório unico para aplicacoes no Brasil e no exterior, Nubank que pode ter
     a conta corrente e conta na Nuinvest no mesmo relatório, bancos como o Itaú que tem múltiplos produtos e podem
     também ser fontes pagadaoras de dividendos de ação, fundos fechados listados em bolsa como informes de
-    fundos imobiliários), formatos (por exemplo, alguns incompletos que necessitarão de cálculos adicionais) e tipos de informes (por exemplo, recebimentos de pessoa juridica para
-    funcionarios, socios, etc).
+    fundos imobiliários), formatos (por exemplo, alguns incompletos que necessitarão de cálculos adicionais) e
+    tipos de informes (por exemplo, recebimentos de pessoa juridica se a pessoa é funcionário de alguma empresa, etc).
+- [ ] Códigos atualizados de campos estão disponíveis no xml e arquivos referenciados no xml:
+    https://downloadirpf.receita.fazenda.gov.br/irpf/2025/irpf/update/latest.xml . Acho que seria interessante
+    antes de iniciar o programa verificar se temos os códigos atualiados se não baixar localmente e salva-los de
+    alguma forma que o programa consiga acessar.
 
 ### ℹ️ A Validar
 - [ ] Converter a documentação, laiautes e códigos de referência em C# para um formato mais amigável para as LLMs, possivelmente Markdown.

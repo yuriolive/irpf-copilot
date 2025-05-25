@@ -1,38 +1,72 @@
 """
 Simple test to validate the IRPF Agent implementation.
 Run this to test basic functionality before using the full agent.
+
+Debug Mode Configuration:
+- Use F5 in VS Code to run in debug mode
+- Use Ctrl+Shift+P -> "Tasks: Run Task" -> "Debug test_basic.py" for PDB
+- Set DEBUG=1 environment variable for verbose output
 """
 
 import os
 import sys
+import logging
 from pathlib import Path
 
 # Add project root to Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
+# Configure debug logging
+DEBUG_MODE = os.getenv('DEBUG', '').lower() in ('1', 'true', 'yes', 'on')
+
+if DEBUG_MODE:
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='🐛 %(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler('irpf_agent_test.log', encoding='utf-8')
+        ]
+    )
+    print("🐛 DEBUG MODE ENABLED - Verbose logging active")
+else:
+    logging.basicConfig(level=logging.INFO, format='%(message)s')
+
+logger = logging.getLogger(__name__)
+
 def test_checksum_functions():
     """Test the checksum functions."""
     print("\n🧪 Testing checksum functions...")
+    logger.debug("Starting checksum function tests")
     
     try:
         from agent.utils.checksum import calcular_checksum_automatico, validar_checksum_automatico
+        logger.debug("Successfully imported checksum functions")
         
         # Test with a sample T9 line (recognized record type)
         test_line = "T9" + "0" * 489 + "1234567890"  # T9 record with dummy checksum
+        logger.debug(f"Test line created: {test_line[:20]}...{test_line[-20:]}")
         
         # Calculate checksum
         checksum = calcular_checksum_automatico(test_line)
         print(f"✅ Checksum calculation working: {checksum}")
+        logger.debug(f"Calculated checksum: {checksum}")
         
         # Validate checksum with correct checksum
         full_line = test_line[:-10] + checksum
         is_valid = validar_checksum_automatico(full_line)
         print(f"✅ Checksum validation working: {is_valid}")
+        logger.debug(f"Validation result: {is_valid}")
+        
+        if DEBUG_MODE:
+            # Add debug breakpoint for inspection
+            import pdb; pdb.set_trace() if os.getenv('PDB_BREAK') else None
         
         return True
     except Exception as e:
         print(f"❌ Checksum test failed: {e}")
+        logger.error(f"Checksum test failed: {e}", exc_info=True)
         return False
 
 def test_dbk_parser():
@@ -183,19 +217,31 @@ def test_pdf_extraction():
         
         # Parse result
         parsed = json.loads(result)
-        
         if parsed.get("success"):
-            data = parsed.get("data", {})
-            print(f"✅ Extraction successful using {data.get('processing_method')}")
-            print(f"✅ Document type identified: {data.get('document_type')}")
-            print(f"✅ Confidence level: {data.get('confidence', 0.0):.2f}")
+            print(f"✅ Extraction successful using {parsed.get('method')}")
+            
+            # Get document type from extracted data
+            extracted_data = parsed.get("extracted_data", {})
+            document_type = extracted_data.get("document_type") or extracted_data.get("institution_detected") or "Unknown"
+            confidence = parsed.get("confidence", 0.0)
+            
+            print(f"✅ Document type identified: {document_type}")
+            print(f"✅ Confidence level: {confidence:.2f}")
             
             # Check for structured data
-            if data.get("structured_data"):
+            if extracted_data:
                 print("✅ Structured data extracted successfully")
                 # Print a sample of keys
-                keys = list(data.get("structured_data", {}).keys())[:5]
+                keys = list(extracted_data.keys())[:5]
                 print(f"   Data keys: {', '.join(keys)}...")
+                
+                # Show some specific financial data if available
+                if extracted_data.get("financial_data"):
+                    print("   💰 Financial data detected")
+                if extracted_data.get("taxpayer_info"):
+                    print("   👤 Taxpayer info detected")
+                if extracted_data.get("irpf_mapping"):
+                    print("   📋 IRPF mapping suggestions available")
             else:
                 print("⚠️  No structured data extracted")
                 
@@ -211,7 +257,11 @@ def test_pdf_extraction():
 def main():
     """Run all tests."""
     print("🚀 IRPF Agent - Basic Implementation Test")
+    if DEBUG_MODE:
+        print("🐛 DEBUG MODE: Verbose logging enabled")
     print("=" * 50)
+    
+    logger.info("Starting test suite execution")
     
     tests = [
         ("Environment Setup", test_environment_setup),
@@ -227,14 +277,20 @@ def main():
     total = len(tests)
     
     for test_name, test_func in tests:
+        logger.debug(f"Executing test: {test_name}")
         try:
             if test_func():
                 passed += 1
+                logger.debug(f"Test {test_name} passed")
+            else:
+                logger.warning(f"Test {test_name} failed")
         except Exception as e:
             print(f"❌ {test_name} test crashed: {e}")
+            logger.error(f"Test {test_name} crashed: {e}", exc_info=True)
     
     print("\n" + "=" * 50)
     print(f"📊 Test Results: {passed}/{total} tests passed")
+    logger.info(f"Test suite completed: {passed}/{total} tests passed")
     
     if passed == total:
         print("🎉 All tests passed! The basic implementation is working.")
@@ -243,8 +299,16 @@ def main():
         print("2. Install dependencies: uv sync")
         print("3. Run the agent: uv run main.py")
         print("4. Test PDF extraction: uv run main.py and type 'test-pdf'")
+        
+        if DEBUG_MODE:
+            print("\n🐛 Debug info:")
+            print(f"   Log file: irpf_agent_test.log")
+            print(f"   Python path: {sys.path[0]}")
+            print(f"   Working directory: {os.getcwd()}")
     else:
         print("⚠️  Some tests failed. Check the implementation.")
+        if DEBUG_MODE:
+            print("🐛 Check irpf_agent_test.log for detailed error information")
         return 1
     
     return 0
