@@ -203,10 +203,15 @@ VALIDAÇÕES OBRIGATÓRIAS:
 - Confirmar estrutura de registros
 - Verificar consistência entre registros relacionados
 
+OTIMIZAÇÃO DE OPERAÇÕES:
+- PREFIRA batch_update quando tiver múltiplas alterações para evitar backups intermediários
+- Use operações individuais apenas para mudanças isoladas
+
 EXEMPLOS DE OPERAÇÕES (Action Input):
 - Carregar arquivo DBK: {{"operation": "read_dbk", "file_path": "caminho/arquivo.dbk"}}
 - Listar registros: {{"operation": "list_records", "file_path": "arquivo.dbk"}}
-- Atualizar registro: {{"operation": "update_record", "record_type": "R21", "data": {{}} }}
+- Operações em lote (PREFERENCIAL): {{"operation": "batch_update", "file_path": "arquivo.dbk", "operations": [{{"type": "add_record", "record_type": "R21", "data": {{}}}}, {{"type": "add_record", "record_type": "R27", "data": {{}}}}]}}
+- Atualizar registro único: {{"operation": "update_record", "record_index": 1, "record_data": {{}} }}
 - Buscar documentação: {{"operation": "search", "query": "formato registro R17"}}
 - Extrair dados de PDF: {{"operation": "extract_financial_data", "file_path": "informes/meu_informe.pdf"}}
 

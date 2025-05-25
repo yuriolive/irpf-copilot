@@ -7,22 +7,16 @@ arquivos DBK da Receita Federal de forma segura.
 
 import os
 import json
-import shutil
-from datetime import datetime
+import logging
 from typing import Dict, Any
 from langchain.tools import BaseTool
 from pydantic import Field
-import logging
 from pathlib import Path
 
-# Import utilities
-from ..utils.checksum import (
-    validar_checksum_automatico,
-    detectar_tipo_registro
-)
+# Import the centralized parser
+from ..utils.dbk_parser import DbkParser
 
 logger = logging.getLogger(__name__)
-
 
 class DbkTool(BaseTool):
     """
@@ -37,6 +31,7 @@ class DbkTool(BaseTool):
     - update_record: Atualizar registro existente
     - add_record: Adicionar novo registro
     - backup_file: Criar backup de arquivo
+    - batch_update: Fazer múltiplas operações em um único batch
     """
     
     name: str = "dbk_tool"
@@ -50,7 +45,8 @@ class DbkTool(BaseTool):
     5. get_record - Obter detalhes de registro específico por índice/tipo
     6. update_record - Atualizar dados de registro existente
     7. add_record - Adicionar novo registro ao arquivo
-    8. backup_file - Criar backup com timestamp
+    8. batch_update - Fazer múltiplas operações em um único batch (evita backups intermediários)
+    9. backup_file - Criar backup com timestamp
     
     Formatos de entrada JSON:
     - {"operation": "read_dbk", "file_path": "caminho/arquivo.dbk"}
@@ -58,6 +54,7 @@ class DbkTool(BaseTool):
     - {"operation": "list_records", "file_path": "arquivo.dbk"}
     - {"operation": "get_record", "file_path": "arquivo.dbk", "record_index": 0}
     - {"operation": "update_record", "file_path": "arquivo.dbk", "record_index": 1, "data": {...}}
+    - {"operation": "batch_update", "file_path": "arquivo.dbk", "operations": [{"type": "add_record", "record_type": "R21", "data": {...}}, {"type": "add_record", "record_type": "R27", "data": {...}}]}
     - {"operation": "backup_file", "file_path": "arquivo.dbk"}
     
     SEGURANÇA:
@@ -65,17 +62,21 @@ class DbkTool(BaseTool):
     - Validação de checksums obrigatória
     - Encoding Latin-1 para compatibilidade
     - Verificação de integridade pós-modificação
+    - Arquivos modificados são salvos na pasta 'gerado', mantendo originais intocados
     """
     
     # Configurações de segurança
     auto_backup: bool = Field(default=True, exclude=True)
     validate_checksums: bool = Field(default=True, exclude=True)
+    parser: DbkParser  # Added type hint for the parser instance variable
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Configurar baseado em variáveis de ambiente
         object.__setattr__(self, 'auto_backup', os.getenv("AUTO_BACKUP", "true").lower() == "true")
         object.__setattr__(self, 'validate_checksums', os.getenv("VALIDATE_CHECKSUMS", "true").lower() == "true")
+        # Initialize the parser
+        self.parser = DbkParser() # Changed from object.__setattr__
     
     def _run(self, query: str) -> str:
         """Executa operação DBK baseada no JSON de entrada."""
@@ -106,10 +107,12 @@ class DbkTool(BaseTool):
                 return self._update_record(input_data)
             elif operation == "add_record":
                 return self._add_record(input_data)
+            elif operation == "batch_update":
+                return self._batch_update(input_data)
             elif operation == "backup_file":
                 return self._backup_file(input_data)
             else:
-                return f"❌ Erro: Operação '{operation}' não suportada. Operações disponíveis: read_dbk, write_dbk, validate_dbk, list_records, get_record, update_record, add_record, backup_file"
+                return f"❌ Erro: Operação '{operation}' não suportada. Operações disponíveis: read_dbk, write_dbk, validate_dbk, list_records, get_record, update_record, add_record, batch_update, backup_file"
         
         except Exception as e:
             logger.error(f"Erro na execução do DbkTool: {e}")
@@ -121,69 +124,14 @@ class DbkTool(BaseTool):
         if not file_path:
             return "❌ Erro: 'file_path' é obrigatório para read_dbk"
         
-        # Verificar se arquivo existe
-        if not os.path.exists(file_path):
-            return f"❌ Erro: Arquivo não encontrado: {file_path}"
-        
         try:
-            # Ler arquivo com encoding correto
-            with open(file_path, 'r', encoding='latin-1') as f:
-                lines = f.readlines()
+            # Use the centralized analyzer
+            result = self.parser.analyze_dbk_file(file_path)
             
-            # Análise básica
-            result = {
-                "file_path": file_path,
-                "file_size_bytes": os.path.getsize(file_path),
-                "total_lines": len(lines),
-                "records": []
-            }
+            if 'error' in result:
+                return f"❌ {result['error']}"
             
-            # Analisar cada linha
-            validation_errors = []
-            for i, line in enumerate(lines):
-                line_clean = line.strip()
-                if not line_clean:
-                    continue
-                
-                record_type = detectar_tipo_registro(line_clean)
-                
-                record_info = {
-                    "line_number": i + 1,
-                    "record_type": record_type,
-                    "length": len(line_clean),
-                    "checksum_valid": False
-                }
-                
-                # Validar checksum se habilitado
-                if self.validate_checksums and len(line_clean) >= 10:
-                    try:
-                        file_name = os.path.basename(file_path)
-                        is_valid = validar_checksum_automatico(line_clean, file_name)
-                        record_info["checksum_valid"] = is_valid
-                        
-                        if not is_valid:
-                            validation_errors.append(f"Linha {i+1}: Checksum inválido para registro {record_type}")
-                    except Exception as e:
-                        validation_errors.append(f"Linha {i+1}: Erro ao validar checksum: {e}")
-                
-                # Extrair informações específicas por tipo
-                if record_type == "IRPF":
-                    record_info["year"] = line_clean[8:12] if len(line_clean) > 12 else "N/A"
-                    record_info["tax_year"] = line_clean[12:16] if len(line_clean) > 16 else "N/A"
-                    record_info["cpf"] = line_clean[20:31] if len(line_clean) > 31 else "N/A"
-                
-                result["records"].append(record_info)
-            
-            # Resumo final
-            result["validation_errors"] = validation_errors
-            result["records_by_type"] = {}
-            for record in result["records"]:
-                record_type = record["record_type"]
-                if record_type not in result["records_by_type"]:
-                    result["records_by_type"][record_type] = 0
-                result["records_by_type"][record_type] += 1
-            
-            # Formatação da resposta
+            # Format the response
             response = f"📁 **Análise do arquivo DBK**: {file_path}\\n\\n"
             response += f"📊 **Estatísticas básicas:**\\n"
             response += f"- Tamanho: {result['file_size_bytes']:,} bytes\\n"
@@ -194,35 +142,17 @@ class DbkTool(BaseTool):
             for record_type, count in result["records_by_type"].items():
                 response += f"- {record_type}: {count} registro(s)\\n"
             
-            if validation_errors:
-                response += f"\\n⚠️ **Erros de validação encontrados ({len(validation_errors)}):**\\n"
-                # Agrupar erros por tipo para resumir
-                error_types = {}
-                for error in validation_errors:
-                    if "DESCONHECIDO" in error:
-                        error_types["DESCONHECIDO"] = error_types.get("DESCONHECIDO", 0) + 1
-                    else:
-                        error_types["Outros"] = error_types.get("Outros", 0) + 1
-                
-                if "DESCONHECIDO" in error_types:
-                    response += f"- {error_types['DESCONHECIDO']} registros com formato desconhecido (possível corrupção ou formato não padrão)\\n"
-                if "Outros" in error_types:
-                    response += f"- {error_types['Outros']} outros erros de validação\\n"
-                
-                # Mostrar apenas alguns exemplos específicos
-                specific_errors = [e for e in validation_errors if "DESCONHECIDO" not in e][:3]
-                for error in specific_errors:
+            if result["validation_errors"]:
+                response += f"\\n⚠️ **Erros de validação encontrados ({len(result['validation_errors'])}):**\\n"
+                # Show first few errors
+                for error in result["validation_errors"][:5]:
                     response += f"- {error}\\n"
-                
-                if len(validation_errors) > 5:
-                    response += f"... e mais {len(validation_errors) - 5} erro(s)\\n"
-                    response += f"- {error}\\n"
-                if len(validation_errors) > 5:
-                    response += f"... e mais {len(validation_errors) - 5} erro(s)\\n"
+                if len(result["validation_errors"]) > 5:
+                    response += f"... e mais {len(result['validation_errors']) - 5} erro(s)\\n"
             else:
                 response += f"\\n✅ **Validação:** Todos os checksums válidos!\\n"
             
-            # Detalhes do registro IRPF se disponível
+            # Show IRPF details if available
             irpf_records = [r for r in result["records"] if r["record_type"] == "IRPF"]
             if irpf_records:
                 irpf = irpf_records[0]
@@ -247,77 +177,31 @@ class DbkTool(BaseTool):
             return f"❌ Erro: Arquivo não encontrado: {file_path}"
         
         try:
-            with open(file_path, 'r', encoding='latin-1') as f:
-                lines = f.readlines()
+            validation = self.parser.validate_dbk_file(Path(file_path))
             
-            file_name = os.path.basename(file_path)
-            total_records = 0
-            valid_checksums = 0
-            errors = []
-            warnings = []
-            
-            for i, line in enumerate(lines):
-                line_clean = line.strip()
-                if not line_clean:
-                    continue
-                
-                total_records += 1
-                record_type = detectar_tipo_registro(line_clean)
-                
-                # Validar checksum
-                try:
-                    is_valid = validar_checksum_automatico(line_clean, file_name)
-                    if is_valid:
-                        valid_checksums += 1
-                    else:
-                        errors.append(f"Linha {i+1}: Checksum inválido para registro {record_type}")
-                except Exception as e:
-                    errors.append(f"Linha {i+1}: Erro na validação de checksum: {e}")
-                
-                # Validações estruturais básicas
-                if record_type == "DESCONHECIDO":
-                    warnings.append(f"Linha {i+1}: Tipo de registro não reconhecido")
-                
-                if len(line_clean) < 10:
-                    errors.append(f"Linha {i+1}: Registro muito curto (< 10 caracteres)")
-            
-            # Verificar estrutura mínima
-            has_irpf = any("IRPF" in line for line in lines)
-            has_t9 = any(line.strip().startswith("T9") for line in lines)
-            
-            if not has_irpf:
-                errors.append("Arquivo não possui registro IRPF (header obrigatório)")
-            
-            if not has_t9:
-                warnings.append("Arquivo não possui registro T9 (trailer recomendado)")
-            
-            # Relatório final
             response = f"🔍 **Validação completa**: {file_path}\\n\\n"
             response += f"📊 **Resumo:**\\n"
-            response += f"- Total de registros: {total_records}\\n"
-            response += f"- Checksums válidos: {valid_checksums}/{total_records}\\n"
-            response += f"- Taxa de sucesso: {(valid_checksums/total_records*100):.1f}%\\n\\n"
+            response += f"- Total de registros: {validation['total_records']}\\n"
+            response += f"- Checksums válidos: {validation['valid_checksums']}/{validation['total_records']}\\n"
             
-            if errors:
-                response += f"❌ **Erros críticos ({len(errors)}):**\\n"
-                for error in errors[:10]:
+            if validation['total_records'] > 0:
+                success_rate = (validation['valid_checksums'] / validation['total_records']) * 100
+                response += f"- Taxa de sucesso: {success_rate:.1f}%\\n\\n"
+            
+            if validation['errors']:
+                response += f"❌ **Erros críticos ({len(validation['errors'])}):**\\n"
+                for error in validation['errors']:
                     response += f"- {error}\\n"
-                if len(errors) > 10:
-                    response += f"... e mais {len(errors) - 10} erro(s)\\n"
                 response += "\\n"
             
-            if warnings:
-                response += f"⚠️ **Avisos ({len(warnings)}):**\\n"
-                for warning in warnings[:5]:
+            if validation['warnings']:
+                response += f"⚠️ **Avisos ({len(validation['warnings'])}):**\\n"
+                for warning in validation['warnings']:
                     response += f"- {warning}\\n"
-                if len(warnings) > 5:
-                    response += f"... e mais {len(warnings) - 5} aviso(s)\\n"
                 response += "\\n"
             
-            if not errors and not warnings:
+            if validation['is_valid']:
                 response += "✅ **Resultado:** Arquivo válido e íntegro!\\n"
-            elif not errors:
-                response += "✅ **Resultado:** Arquivo válido com avisos menores\\n"
             else:
                 response += "❌ **Resultado:** Arquivo possui erros que precisam ser corrigidos\\n"
             
@@ -333,27 +217,21 @@ class DbkTool(BaseTool):
         if not file_path:
             return "❌ Erro: 'file_path' é obrigatório para list_records"
         
-        if not os.path.exists(file_path):
-            return f"❌ Erro: Arquivo não encontrado: {file_path}"
-        
         try:
-            with open(file_path, 'r', encoding='latin-1') as f:
-                lines = f.readlines()
+            result = self.parser.analyze_dbk_file(file_path)
+            
+            if 'error' in result:
+                return f"❌ {result['error']}"
             
             response = f"📋 **Lista de registros**: {file_path}\\n\\n"
             
-            for i, line in enumerate(lines):
-                line_clean = line.strip()
-                if not line_clean:
-                    continue
+            for record in result['records']:
+                line_number = record['line_number']
+                record_type = record['record_type']
+                length = record['length']
+                checksum_status = "✅" if record['checksum_valid'] else "❌"
                 
-                record_type = detectar_tipo_registro(line_clean)
-                length = len(line_clean)
-                
-                # Mostrar preview do conteúdo
-                preview = line_clean[:50] + "..." if len(line_clean) > 50 else line_clean
-                
-                response += f"{i+1:3d}. **{record_type}** ({length} chars): {preview}\\n"
+                response += f"{line_number:3d}. **{record_type}** ({length} chars) {checksum_status}\\n"
             
             return response
             
@@ -371,37 +249,30 @@ class DbkTool(BaseTool):
             return "❌ Erro: 'record_index' é obrigatório"
         
         try:
-            with open(file_path, 'r', encoding='latin-1') as f:
-                lines = f.readlines()
+            parsed_data = self.parser.parse_dbk_file(Path(file_path))
+            records = parsed_data.get('records', [])
             
-            # Filtrar linhas vazias
-            valid_lines = [line.strip() for line in lines if line.strip()]
+            if record_index >= len(records):
+                return f"❌ Erro: Índice {record_index} fora do range (0-{len(records)-1})"
             
-            if record_index >= len(valid_lines):
-                return f"❌ Erro: Índice {record_index} fora do range (0-{len(valid_lines)-1})"
-            
-            line = valid_lines[record_index]
-            record_type = detectar_tipo_registro(line)
+            record = records[record_index]
             
             response = f"📄 **Detalhes do registro {record_index}**\\n\\n"
-            response += f"**Tipo:** {record_type}\\n"
-            response += f"**Tamanho:** {len(line)} caracteres\\n"
-            response += f"**Conteúdo completo:**\\n```\\n{line}\\n```\\n\\n"
+            response += f"**Tipo:** {record.record_type}\\n"
+            response += f"**Tamanho:** {len(record.raw_line)} caracteres\\n"
+            response += f"**Válido:** {'✅ Sim' if record.is_valid else '❌ Não'}\\n"
             
-            # Validar checksum
-            try:
-                file_name = os.path.basename(file_path)
-                is_valid = validar_checksum_automatico(line, file_name)
-                response += f"**Checksum:** {'✅ Válido' if is_valid else '❌ Inválido'}\\n"
-            except Exception as e:
-                response += f"**Checksum:** ❌ Erro na validação: {e}\\n"
+            if record.validation_errors:
+                response += f"**Erros:** {'; '.join(record.validation_errors)}\\n"
             
-            # Análise específica por tipo
-            if record_type == "IRPF" and len(line) > 30:
-                response += f"\\n**Análise IRPF:**\\n"
-                response += f"- Ano declaração: {line[8:12]}\\n"
-                response += f"- Ano-calendário: {line[12:16]}\\n"
-                response += f"- CPF: {line[20:31]}\\n"
+            response += f"**Conteúdo completo:**\\n```\\n{record.raw_line}\\n```\\n\\n"
+            
+            # Show parsed data
+            if record.data:
+                response += f"**Dados extraídos:**\\n"
+                for key, value in record.data.items():
+                    if key not in ['content', 'full_line']:
+                        response += f"- {key}: {value}\\n"
             
             return response
             
@@ -414,19 +285,8 @@ class DbkTool(BaseTool):
         if not file_path:
             return "❌ Erro: 'file_path' é obrigatório para backup_file"
         
-        if not os.path.exists(file_path):
-            return f"❌ Erro: Arquivo não encontrado: {file_path}"
-        
         try:
-            # Gerar nome do backup
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            file_dir = os.path.dirname(file_path)
-            file_name = os.path.basename(file_path)
-            backup_name = f"{file_name}.backup_{timestamp}"
-            backup_path = os.path.join(file_dir, backup_name)
-            
-            # Criar backup
-            shutil.copy2(file_path, backup_path)
+            backup_path = self.parser.create_backup(file_path)
             return f"✅ **Backup criado com sucesso!**\\n- Original: {file_path}\\n- Backup: {backup_path}"
             
         except Exception as e:
@@ -445,56 +305,33 @@ class DbkTool(BaseTool):
         if not record_data:
             return "❌ Erro: 'record_data' é obrigatório"
         
-        if not os.path.exists(file_path):
-            return f"❌ Erro: Arquivo não encontrado: {file_path}"
-        
         try:
-            from ..utils.dbk_parser import DbkParser
-            parser = DbkParser()
+            # Use single operation batch update for consistency
+            operations = [{
+                'type': 'update_record',
+                'record_index': record_index,
+                'data': record_data
+            }]
             
-            # Parse existing file
-            parsed_data = parser.parse_dbk_file(Path(file_path))
-            records = parsed_data.get('records', [])
+            result = self.parser.update_file_with_operations(file_path, operations)
             
-            if not (0 <= record_index < len(records)):
-                return f"❌ Erro: Índice {record_index} fora do range (0-{len(records)-1})"
-            
-            # Get the existing record
-            existing_record = records[record_index]
-            
-            # Update the record data
-            updated_data = existing_record.data.copy()
-            updated_data.update(record_data)
-            
-            # Create updated record
-            updated_record = parser.create_record(existing_record.record_type, updated_data)
-            updated_record.line_number = existing_record.line_number
-            
-            # Update in parsed data
-            parser.update_record(parsed_data, record_index, updated_record)
-            
-            # Write back to file
-            success = parser.write_dbk_file(parsed_data, Path(file_path), create_backup=True)
-            
-            if success:
-                validation = parser.validate_dbk_file(Path(file_path))
-                
+            if result['success']:
                 response = f"✅ **Registro {record_index} atualizado com sucesso!**\\n\\n"
-                response += f"**Tipo de registro:** {updated_record.record_type}\\n"
                 response += f"**Campos atualizados:** {', '.join(record_data.keys())}\\n"
-                response += f"**Arquivo:** {file_path}\\n"
-                response += f"**Backup criado:** Sim\\n"
+                response += f"**Arquivo original:** {file_path}\\n"
+                response += f"**Arquivo gerado:** {result['output_path']}\\n"
+                response += f"**Backup criado:** {result['backup_path']}\\n"
                 
-                if validation['is_valid']:
+                if result['validation']['is_valid']:
                     response += f"**Validação:** ✅ Arquivo válido\\n"
                 else:
                     response += f"**Validação:** ❌ Arquivo com problemas\\n"
-                    if validation['errors']:
-                        response += f"**Erros:** {'; '.join(validation['errors'][:3])}\\n"
+                    if result['validation']['errors']:
+                        response += f"**Erros:** {'; '.join(result['validation']['errors'][:3])}\\n"
                 
                 return response
             else:
-                return "❌ Erro: Falha ao salvar arquivo atualizado"
+                return f"❌ Erro: {result['error']}"
         
         except Exception as e:
             logger.error(f"Error updating record: {e}")
@@ -512,57 +349,79 @@ class DbkTool(BaseTool):
         if not record_type:
             return "❌ Erro: 'record_type' é obrigatório"
         
-        if not os.path.exists(file_path):
-            return f"❌ Erro: Arquivo não encontrado: {file_path}"
-        
         try:
-            from ..utils.dbk_parser import DbkParser
-            parser = DbkParser()
+            # Use single operation batch update for consistency
+            operations = [{
+                'type': 'add_record',
+                'record_type': record_type,
+                'data': record_data,
+                'position': position
+            }]
             
-            # Parse existing file
-            parsed_data = parser.parse_dbk_file(Path(file_path))
+            result = self.parser.update_file_with_operations(file_path, operations)
             
-            # Create new record
-            new_record = parser.create_record(record_type, record_data)
-            
-            # Add record to parsed data
-            if position == "before_trailer":
-                parser.add_record(parsed_data, new_record)
-            elif position == "end":
-                parsed_data['records'].append(new_record)
-            elif isinstance(position, int):
-                parsed_data['records'].insert(position, new_record)
-                parser._update_sequences(parsed_data['records'])
-            else:
-                return f"❌ Erro: Posição inválida: {position}"
-            
-            # Write back to file
-            success = parser.write_dbk_file(parsed_data, Path(file_path), create_backup=True)
-            
-            if success:
-                validation = parser.validate_dbk_file(Path(file_path))
-                
+            if result['success']:
                 response = f"✅ **Novo registro {record_type} adicionado com sucesso!**\\n\\n"
                 response += f"**Tipo de registro:** {record_type}\\n"
                 response += f"**Posição:** {position}\\n"
-                response += f"**Total de registros:** {len(parsed_data['records'])}\\n"
-                response += f"**Arquivo:** {file_path}\\n"
-                response += f"**Backup criado:** Sim\\n"
+                response += f"**Arquivo original:** {file_path}\\n"
+                response += f"**Arquivo gerado:** {result['output_path']}\\n"
+                response += f"**Backup criado:** {result['backup_path']}\\n"
                 
-                if validation['is_valid']:
+                if result['validation']['is_valid']:
                     response += f"**Validação:** ✅ Arquivo válido\\n"
                 else:
                     response += f"**Validação:** ❌ Arquivo com problemas\\n"
-                    if validation['errors']:
-                        response += f"**Erros:** {'; '.join(validation['errors'][:3])}\\n"
+                    if result['validation']['errors']:
+                        response += f"**Erros:** {'; '.join(result['validation']['errors'][:3])}\\n"
                 
                 return response
             else:
-                return "❌ Erro: Falha ao salvar arquivo atualizado"
+                return f"❌ Erro: {result['error']}"
         
         except Exception as e:
             logger.error(f"Error adding record: {e}")
             return f"❌ Erro ao adicionar registro: {str(e)}"
+    
+    def _batch_update(self, input_data: Dict[str, Any]) -> str:
+        """Executa múltiplas operações em um único batch, evitando backups intermediários."""
+        file_path = input_data.get('file_path')
+        operations = input_data.get('operations', [])
+        
+        if not file_path:
+            return "❌ Erro: 'file_path' é obrigatório para batch_update"
+        if not operations:
+            return "❌ Erro: 'operations' é obrigatório para batch_update"
+        
+        try:
+            result = self.parser.update_file_with_operations(file_path, operations)
+            
+            if result['success']:
+                response = f"🔄 **Operação batch executada com sucesso!**\\n\\n"
+                response += f"**Arquivo original:** {file_path}\\n"
+                response += f"**Arquivo gerado:** {result['output_path']}\\n"
+                response += f"**Total de operações:** {result['total_operations']}\\n"
+                response += f"**Operações bem-sucedidas:** {result['operations_completed']}\\n"
+                response += f"**Backup criado:** {result['backup_path']}\\n\\n"
+                
+                response += f"📋 **Detalhes das operações:**\\n"
+                for operation_result in result['operation_results']:
+                    response += f"- {operation_result}\\n"
+                
+                if result['validation']['is_valid']:
+                    response += f"\\n**Validação final:** ✅ Arquivo válido\\n"
+                else:
+                    response += f"\\n**Validação final:** ❌ Arquivo com problemas\\n"
+                    if result['validation']['errors']:
+                        response += f"**Erros:** {'; '.join(result['validation']['errors'][:3])}\\n"
+                
+                return response
+            else:
+                return f"❌ Erro: {result['error']}"
+        
+        except Exception as e:
+            logger.error(f"Error in batch update: {e}")
+            return f"❌ Erro crítico no batch update: {str(e)}"
     
     def _write_dbk(self, input_data: Dict[str, Any]) -> str:
         """Salva arquivo DBK completo."""
@@ -576,21 +435,20 @@ class DbkTool(BaseTool):
             return "❌ Erro: 'data' é obrigatório"
         
         try:
-            from ..utils.dbk_parser import DbkParser
-            parser = DbkParser()
-            
             # Validate data structure
             if not isinstance(data, dict) or 'records' not in data:
                 return "❌ Erro: Formato de dados inválido. Esperado dict com chave 'records'."
             
-            # Write the file
-            success = parser.write_dbk_file(data, Path(file_path), create_backup=create_backup)
+            # Write the file using the parser
+            success = self.parser.write_dbk_file(data, Path(file_path), create_backup=create_backup)
             
             if success:
-                validation = parser.validate_dbk_file(Path(file_path))
+                output_path = self.parser.get_output_path(file_path)
+                validation = self.parser.validate_dbk_file(Path(output_path))
                 
                 response = f"✅ **Arquivo DBK salvo com sucesso!**\\n\\n"
-                response += f"**Arquivo:** {file_path}\\n"
+                response += f"**Arquivo original:** {file_path}\\n"
+                response += f"**Arquivo gerado:** {output_path}\\n"
                 response += f"**Total de registros:** {len(data.get('records', []))}\\n"
                 response += f"**Backup criado:** {'Sim' if create_backup else 'Não'}\\n"
                 

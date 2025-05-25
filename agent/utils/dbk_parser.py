@@ -4,6 +4,8 @@ Provides specialized parsing and manipulation of DBK files according to Receita 
 """
 
 import logging
+import os
+import shutil
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 from dataclasses import dataclass
@@ -40,6 +42,117 @@ class DbkParser:
     def __init__(self):
         """Initialize the DBK parser."""
         self.encoding = 'latin-1'  # DBK files use Latin-1 encoding
+    
+    def get_output_path(self, input_path: str) -> str:
+        """
+        Determina o caminho de saída baseado na estrutura de pastas.
+        Se o arquivo está na pasta 'original', salva na pasta 'gerado'.
+        Caso contrário, mantém o caminho original.
+        """
+        input_path = os.path.normpath(input_path)
+        
+        # Verifica se o arquivo está na pasta original
+        if os.sep + 'original' + os.sep in input_path or input_path.endswith(os.sep + 'original'):
+            # Substitui 'original' por 'gerado' no caminho
+            output_path = input_path.replace(os.sep + 'original' + os.sep, os.sep + 'gerado' + os.sep)
+            if input_path.endswith(os.sep + 'original'):
+                output_path = input_path.replace(os.sep + 'original', os.sep + 'gerado')
+            
+            # Garante que o diretório de destino existe
+            output_dir = os.path.dirname(output_path)
+            os.makedirs(output_dir, exist_ok=True)
+            
+            return output_path
+        
+        # Se está na pasta 'dbks' mas não é original nem gerado, assume original e salva em gerado
+        if 'dbks' + os.sep in input_path and 'gerado' not in input_path and 'original' not in input_path:
+            # Assume que está no root de dbks e deve ser salvo em gerado
+            dir_path = os.path.dirname(input_path)
+            filename = os.path.basename(input_path)
+            output_path = os.path.join(dir_path, 'gerado', filename)
+            
+            # Garante que o diretório de destino existe
+            output_dir = os.path.dirname(output_path)
+            os.makedirs(output_dir, exist_ok=True)
+            
+            return output_path
+        
+        return input_path
+    
+    def analyze_dbk_file(self, file_path: str) -> Dict[str, Any]:
+        """
+        Analisa um arquivo DBK completo e retorna estatísticas detalhadas.
+        """
+        if not os.path.exists(file_path):
+            return {
+                'error': f"Arquivo não encontrado: {file_path}",
+                'is_valid': False
+            }
+        
+        try:
+            with open(file_path, 'r', encoding=self.encoding) as f:
+                lines = f.readlines()
+            
+            result = {
+                "file_path": file_path,
+                "file_size_bytes": os.path.getsize(file_path),
+                "total_lines": len(lines),
+                "records": [],
+                "validation_errors": [],
+                "records_by_type": {},
+                "is_valid": True
+            }
+            
+            file_name = os.path.basename(file_path)
+            
+            for i, line in enumerate(lines):
+                line_clean = line.strip()
+                if not line_clean:
+                    continue
+                
+                record_type = detectar_tipo_registro(line_clean)
+                
+                record_info = {
+                    "line_number": i + 1,
+                    "record_type": record_type,
+                    "length": len(line_clean),
+                    "checksum_valid": False
+                }
+                
+                # Validar checksum se possível
+                if len(line_clean) >= 10:
+                    try:
+                        is_valid = validar_checksum_automatico(line_clean, file_name)
+                        record_info["checksum_valid"] = is_valid
+                        
+                        if not is_valid:
+                            result["validation_errors"].append(f"Linha {i+1}: Checksum inválido para registro {record_type}")
+                            result["is_valid"] = False
+                    except Exception as e:
+                        result["validation_errors"].append(f"Linha {i+1}: Erro ao validar checksum: {e}")
+                        result["is_valid"] = False
+                
+                # Extrair informações específicas por tipo
+                if record_type == "IRPF":
+                    record_info["year"] = line_clean[8:12] if len(line_clean) > 12 else "N/A"
+                    record_info["tax_year"] = line_clean[12:16] if len(line_clean) > 16 else "N/A"
+                    record_info["cpf"] = line_clean[20:31] if len(line_clean) > 31 else "N/A"
+                
+                result["records"].append(record_info)
+                
+                # Contar tipos de registro
+                if record_type not in result["records_by_type"]:
+                    result["records_by_type"][record_type] = 0
+                result["records_by_type"][record_type] += 1
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Erro ao analisar arquivo DBK {file_path}: {e}")
+            return {
+                'error': f"Erro ao analisar arquivo: {str(e)}",
+                'is_valid': False
+            }
     
     def parse_dbk_file(self, file_path: Path) -> Dict[str, Any]:
         """Parse a complete DBK file into structured data."""
@@ -203,19 +316,23 @@ class DbkParser:
     
     def write_dbk_file(self, data: Dict[str, Any], file_path: Path, 
                        create_backup: bool = True) -> bool:
-        """Write structured data back to a DBK file."""
+        """Write structured data back to a DBK file with path management."""
         try:
-            logger.info(f"Writing DBK file: {file_path}")
+            # Determine output path based on folder structure
+            original_path = str(file_path)
+            output_path = self.get_output_path(original_path)
+            final_path = Path(output_path)
             
-            # Create backup if requested
-            if create_backup and file_path.exists():
-                backup_path = file_path.with_suffix(f'.bak.{datetime.now().strftime("%Y%m%d_%H%M%S")}')
-                import shutil
-                shutil.copy2(file_path, backup_path)
+            logger.info(f"Writing DBK file: {original_path} -> {final_path}")
+            
+            # Create backup if requested and file exists
+            if create_backup and final_path.exists():
+                backup_path = final_path.with_suffix(f'.bak.{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+                shutil.copy2(final_path, backup_path)
                 logger.info(f"Backup created: {backup_path}")
             
             # Ensure parent directory exists
-            file_path.parent.mkdir(parents=True, exist_ok=True)
+            final_path.parent.mkdir(parents=True, exist_ok=True)
             
             # Build lines from records
             lines = []
@@ -226,22 +343,22 @@ class DbkParser:
                         lines.append(record.raw_line)
                     else:
                         # Reconstruct line if needed
-                        line = self._reconstruct_line(record, file_path.name)
+                        line = self._reconstruct_line(record, final_path.name)
                         lines.append(line)
                 else:
                     # Handle dict format
                     lines.append(record.get('raw_line', ''))
             
             # Write to file
-            with open(file_path, 'w', encoding=self.encoding, newline='') as file:
+            with open(final_path, 'w', encoding=self.encoding, newline='') as file:
                 for line in lines:
                     file.write(line + '\n')
             
-            logger.info(f"Successfully wrote {len(lines)} lines to {file_path}")
+            logger.info(f"Successfully wrote {len(lines)} lines to {final_path}")
             
             # Validate written file
             try:
-                validation_result = self.validate_dbk_file(file_path)
+                validation_result = self.validate_dbk_file(final_path)
                 if not validation_result['is_valid']:
                     logger.warning(f"Written file has validation issues: {validation_result}")
             except Exception as e:
@@ -418,3 +535,132 @@ class DbkParser:
         )
         
         return record
+    
+    def create_backup(self, file_path: str) -> str:
+        """Create a backup of a file and return the backup path."""
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found: {file_path}")
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_dir = os.path.dirname(file_path)
+        file_name = os.path.basename(file_path)
+        backup_name = f"{file_name}.backup_{timestamp}"
+        backup_path = os.path.join(file_dir, backup_name)
+        
+        shutil.copy2(file_path, backup_path)
+        logger.info(f"Backup created: {backup_path}")
+        return backup_path
+    
+    def update_file_with_operations(self, file_path: str, operations: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Aplica uma lista de operações a um arquivo DBK de forma otimizada.
+        Cria apenas um backup e valida apenas uma vez ao final.
+        """
+        if not os.path.exists(file_path):
+            return {
+                'success': False,
+                'error': f"Arquivo não encontrado: {file_path}",
+                'operations_completed': 0
+            }
+        
+        try:
+            # Parse do arquivo existente
+            parsed_data = self.parse_dbk_file(Path(file_path))
+            
+            # Criar backup único
+            backup_path = self.create_backup(file_path)
+            
+            operation_results = []
+            successful_operations = 0
+            
+            # Executar todas as operações na memória
+            for i, operation in enumerate(operations):
+                try:
+                    op_type = operation.get('type')
+                    
+                    if op_type == "add_record":
+                        record_type = operation.get('record_type')
+                        record_data = operation.get('data', {})
+                        position = operation.get('position', 'before_trailer')
+                        
+                        if not record_type:
+                            operation_results.append(f"❌ Operação {i+1}: 'record_type' obrigatório")
+                            continue
+                        
+                        new_record = self.create_record(record_type, record_data)
+                        
+                        if position == "before_trailer":
+                            self.add_record(parsed_data, new_record)
+                        elif position == "end":
+                            parsed_data['records'].append(new_record)
+                        elif isinstance(position, int):
+                            parsed_data['records'].insert(position, new_record)
+                            self._update_sequences(parsed_data['records'])
+                        
+                        operation_results.append(f"✅ Operação {i+1}: Registro {record_type} adicionado")
+                        successful_operations += 1
+                    
+                    elif op_type == "update_record":
+                        record_index = operation.get('record_index')
+                        record_data = operation.get('data', {})
+                        
+                        if record_index is None:
+                            operation_results.append(f"❌ Operação {i+1}: 'record_index' obrigatório")
+                            continue
+                        
+                        records = parsed_data.get('records', [])
+                        if not (0 <= record_index < len(records)):
+                            operation_results.append(f"❌ Operação {i+1}: Índice {record_index} fora do range")
+                            continue
+                        
+                        existing_record = records[record_index]
+                        updated_data = existing_record.data.copy()
+                        updated_data.update(record_data)
+                        
+                        updated_record = self.create_record(existing_record.record_type, updated_data)
+                        updated_record.line_number = existing_record.line_number
+                        
+                        self.update_record(parsed_data, record_index, updated_record)
+                        operation_results.append(f"✅ Operação {i+1}: Registro {record_index} atualizado")
+                        successful_operations += 1
+                    
+                    else:
+                        operation_results.append(f"❌ Operação {i+1}: Tipo '{op_type}' não suportado")
+                
+                except Exception as e:
+                    operation_results.append(f"❌ Operação {i+1}: Erro - {str(e)}")
+            
+            # Salvar arquivo uma única vez (path management already handled in write_dbk_file)
+            success = self.write_dbk_file(parsed_data, Path(file_path), create_backup=False)
+            
+            if success:
+                # Determine actual output path for validation
+                output_path = self.get_output_path(file_path)
+                validation = self.validate_dbk_file(Path(output_path))
+                
+                return {
+                    'success': True,
+                    'operations_completed': successful_operations,
+                    'total_operations': len(operations),
+                    'backup_path': backup_path,
+                    'output_path': output_path,
+                    'validation': validation,
+                    'operation_results': operation_results
+                }
+            else:
+                # Restore backup on failure
+                shutil.copy2(backup_path, file_path)
+                return {
+                    'success': False,
+                    'error': "Falha ao salvar arquivo. Backup restaurado.",
+                    'operations_completed': 0,
+                    'backup_restored': True
+                }
+        
+        except Exception as e:
+            logger.error(f"Error in batch update: {e}")
+            return {
+                'success': False,
+                'error': f"Erro crítico: {str(e)}",
+                'operations_completed': 0
+            }
