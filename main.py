@@ -477,8 +477,11 @@ def main():
         # Interactive conversation loop
         while True:
             try:
-                # Get user input
-                user_input = console.input("\n[bold green]Você:[/bold green] ").strip()
+                # Explicitly print the input prompt to ensure it's visible
+                console.print("\n[bold green]Você:[/bold green] ", end="")
+                
+                # Get user input without additional prompt
+                user_input = input().strip()
                 
                 # Skip empty input
                 if not user_input:
