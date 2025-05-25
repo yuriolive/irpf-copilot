@@ -408,12 +408,12 @@ class DbkTool(BaseTool):
             
             # Criar backup
             shutil.copy2(file_path, backup_path)
-            
             return f"✅ **Backup criado com sucesso!**\\n- Original: {file_path}\\n- Backup: {backup_path}"
             
         except Exception as e:
             return f"❌ Erro ao criar backup: {str(e)}"
-      def _update_record(self, input_data: Dict[str, Any]) -> str:
+    
+    def _update_record(self, input_data: Dict[str, Any]) -> str:
         """Atualiza um registro existente."""
         file_path = input_data.get('file_path')
         record_index = input_data.get('record_index')
