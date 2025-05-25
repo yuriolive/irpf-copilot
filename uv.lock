@@ -76,7 +76,7 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3.24" },
     { name = "langchain-google-genai", specifier = ">=2.1.4" },
     { name = "langchain-google-vertexai", specifier = ">=2.0.24" },
-    { name = "opencv-python", specifier = ">=4.8.0" },
+    { name = "opencv-python", specifier = ">=4.11.0" },
     { name = "openpyxl", specifier = ">=3.1.0" },
     { name = "pandas", specifier = ">=2.0.0" },
     { name = "pdf2image", specifier = ">=1.16.3" },

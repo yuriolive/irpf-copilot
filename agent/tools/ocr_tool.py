@@ -44,6 +44,8 @@ class OcrTool(BaseTool):
     - preprocess_image: Clean and optimize images for better OCR
     - extract_bank_statement: Extract banking data from statements
     - list_supported_formats: List supported file formats
+    - list_informes: List all available informes in the informes folder
+    - find_informe: Find informe files by name pattern
     
     Input format: JSON string with operation and parameters
     Example: {"operation": "extract_data", "file_path": "informe.pdf", "document_type": "bank_statement"}
@@ -93,10 +95,14 @@ class OcrTool(BaseTool):
                 return self._extract_bank_statement(params)
             elif operation == "list_supported_formats":
                 return self._list_supported_formats()
+            elif operation == "list_informes":
+                return self._list_available_informes()
+            elif operation == "find_informe":
+                return self._find_informe_by_name(params)
             else:
                 return json.dumps({
                     "success": False,
-                    "error": f"Unknown operation: {operation}. Supported: extract_data, extract_tables, preprocess_image, extract_bank_statement, list_supported_formats"
+                    "error": f"Unknown operation: {operation}. Supported: extract_data, extract_tables, preprocess_image, extract_bank_statement, list_supported_formats, list_informes, find_informe"
                 })
         
         except Exception as e:
@@ -118,6 +124,14 @@ class OcrTool(BaseTool):
                 "success": False,
                 "error": "Missing 'file_path' parameter"
             })
+        
+        # If file_path is just a name, try to find it in informes folder
+        if not "/" in file_path and not "\\" in file_path:
+            find_result = self._find_informe_by_name({"search_term": file_path})
+            find_data = json.loads(find_result)
+            if find_data.get("success") and find_data.get("data", {}).get("files"):
+                file_path = find_data["data"]["files"][0]["path"]
+                logger.info(f"Found informe file: {file_path}")
         
         file_path = Path(file_path)
         if not file_path.exists():
@@ -349,7 +363,8 @@ class OcrTool(BaseTool):
         value_patterns = [
             r"RENDIMENTO[:\s]*R\$\s*([\d.,]+)",
             r"IMPOSTO[:\s]*R\$\s*([\d.,]+)",
-            r"VALOR[:\s]*R\$\s*([\d.,]+)"
+            r"VALOR[:\s]*R\$\s*([\d.,]+)",
+            r"SALDO[:\s]*R\$\s*([\d.,]+)"
         ]
         
         values = []
@@ -447,3 +462,86 @@ class OcrTool(BaseTool):
                 "notes": "Install missing dependencies for full functionality"
             }
         })
+    
+    def _list_available_informes(self) -> str:
+        """List all available financial statement files in the informes folder."""
+        try:
+            informes_dir = Path("informes")
+            if not informes_dir.exists() or not informes_dir.is_dir():
+                return json.dumps({
+                    "success": False,
+                    "error": "Informes directory not found"
+                })
+                
+            files = []
+            for ext in ['.pdf', '.png', '.jpg', '.jpeg', '.tiff', '.bmp']:
+                files.extend(list(informes_dir.glob(f"*{ext}")))
+                
+            file_list = []
+            for file in files:
+                file_list.append({
+                    "name": file.name,
+                    "path": str(file),
+                    "size": file.stat().st_size,
+                    "type": file.suffix.lower()
+                })
+                
+            return json.dumps({
+                "success": True,
+                "data": {
+                    "total_files": len(file_list),
+                    "files": file_list
+                }
+            })
+                
+        except Exception as e:
+            logger.error(f"Error listing informes: {e}")
+            return json.dumps({
+                "success": False,
+                "error": f"Failed to list informes: {str(e)}"
+            })
+    
+    def _find_informe_by_name(self, params: Dict[str, Any]) -> str:
+        """Find informe files by name pattern (e.g., '99Pay', 'banco', etc.)."""
+        search_term = params.get("search_term", "").lower()
+        if not search_term:
+            return json.dumps({
+                "success": False,
+                "error": "Missing 'search_term' parameter"
+            })
+            
+        try:
+            informes_dir = Path("informes")
+            if not informes_dir.exists():
+                return json.dumps({
+                    "success": False,
+                    "error": "Informes directory not found"
+                })
+                
+            matches = []
+            for ext in ['.pdf', '.png', '.jpg', '.jpeg', '.tiff', '.bmp']:
+                files = list(informes_dir.glob(f"*{ext}"))
+                for file in files:
+                    if search_term in file.name.lower():
+                        matches.append({
+                            "name": file.name,
+                            "path": str(file),
+                            "size": file.stat().st_size,
+                            "type": file.suffix.lower()
+                        })
+                        
+            return json.dumps({
+                "success": True,
+                "data": {
+                    "search_term": search_term,
+                    "matches_found": len(matches),
+                    "files": matches
+                }
+            })
+                
+        except Exception as e:
+            logger.error(f"Error finding informe: {e}")
+            return json.dumps({
+                "success": False,
+                "error": f"Failed to find informe: {str(e)}"
+            })

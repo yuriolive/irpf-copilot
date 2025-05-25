@@ -166,6 +166,8 @@ CONHECIMENTO ESPECÍFICO:
 FERRAMENTAS DISPONÍVEIS:
 {tools}
 
+NOMES DAS FERRAMENTAS: {tool_names}
+
 FORMATO DE RESPOSTA OBRIGATÓRIO:
 Question: {input}
 Thought: [analise detalhada do que precisa fazer]
