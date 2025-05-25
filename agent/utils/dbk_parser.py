@@ -10,10 +10,9 @@ from dataclasses import dataclass
 from datetime import datetime
 
 # Import checksum utilities
-from .checksum import calcular_checksum_automatico, validar_checksum_automatico
+from .checksum import calcular_checksum_automatico, validar_checksum_automatico, detectar_tipo_registro
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class DbkRecord:
@@ -31,99 +30,12 @@ class DbkRecord:
         if self.validation_errors is None:
             self.validation_errors = []
 
-
 class DbkParser:
     """Parser for DBK files with validation and manipulation capabilities."""
     
-    # Record type specifications based on IRPF layout
-    RECORD_SPECS = {
-        'IRPF': {
-            'description': 'Header record',
-            'length': 500,
-            'fields': {
-                'tipo_registro': (0, 4),
-                'ano_exercicio': (4, 8),
-                'ano_calendario': (8, 12),
-                'cpf_declarante': (12, 23),
-                'situacao_especial': (23, 24),
-                'versao_programa': (24, 32),
-                'total_linhas': (492, 500)
-            }
-        },
-        'R16': {
-            'description': 'Declarante data',
-            'length': 500,
-            'fields': {
-                'tipo_registro': (0, 3),
-                'sequencial': (3, 8),
-                'cpf': (8, 19),
-                'tipo_declaracao': (19, 20),
-                'nome': (20, 80),
-                'data_nascimento': (80, 88),
-                'titulo_eleitor': (88, 100),
-                'codigo_municipio': (100, 108),
-                'cep': (108, 116),
-                'uf': (116, 118),
-                'ddd': (118, 122),
-                'telefone': (122, 131),
-                'codigo_ocupacao': (131, 135),
-                'natureza_ocupacao': (135, 138),
-                'checksum': (492, 500)
-            }
-        },
-        'R17': {
-            'description': 'Rendimentos com imposto retido na fonte',
-            'length': 500,
-            'fields': {
-                'tipo_registro': (0, 3),
-                'sequencial': (3, 8),
-                'cpf_cnpj_fonte': (8, 23),
-                'nome_fonte': (23, 83),
-                'valor_rendimento': (83, 98),
-                'valor_imposto_retido': (98, 113),
-                'valor_13_salario': (113, 128),
-                'valor_imposto_13': (128, 143),
-                'checksum': (492, 500)
-            }
-        },
-        'R21': {
-            'description': 'Rendimentos recebidos de pessoas jurídicas',
-            'length': 500,
-            'fields': {
-                'tipo_registro': (0, 3),
-                'sequencial': (3, 8),
-                'cpf_cnpj_fonte': (8, 23),
-                'nome_fonte': (23, 83),
-                'valor_rendimento': (83, 98),
-                'valor_imposto_retido': (98, 113),
-                'checksum': (492, 500)
-            }
-        },
-        'R27': {
-            'description': 'Bens e direitos',
-            'length': 500,
-            'fields': {
-                'tipo_registro': (0, 3),
-                'sequencial': (3, 8),
-                'codigo_bem': (8, 10),
-                'discriminacao': (10, 250),
-                'situacao_inicial': (250, 265),
-                'situacao_final': (265, 280),
-                'checksum': (492, 500)
-            }
-        },
-        'T9': {
-            'description': 'Trailer record',
-            'length': 500,
-            'fields': {
-                'tipo_registro': (0, 2),
-                'quantidade_registros': (2, 9),
-                'valor_total_rendimentos': (9, 24),
-                'valor_total_impostos': (24, 39),
-                'checksum': (492, 500)
-            }
-        }
-    }
+    # Configurações básicas para todos os tipos de registro
+    DEFAULT_RECORD_LENGTH = 500
+    CHECKSUM_POSITION = (490, 500)  # Posição padrão do checksum
     
     def __init__(self):
         """Initialize the DBK parser."""
@@ -157,9 +69,11 @@ class DbkParser:
                 }
             }
             
+            file_name = file_path.name
+            
             for line_num, line in enumerate(lines, 1):
                 try:
-                    record = self._parse_record(line.rstrip('\n\r'), line_num)
+                    record = self._parse_record(line.rstrip('\n\r'), line_num, file_name)
                     parsed_data['records'].append(record)
                     
                     # Store header and trailer separately
@@ -179,7 +93,7 @@ class DbkParser:
                             
                             if any('checksum' in error.lower() for error in record.validation_errors):
                                 parsed_data['validation_summary']['checksum_errors'] += 1
-                            if any('format' in error.lower() for error in record.validation_errors):
+                            if any('format' in error.lower() or 'length' in error.lower() for error in record.validation_errors):
                                 parsed_data['validation_summary']['format_errors'] += 1
                 
                 except Exception as e:
@@ -198,8 +112,8 @@ class DbkParser:
             logger.error(f"Error parsing DBK file {file_path}: {e}")
             raise
     
-    def _parse_record(self, line: str, line_number: int) -> DbkRecord:
-        """Parse a single record line."""
+    def _parse_record(self, line: str, line_number: int, file_name: str) -> DbkRecord:
+        """Parse a single record line using simplified approach."""
         if not line:
             return DbkRecord(
                 record_type='EMPTY',
@@ -211,64 +125,70 @@ class DbkParser:
                 validation_errors=['Empty line']
             )
         
-        # Determine record type from the beginning of the line
-        record_type = self._identify_record_type(line)
+        # Determine record type
+        record_type = detectar_tipo_registro(line)
         
-        # Get record specification
-        spec = self.RECORD_SPECS.get(record_type)
-        if not spec:
-            return DbkRecord(
-                record_type=record_type,
-                sequence=None,
-                data={},
-                raw_line=line,
-                line_number=line_number,
-                is_valid=False,
-                validation_errors=[f'Unknown record type: {record_type}']
-            )
+        # Basic validation
+        errors = []
+        
+        # Validate basic structure
+        if record_type == 'DESCONHECIDO':
+            errors.append(f'Unknown or invalid record type')
         
         # Validate line length
-        errors = []
-        if len(line) != spec['length']:
-            errors.append(f'Invalid length: expected {spec["length"]}, got {len(line)}')
+        if len(line) < 10:  # Minimum for checksum
+            errors.append(f'Line too short: {len(line)} chars (minimum 10)')
         
-        # Extract fields
-        data = {}
+        # Extract basic data
+        data = {
+            'record_type': record_type,
+            'content': line[:-10] if len(line) >= 10 else line,  # Content without checksum
+            'full_line': line
+        }
+        
+        # Extract sequence number if applicable (for Rxx records)
         sequence = None
+        if record_type.startswith('R') and len(line) >= 8:
+            try:
+                seq_part = line[3:8].strip()
+                if seq_part.isdigit():
+                    sequence = int(seq_part)
+                    data['sequence'] = str(sequence)  # Store as string in data dict
+            except (ValueError, IndexError):
+                pass
+        
+        # Extract checksum
         checksum = None
+        if len(line) >= 10:
+            checksum = line[-10:]
+            data['checksum'] = checksum
         
-        for field_name, (start, end) in spec['fields'].items():
+        # Validate checksum using unified algorithm
+        if checksum and record_type != 'DESCONHECIDO':
             try:
-                if start < len(line):
-                    value = line[start:end].strip()
-                    data[field_name] = value
-                    
-                    # Special handling for sequence and checksum
-                    if field_name == 'sequencial' and value.isdigit():
-                        sequence = int(value)
-                    elif field_name == 'checksum':
-                        checksum = value
-                else:
-                    data[field_name] = ''
-                    errors.append(f'Field {field_name} beyond line length')
-            except Exception as e:
-                data[field_name] = ''
-                errors.append(f'Error extracting field {field_name}: {str(e)}')
-        
-        # Validate checksum if present
-        if checksum:
-            try:
-                # For IRPF records, we need the filename for checksum validation
-                if record_type == 'IRPF':
-                    # Extract filename from the parsed data context (will be passed separately)
-                    # For now, skip IRPF checksum validation in record parsing
-                    pass
-                else:
-                    # For other records, use standard validation
-                    if not validar_checksum_automatico(line):
-                        errors.append('Invalid checksum')
+                is_valid_checksum = validar_checksum_automatico(line, file_name)
+                if not is_valid_checksum:
+                    errors.append('Invalid checksum')
             except Exception as e:
                 errors.append(f'Checksum validation error: {str(e)}')
+        
+        # Extract type-specific basic info
+        if record_type == 'IRPF' and len(line) >= 31:
+            data.update({
+                'year': line[8:12] if len(line) > 12 else '',
+                'tax_year': line[12:16] if len(line) > 16 else '',
+                'cpf': line[20:31] if len(line) > 31 else ''
+            })
+        elif record_type.startswith('R') and len(line) >= 20:
+            data.update({
+                'sequence_field': line[3:8].strip() if len(line) > 8 else '',
+                'identifier': line[8:20].strip() if len(line) > 20 else ''
+            })
+        elif record_type == 'T9' and len(line) >= 20:
+            data.update({
+                'record_count': line[2:9].strip() if len(line) > 9 else '',
+                'totals_start': line[9:20] if len(line) > 20 else ''
+            })
         
         return DbkRecord(
             record_type=record_type,
@@ -278,14 +198,8 @@ class DbkParser:
             line_number=line_number,
             checksum=checksum,
             is_valid=len(errors) == 0,
-            validation_errors=errors
+            validation_errors=errors if errors else None
         )
-    
-    def _identify_record_type(self, line: str) -> str:
-        """Identify the record type from the line content."""
-        # Use the same logic as in checksum.py for consistency
-        from .checksum import detectar_tipo_registro
-        return detectar_tipo_registro(line)
     
     def write_dbk_file(self, data: Dict[str, Any], file_path: Path, 
                        create_backup: bool = True) -> bool:
@@ -307,8 +221,13 @@ class DbkParser:
             lines = []
             for record in data.get('records', []):
                 if isinstance(record, DbkRecord):
-                    line = self._record_to_line(record)
-                    lines.append(line)
+                    # Use the raw line if available and valid
+                    if record.raw_line and record.is_valid:
+                        lines.append(record.raw_line)
+                    else:
+                        # Reconstruct line if needed
+                        line = self._reconstruct_line(record, file_path.name)
+                        lines.append(line)
                 else:
                     # Handle dict format
                     lines.append(record.get('raw_line', ''))
@@ -334,57 +253,26 @@ class DbkParser:
             logger.error(f"Error writing DBK file {file_path}: {e}")
             raise
     
-    def _record_to_line(self, record: DbkRecord) -> str:
-        """Convert a DbkRecord back to a properly formatted line."""
-        if record.raw_line and len(record.raw_line.strip()) > 0:
-            # If we have the original line and it was valid, use it
-            if record.is_valid:
-                return record.raw_line
+    def _reconstruct_line(self, record: DbkRecord, file_name: str) -> str:
+        """Reconstruct a line from record data."""
+        if record.raw_line:
+            return record.raw_line
         
-        # Reconstruct the line from data
-        spec = self.RECORD_SPECS.get(record.record_type)
-        if not spec:
-            return record.raw_line if record.raw_line else ''
+        # Simple reconstruction for basic cases
+        content = record.data.get('content', '')
         
-        # Build line with proper field positioning
-        line = [' '] * spec['length']
+        # Ensure minimum length
+        if len(content) < self.DEFAULT_RECORD_LENGTH - 10:
+            content = content.ljust(self.DEFAULT_RECORD_LENGTH - 10)
         
-        for field_name, (start, end) in spec['fields'].items():
-            value = record.data.get(field_name, '')
-            
-            # Handle different field types
-            if field_name in ['valor_rendimento', 'valor_imposto_retido', 'situacao_inicial', 'situacao_final']:
-                # Numeric fields - right-align and pad with zeros
-                value = str(value).replace('.', '').replace(',', '').zfill(end - start)
-            else:
-                # Text fields - left-align and pad with spaces
-                value = str(value).ljust(end - start)[:end - start]
-            
-            # Place value in line
-            for i, char in enumerate(value):
-                if start + i < len(line):
-                    line[start + i] = char
-        
-        line_str = ''.join(line)
-        
-        # Calculate and add checksum for non-header records
-        if record.record_type != 'IRPF' and record.record_type != 'T9':
-            try:
-                # Calculate checksum for the line without the checksum field
-                checksum_start = spec['fields'].get('checksum', (492, 500))[0]
-                line_for_checksum = line_str[:checksum_start] + ' ' * 8
-                checksum = calcular_checksum_automatico(line_for_checksum)
-                
-                # Insert checksum
-                for i, char in enumerate(checksum):
-                    if checksum_start + i < len(line):
-                        line[checksum_start + i] = char
-                
-                line_str = ''.join(line)
-            except Exception as e:
-                logger.warning(f"Could not calculate checksum for record: {e}")
-        
-        return line_str
+        # Calculate checksum
+        try:
+            full_line = content + '0000000000'  # Temporary checksum
+            checksum = calcular_checksum_automatico(full_line, file_name)
+            return content + checksum
+        except Exception as e:
+            logger.warning(f"Could not calculate checksum for record reconstruction: {e}")
+            return content + '0000000000'  # Fallback
     
     def validate_dbk_file(self, file_path: Path) -> Dict[str, Any]:
         """Validate a DBK file structure and checksums."""
@@ -395,35 +283,32 @@ class DbkParser:
                 'is_valid': True,
                 'file_path': str(file_path),
                 'total_records': len(parsed_data['records']),
+                'valid_checksums': parsed_data['validation_summary']['valid_records'],
+                'invalid_checksums': parsed_data['validation_summary']['checksum_errors'],
                 'errors': [],
                 'warnings': []
             }
             
             # Check for header
             if not parsed_data['header']:
-                validation_result['errors'].append('Missing IRPF header record')
-                validation_result['is_valid'] = False
+                validation_result['warnings'].append('No IRPF header record found')
             
             # Check for trailer
             if not parsed_data['trailer']:
-                validation_result['errors'].append('Missing T9 trailer record')
-                validation_result['is_valid'] = False
+                validation_result['warnings'].append('No T9 trailer record found')
             
             # Aggregate validation errors
             if parsed_data['validation_summary']['invalid_records'] > 0:
                 validation_result['is_valid'] = False
-                validation_result['errors'].extend(parsed_data['validation_summary']['errors'])
+                validation_result['errors'].extend(parsed_data['validation_summary']['errors'][:10])  # Limit errors
+                
+                if len(parsed_data['validation_summary']['errors']) > 10:
+                    validation_result['errors'].append(f"... and {len(parsed_data['validation_summary']['errors']) - 10} more errors")
             
-            # Check record sequence if applicable
-            sequences = []
-            for record in parsed_data['records']:
-                if record.sequence is not None:
-                    sequences.append(record.sequence)
-            
-            if sequences:
-                expected_sequences = list(range(1, len(sequences) + 1))
-                if sorted(sequences) != expected_sequences:
-                    validation_result['warnings'].append('Record sequences are not sequential')
+            # Check for unknown record types
+            unknown_records = [r for r in parsed_data['records'] if r.record_type == 'DESCONHECIDO']
+            if unknown_records:
+                validation_result['warnings'].append(f'{len(unknown_records)} records with unknown format')
             
             return validation_result
         
@@ -432,6 +317,8 @@ class DbkParser:
                 'is_valid': False,
                 'file_path': str(file_path),
                 'total_records': 0,
+                'valid_checksums': 0,
+                'invalid_checksums': 0,
                 'errors': [f'Validation failed: {str(e)}'],
                 'warnings': []
             }
@@ -496,88 +383,38 @@ class DbkParser:
         for record in records:
             if record.record_type not in ['IRPF', 'T9'] and record.sequence is not None:
                 record.sequence = sequence
-                record.data['sequencial'] = f"{sequence:05d}"
+                if 'sequence' in record.data:
+                    record.data['sequence'] = str(sequence)  # Store as string in data dict
                 sequence += 1
     
     def create_record(self, record_type: str, data: Dict[str, Any]) -> DbkRecord:
         """Create a new record of the specified type with the given data."""
-        spec = self.RECORD_SPECS.get(record_type)
-        if not spec:
-            raise ValueError(f"Unknown record type: {record_type}")
+        # Simplified record creation
+        record_data = {
+            'record_type': record_type,
+            'content': data.get('content', ''),
+            **data  # Include all provided data
+        }
         
-        # Initialize with default values
-        record_data = {}
-        for field_name in spec['fields']:
-            record_data[field_name] = data.get(field_name, '')
+        # Handle sequence conversion with proper type checking
+        sequence_value = data.get('sequence') or data.get('sequencial')
+        sequence: Optional[int] = None
         
-        # Set record type
-        record_data['tipo_registro'] = record_type
+        if sequence_value is not None:
+            if isinstance(sequence_value, int):
+                sequence = sequence_value
+            elif isinstance(sequence_value, str) and sequence_value.isdigit():
+                sequence = int(sequence_value)
+            # If it's any other type or non-digit string, sequence remains None
         
         record = DbkRecord(
             record_type=record_type,
-            sequence=data.get('sequencial'),
+            sequence=sequence,
             data=record_data,
-            raw_line='',
+            raw_line=data.get('raw_line', ''),
             line_number=0,
             is_valid=True,
             validation_errors=[]
         )
         
-        # Validate the new record
-        self._validate_record_data(record)
-        
         return record
-    
-    def _validate_record_data(self, record: DbkRecord):
-        """Validate the data in a record."""
-        spec = self.RECORD_SPECS.get(record.record_type)
-        if not spec:
-            if record.validation_errors is None:
-                record.validation_errors = []
-            record.validation_errors.append(f"Unknown record type: {record.record_type}")
-            record.is_valid = False
-            return
-        
-        errors = []
-        
-        # Validate required fields and formats
-        for field_name in spec['fields']:
-            value = record.data.get(field_name, '')
-            
-            # Check field-specific validations
-            if field_name == 'cpf' and value:
-                if not self._validate_cpf_format(value):
-                    errors.append(f"Invalid CPF format: {value}")
-            
-            elif field_name == 'cpf_cnpj_fonte' and value:
-                if not (self._validate_cpf_format(value) or self._validate_cnpj_format(value)):
-                    errors.append(f"Invalid CPF/CNPJ format: {value}")
-            
-            elif 'valor' in field_name and value:
-                if not self._validate_numeric_value(value):
-                    errors.append(f"Invalid numeric value for {field_name}: {value}")
-        
-        if errors:
-            if record.validation_errors is None:
-                record.validation_errors = []
-            record.validation_errors.extend(errors)
-            record.is_valid = False
-    
-    def _validate_cpf_format(self, cpf: str) -> bool:
-        """Validate CPF format (basic check)."""
-        import re
-        cpf_pattern = r'^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$'
-        return bool(re.match(cpf_pattern, cpf))
-    
-    def _validate_cnpj_format(self, cnpj: str) -> bool:
-        """Validate CNPJ format (basic check)."""
-        import re
-        cnpj_pattern = r'^\d{14}$|^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$'
-        return bool(re.match(cnpj_pattern, cnpj))
-    
-    def _validate_numeric_value(self, value: str) -> bool:
-        """Validate numeric value format."""
-        import re
-        # Allow integers or decimals with comma or dot
-        numeric_pattern = r'^\d+([,.]\d+)?$'
-        return bool(re.match(numeric_pattern, value.replace(' ', '')))

@@ -5,7 +5,7 @@ def calcular_checksum_dbk(linha_payload_str):
     """
     Calcula o checksum de 10 dígitos para uma linha de dados do arquivo DBK.
     
-    ALGORITMO BASE UNIVERSAL para tipos de registro padrão (tipo 27, etc.)
+    ALGORITMO BASE UNIVERSAL para registros padrão (T9, R16, R17, R18...R91)
     - Aplica CRC32 sobre o payload
     - Converte para unsigned (32-bit)
     - Aplica módulo 10^10
@@ -29,45 +29,9 @@ def calcular_checksum_dbk(linha_payload_str):
     checksum_str = str(checksum_num).zfill(10)
     return checksum_str
 
-def calcular_checksum_t9(linha_t9: str) -> str:
-    """
-    Calcula o checksum para registro T9 (TRAILER - TOTAIS DE REGISTROS).
-    
-    O registro T9 tem tamanho oficial de 449 caracteres conforme especificação DEC.
-    Arquivos DBK podem ter padding adicional (zeros) antes do checksum, que deve
-    ser ignorado no cálculo.
-    
-    Args:
-        linha_t9: Linha T9 completa com checksum
-        
-    Returns:
-        Checksum calculado (string de 10 dígitos)
-        
-    Exemplo:
-        >>> calcular_checksum_t9("T9000000001...dados(449)...00000000000000001234567890")
-        "1234567890"
-    """
-    # Payload são os primeiros 449 caracteres (tamanho oficial do registro T9)
-    payload = linha_t9[:449]
-    return calcular_checksum_dbk(payload)
-
-def validar_checksum_t9(linha_t9: str) -> bool:
-    """
-    Valida se o checksum da linha T9 está correto.
-    
-    Args:
-        linha_t9: Linha T9 completa com checksum
-        
-    Returns:
-        True se o checksum está correto, False caso contrário
-    """
-    checksum_esperado = linha_t9[-10:]
-    checksum_calculado = calcular_checksum_t9(linha_t9)
-    return checksum_calculado == checksum_esperado
-
 def calcular_checksum_irpf(nome_arquivo: str, linha_irpf: str) -> str:
     """
-    Calcula o checksum da linha IRPF seguindo o algoritmo correto descoberto.
+    Calcula o checksum da linha IRPF seguindo o algoritmo específico.
     
     ALGORITMO ESPECÍFICO PARA IRPF (descoberto através do código fonte C# oficial):
     - Extrai os 8 primeiros caracteres do nome do arquivo + ".DBK"
@@ -102,34 +66,13 @@ def calcular_checksum_irpf(nome_arquivo: str, linha_irpf: str) -> str:
     # Formata para 10 dígitos
     return f"{crc:010d}"
 
-def validar_checksum_irpf(nome_arquivo: str, linha_irpf: str) -> bool:
-    """
-    Valida se o checksum da linha IRPF está correto.
-    
-    Args:
-        nome_arquivo: Nome do arquivo DBK
-        linha_irpf: Linha IRPF completa com checksum
-        
-    Returns:
-        True se o checksum está correto, False caso contrário
-    
-    Exemplo:
-        >>> validar_checksum_irpf("31753227376-IRPF-A-2025-2024-ORIGI.DBK", linha_irpf)
-        True
-    """
-    checksum_esperado = linha_irpf[-10:]
-    checksum_calculado = calcular_checksum_irpf(nome_arquivo, linha_irpf)
-    return checksum_calculado == checksum_esperado
-
-# FUNÇÕES DE DETECÇÃO DE TIPO DE REGISTRO
-
 def detectar_tipo_registro(linha: str) -> str:
     """
     Detecta o tipo de registro baseado no início da linha.
     
     Com base na documentação oficial, há muitos tipos de registro (R16 até R91).
-    Apenas IRPF (header) e T9 (trailer) têm algoritmos de checksum específicos.
-    Todos os outros registros Rxx usam o algoritmo padrão.
+    Apenas IRPF (header) tem algoritmo de checksum específico.
+    Todos os outros registros (T9, Rxx) usam o algoritmo padrão.
     
     Args:
         linha: Linha do arquivo DBK
@@ -165,10 +108,9 @@ def calcular_checksum_automatico(linha: str, nome_arquivo: str | None = None) ->
     """
     Calcula o checksum automaticamente baseado no tipo de registro.
     
-    Conforme documentação oficial:
-    - IRPF (header): Algoritmo específico com nome do arquivo
-    - T9 (trailer): Algoritmo específico (primeiros 449 chars)
-    - Todos os registros Rxx: Algoritmo padrão (linha sem checksum)
+    Algoritmos simplificados:
+    - IRPF (header): Algoritmo específico com nome do arquivo → zlib.crc32
+    - T9 e TODOS os Rxx: Algoritmo padrão (linha sem checksum) → binascii.crc32
     
     Args:
         linha: Linha completa do arquivo DBK
@@ -186,10 +128,8 @@ def calcular_checksum_automatico(linha: str, nome_arquivo: str | None = None) ->
         if not nome_arquivo:
             raise ValueError("nome_arquivo é obrigatório para registros IRPF")
         return calcular_checksum_irpf(nome_arquivo, linha)
-    elif tipo == 'T9':
-        return calcular_checksum_t9(linha)
-    elif tipo.startswith('R') and tipo != 'DESCONHECIDO':
-        # TODOS os registros Rxx (R16, R17, R18...R91) usam o algoritmo padrão
+    elif tipo == 'T9' or (tipo.startswith('R') and tipo != 'DESCONHECIDO'):
+        # T9 e TODOS os registros Rxx usam o mesmo algoritmo padrão
         payload = linha[:-10]  # Remove checksum (últimos 10 chars)
         return calcular_checksum_dbk(payload)
     else:
@@ -212,3 +152,31 @@ def validar_checksum_automatico(linha: str, nome_arquivo: str | None = None) -> 
         return checksum_calculado == checksum_esperado
     except ValueError:
         return False
+
+# FUNÇÕES DE COMPATIBILIDADE (mantidas para não quebrar código existente)
+
+def validar_checksum_irpf(nome_arquivo: str, linha_irpf: str) -> bool:
+    """
+    Valida se o checksum da linha IRPF está correto.
+    Mantida para compatibilidade - usar validar_checksum_automatico().
+    """
+    checksum_esperado = linha_irpf[-10:]
+    checksum_calculado = calcular_checksum_irpf(nome_arquivo, linha_irpf)
+    return checksum_calculado == checksum_esperado
+
+def calcular_checksum_t9(linha_t9: str) -> str:
+    """
+    Calcula o checksum para registro T9.
+    Mantida para compatibilidade - usar calcular_checksum_automatico().
+    """
+    payload = linha_t9[:-10]
+    return calcular_checksum_dbk(payload)
+
+def validar_checksum_t9(linha_t9: str) -> bool:
+    """
+    Valida se o checksum da linha T9 está correto.
+    Mantida para compatibilidade - usar validar_checksum_automatico().
+    """
+    checksum_esperado = linha_t9[-10:]
+    checksum_calculado = calcular_checksum_t9(linha_t9)
+    return checksum_calculado == checksum_esperado

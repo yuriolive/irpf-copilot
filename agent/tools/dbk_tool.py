@@ -17,7 +17,6 @@ from pathlib import Path
 
 # Import utilities
 from ..utils.checksum import (
-    calcular_checksum_automatico,
     validar_checksum_automatico,
     detectar_tipo_registro
 )
