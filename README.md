@@ -236,7 +236,14 @@ uv run pre-commit run --all-files
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está licenciado sob uma Licença de Uso Não-Comercial - veja o arquivo [LICENSE](LICENSE) para detalhes. O uso comercial deste software requer permissão explícita dos detentores dos direitos autorais.
+
+### Restrições de Uso
+- ❌ Não pode ser usado em produtos comerciais
+- ❌ Não pode ser usado para fornecer serviços comerciais
+- ❌ Não pode ser usado em ambiente empresarial sem autorização
+- ✅ Pode ser usado para fins pessoais e não comerciais
+- ✅ Pode ser usado para fins educacionais e de pesquisa
 
 ## 🆘 Suporte
 
