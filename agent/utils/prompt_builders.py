@@ -7,11 +7,8 @@ from typing import Optional
 
 class PromptBuilder:
     """Builds specialized prompts for IRPF document processing."""
-    
     @staticmethod
     def create_xml_extraction_prompt(
-        cpf_declarante_irpf: str, 
-        ano_calendario: str, 
         additional_context: Optional[str] = None
     ) -> str:
         """Create an intelligent XML extraction prompt for IRPF documents."""
@@ -85,54 +82,61 @@ class PromptBuilder:
             <Campo Nome="NR_CONTROLE" Descricao="Numero de Controle" Tamanho="10" Tipo="N">{numero_controle_sequencial}</Campo>
         </Registro>
         """
-
         context_block = ""
         if additional_context:
             context_block = f"\nCONTEXTO ADICIONAL FORNECIDO PELO AGENTE (use para refinar sua extração):\n{additional_context}\n"
-
+        
         prompt = f"""
         Você é um especialista em converter informes de rendimentos financeiros brasileiros para o formato XML do arquivo .DEC do IRPF,
-        conforme as especificações de um `mapeamentoTxt.xml`.
-        O ano calendário para esta extração é: {ano_calendario}.
-        O CPF do declarante principal do IRPF é: {cpf_declarante_irpf}.
+        seguindo EXATAMENTE as especificações do mapeamentoTxt.xml.
+
+        **INSTRUÇÕES CRÍTICAS:**
+        1. PRIMEIRO: Identifique no documento o CPF do beneficiário dos rendimentos e o ano calendário/exercício
+        2. Analise o documento identificando TODOS os rendimentos, aplicações financeiras, conta corrente/poupança e investimentos
+        3. Para CADA tipo de rendimento identificado, gere o registro XML correspondente usando os templates abaixo
+        4. Use o CPF identificado no documento para preencher todos os campos NR_CPF e NR_CPF_BENEFIC
+        5. Use o ano calendário identificado no documento
+        6. Se o documento mencionar dependentes, use o CPF do dependente nos registros relacionados a ele
+
         {context_block}
-        Analise o documento financeiro fornecido (PDF ou imagem) e gere uma lista de strings XML, onde cada string é um `<Registro>...</Registro>` completo.
-        Para cada `<Registro>`, inclua os atributos `Nome`, `Identificador`, e `Descricao` corretos.
-        Dentro de cada `<Registro>`, para cada `<Campo>`:
-        1.  Use o atributo `Nome` exatamente como no `mapeamentoTxt.xml`.
-        2.  Inclua os atributos `Descricao`, `Tamanho`, `Tipo`, e `Decimais` (se aplicável para Tipo="N") como definidos no `mapeamentoTxt.xml`.
-        3.  O TEXTO DENTRO DO CAMPO `<Campo>...</Campo>` deve ser o VALOR EXTRAÍDO do informe. NÃO FAÇA PADDING OU TRUNCAMENTO AINDA. A formatação final será feita por outro sistema.
-        4.  Se um campo não tiver valor no informe, gere a tag do campo vazia, ex: `<Campo Nome="XYZ" ...></Campo>`.
-        5.  Para o campo `NR_CONTROLE` em cada registro, use um número sequencial único para todo o conjunto de registros gerados a partir deste documento, começando em 1.
-        6.  Para campos de CPF/CNPJ, extraia apenas os números.
-        7.  Para valores monetários, use ponto como separador decimal (ex: 1234.56).
-        8.  Se você estiver INCERTO sobre um valor específico, um código de campo (ex: CD_BEM, NR_COD), ou o tipo de registro apropriado, faça sua melhor tentativa e adicione um comentário XML logo ANTES do campo ou registro em questão, como: `<!-- LLM_UNCERTAINTY: Possível alternativa para CD_BEM: XX. Razão: [breve explicação] -->` ou `<!-- LLM_UNCERTAINTY: Valor para VR_ANTER não encontrado, assumindo 0.00 -->`. Se precisar de mais informações sobre um código específico, mencione-o no comentário, por exemplo: `<!-- LLM_UNCERTAINTY: Qual o significado exato do CD_BEM '42' para este contexto? -->`
 
-        FOCO NOS REGISTROS DE DETALHE:
-        -   Gere registros detalhados como REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (ID 84), REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMACAO_2 (ID 88), etc., quando aplicável.
-        -   NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.
-
-        EXEMPLOS DE ESTRUTURA XML (use como guia para os atributos e nomes de campo):
+        **TEMPLATES DE REGISTROS:**
         {reg_rendpj_example}
         {reg_bem_example}
         {reg_rend_isento_detalhe_example}
         {reg_rend_exclusiva_detalhe_example}
 
-        Se o informe for claramente de um dependente, e o CPF do dependente for diferente de `{cpf_declarante_irpf}`, use o CPF do dependente nos campos `NR_CPF` dos registros de rendimentos (21, 83-89) e nos campos `NR_CPF` e `NR_CPF_BENEFIC` do registro de bens (27) pertencentes a esse dependente.
+        **REGRAS DE MAPEAMENTO:**
+        - REG_RENDPJ (21): Para salários, rendimentos de trabalho, aluguéis recebidos
+        - REG_BEM (27): Para contas bancárias, investimentos, imóveis, veículos, etc.
+        - REG_RENDIMENTO_ISENTO (83-89): Para rendimentos isentos como dividendos, etc.
 
-        Responda APENAS com o XML dentro de uma tag raiz <ListaRegistros>.
-        Formato da Resposta:
-        ```xml
+        **FOCO NOS REGISTROS DE DETALHE:**
+        - Gere registros detalhados como REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (ID 84), REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMACAO_2 (ID 88), etc., quando aplicável.
+        - NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.
+
+        **INSTRUÇÕES PARA CAMPOS:**
+        1. Use o atributo `Nome` exatamente como no `mapeamentoTxt.xml`.
+        2. Inclua os atributos `Descricao`, `Tamanho`, `Tipo`, e `Decimais` (se aplicável para Tipo="N") como definidos no `mapeamentoTxt.xml`.
+        3. O TEXTO DENTRO DO CAMPO `<Campo>...</Campo>` deve ser o VALOR EXTRAÍDO do informe.
+        4. Se um campo não tiver valor no informe, gere a tag do campo vazia.
+        5. Para o campo `NR_CONTROLE` em cada registro, use um número sequencial único começando em 1.
+        6. Para campos de CPF/CNPJ, extraia apenas os números.
+        7. Para valores monetários, use ponto como separador decimal (ex: 1234.56).
+        8. Se você estiver INCERTO sobre um valor específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`
+
+        {additional_context if additional_context else ""}
+
+        **FORMATO DE RESPOSTA OBRIGATÓRIO:**
+        Responda EXATAMENTE neste formato XML:
+
         <ListaRegistros>
-          <!-- LLM_NOTE: Aqui podem ir notas gerais sobre a extração -->
-          <Registro>...</Registro>
-          <!-- LLM_UNCERTAINTY: Não foi possível determinar com certeza o tipo deste próximo bem. -->
-          <Registro>...</Registro>
-          ...
+        <!-- LLM_NOTE: Notas gerais sobre a extração -->
+        <!-- Registros extraídos aqui -->
         </ListaRegistros>
-        ```
         """
-        return prompt.replace("{cpf_declarante_irpf}", cpf_declarante_irpf).replace("{ano_calendario}", ano_calendario)
+        
+        return prompt
     
     @staticmethod
     def create_mapping_inquiry_prompt(record_name: str, uncertainty_description: str) -> str:

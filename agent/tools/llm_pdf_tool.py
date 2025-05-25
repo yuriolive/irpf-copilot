@@ -47,7 +47,7 @@ class LLMPdfTool(BaseTool):
     {"operation": "extract_to_xml", "file_path": "informes/meu_informe.pdf"}
     
     Ou com parâmetros explícitos:
-    {"operation": "extract_to_xml", "file_path": "informes/meu_informe.pdf", "cpf_declarante_irpf": "12345678900", "ano_calendario": "2025"}
+    {"operation": "extract_to_xml", "file_path": "informes/meu_informe.pdf", "cpf_declarante_irpf": "12345678900", "ano_calendario": "2024"}
 
     Exemplo para get_mapping_details:
     {"operation": "get_mapping_details", "record_name": "REG_BEM"}
@@ -108,23 +108,87 @@ class LLMPdfTool(BaseTool):
             # Try to get DBK context from agent if CPF and year not provided
             if not cpf_declarante_irpf or not ano_calendario:
                 try:
-                    # Try to import agent and get current DBK info
-                    from ..agent import get_agent_instance
+                    # Try to get DBK info from available DBK files
+                    from ..utils import DbkParser
+                    from pathlib import Path
                     
-                    # Check if there's a current agent instance with DBK info
-                    # This is a simplified approach - in production you might use a singleton or context manager
-                    import sys
-                    for obj in sys.modules.values():
-                        if hasattr(obj, 'current_dbk_info') and obj.current_dbk_info:
-                            dbk_info = obj.current_dbk_info
-                            if not cpf_declarante_irpf:
-                                cpf_declarante_irpf = dbk_info.get('cpf_declarante', '')
-                            if not ano_calendario:
-                                ano_calendario = dbk_info.get('ano_calendario', '')
-                            logger.info(f"Usando informações do DBK: CPF {cpf_declarante_irpf}, Ano {ano_calendario}")
+                    # Look for DBK files in standard locations
+                    dbk_directories = ["dbks", "dbks/original", "dbks/gerado"]
+                    dbk_parser = DbkParser()
+                    
+                    for dbk_dir in dbk_directories:
+                        dbk_path = Path(dbk_dir)
+                        if dbk_path.exists():
+                            for dbk_file in dbk_path.glob("*.DBK"):
+                                try:
+                                    analysis = dbk_parser.analyze_dbk_file(str(dbk_file))
+                                    if analysis and not analysis.get('error'):
+                                        # Extract CPF and year from IRPF header record
+                                        for record in analysis.get('records', []):
+                                            if record.get('record_type') == 'IRPF':
+                                                if not cpf_declarante_irpf:
+                                                    cpf_declarante_irpf = record.get('cpf', '').strip()
+                                                if not ano_calendario:
+                                                    ano_calendario = record.get('year', '').strip()
+                                                logger.info(f"Usando informações do DBK {dbk_file}: CPF {cpf_declarante_irpf}, Ano {ano_calendario}")
+                                                break
+                                        if cpf_declarante_irpf and ano_calendario:
+                                            break
+                                except Exception as file_error:
+                                    logger.debug(f"Erro ao analisar DBK {dbk_file}: {file_error}")
+                                    continue
+                        if cpf_declarante_irpf and ano_calendario:
                             break
                 except Exception as e:
                     logger.debug(f"Não foi possível obter contexto do DBK: {e}")
+                
+                # If still not found, try to extract from the informe document itself
+                if not cpf_declarante_irpf or not ano_calendario:
+                    try:
+                        # Create a simple prompt to extract basic info from the document
+                        simple_prompt = f"""
+                        Analise este documento e extraia APENAS:
+                        1. CPF do declarante/beneficiário (11 dígitos)
+                        2. Ano calendário/exercício (formato YYYY)
+                        
+                        Responda APENAS no formato JSON:
+                        {{"cpf": "12345678900", "ano": "2024"}}
+                        
+                        Se não encontrar alguma informação, use string vazia.
+                        """
+                        
+                        if self.llm_manager and self.llm_manager.has_available_llm():
+                            temp_file_path = Path(file_path_str)
+                            mime_type = FileUtils.get_file_mime_type(temp_file_path)
+                            basic_info_response = self.llm_manager.invoke_for_document(
+                                temp_file_path, simple_prompt, mime_type
+                            )
+                            
+                            if basic_info_response:
+                                import re
+                                import json as json_module
+                                
+                                # Try to extract JSON from response
+                                json_match = re.search(r'\{[^}]*\}', basic_info_response)
+                                if json_match:
+                                    try:
+                                        info = json_module.loads(json_match.group())
+                                        extracted_cpf = info.get('cpf', '').strip()
+                                        extracted_ano = info.get('ano', '').strip()
+                                        
+                                        if not cpf_declarante_irpf and extracted_cpf and len(extracted_cpf) == 11:
+                                            cpf_declarante_irpf = extracted_cpf
+                                            logger.info(f"CPF extraído do informe: {cpf_declarante_irpf}")
+                                        
+                                        if not ano_calendario and extracted_ano and len(extracted_ano) == 4:
+                                            ano_calendario = extracted_ano
+                                            logger.info(f"Ano extraído do informe: {ano_calendario}")
+                                            
+                                    except json.JSONDecodeError:
+                                        logger.debug("Não foi possível decodificar JSON da resposta básica")
+                                        
+                    except Exception as e:
+                        logger.debug(f"Não foi possível extrair informações básicas do informe: {e}")
 
             # Set defaults if still not available
             if not cpf_declarante_irpf:
@@ -147,16 +211,16 @@ class LLMPdfTool(BaseTool):
                     "success": False,
                     "error": "Nenhum LLM configurado. Configure GOOGLE_API_KEY ou GOOGLE_CLOUD_PROJECT."
                 })
-
+            
             # Create prompt
             prompt = PromptBuilder.create_xml_extraction_prompt(
-                cpf_declarante_irpf, 
-                ano_calendario, 
                 additional_context_from_agent
             )
-
+            
             # Get MIME type
-            mime_type = FileUtils.get_file_mime_type(file_path)            # Invoke LLM
+            mime_type = FileUtils.get_file_mime_type(file_path)
+            
+            # Invoke LLM
             llm_raw_xml_response_str = ""
             if self.llm_manager:
                 llm_raw_xml_response_str = self.llm_manager.invoke_for_document(
@@ -167,7 +231,9 @@ class LLMPdfTool(BaseTool):
                 return json.dumps({
                     "success": False,
                     "error": "LLM não retornou resposta válida para o documento."
-                })            # Parse LLM response
+                })
+            
+            # Parse LLM response
             if not self.xml_processor:
                 return json.dumps({
                     "success": False,

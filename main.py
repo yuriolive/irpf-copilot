@@ -305,27 +305,74 @@ def is_markdown_content(text: str) -> bool:
     
     return False
 
-def display_agent_response(output: str):
+def display_agent_response(output: str, force_markdown: bool = False, is_error: bool = False):
     """Display agent response with markdown formatting if detected."""
     try:
-        # Check if the output appears to be markdown
-        if is_markdown_content(output):
+        # Check if the output appears to be markdown or forced
+        if force_markdown or is_markdown_content(output):
             # Initialize markdown displayer
             md_displayer = MarkdownDisplayer(console)
             
+            # Choose appropriate title based on content type
+            title = "❌ Erro do Agente" if is_error else "🤖 Resposta do Agente"
+            
             # Try to display as markdown
-            if md_displayer.display_content(output, "🤖 Resposta do Agente"):
+            if md_displayer.display_content(output, title):
                 return
             else:
                 # Fallback to regular print if markdown display fails
-                console.print(output)
+                if is_error:
+                    console.print(f"[red]{output}[/red]")
+                else:
+                    console.print(output)
         else:
-            # Regular text output
-            console.print(output)
+            # Regular text output with error styling if needed
+            if is_error:
+                console.print(f"[red]{output}[/red]")
+            else:
+                console.print(output)
     except Exception as e:
         logger.warning(f"Error formatting response as markdown: {e}")
         # Fallback to regular print
-        console.print(output)
+        if is_error:
+            console.print(f"[red]{output}[/red]")
+        else:
+            console.print(output)
+
+def display_response(content: str, response_type: str = "info", force_markdown: bool = False):
+    """
+    Unified function to display responses consistently.
+    
+    Args:
+        content: Content to display
+        response_type: Type of response ("agent", "error", "success", "info", "warning")
+        force_markdown: Force markdown formatting even if not detected
+    """
+    try:
+        if response_type == "agent":
+            display_agent_response(content, force_markdown=force_markdown)
+        elif response_type == "error":
+            display_agent_response(content, force_markdown=force_markdown, is_error=True)
+        elif response_type == "success":
+            # Check if content has markdown, otherwise add some basic formatting
+            if force_markdown or is_markdown_content(content):
+                display_agent_response(content, force_markdown=True)
+            else:
+                console.print(f"[green]✅ {content}[/green]")
+        elif response_type == "warning":
+            if force_markdown or is_markdown_content(content):
+                display_agent_response(content, force_markdown=True)
+            else:
+                console.print(f"[yellow]⚠️ {content}[/yellow]")
+        else:  # info
+            if force_markdown or is_markdown_content(content):
+                display_agent_response(content, force_markdown=True)
+            else:
+                console.print(content)
+    except Exception as e:
+        logger.warning(f"Error in display_response: {e}")
+        # Final fallback
+        console.print(content)
 
 def test_pdf_extraction(file_path=None, document_type="auto"):
     """Test PDF extraction directly with LLMPdfTool."""
@@ -359,45 +406,62 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
                 if parsed.get("success"):
                     data = parsed.get("data", {})
                     
-                    # Create result panel
-                    result_panel = Panel(
-                        f"[bold green]✅ Extração bem-sucedida![/bold green]\n\n"
-                        f"[cyan]Arquivo:[/cyan] {data.get('file_path')}\n"
-                        f"[cyan]Tipo de documento:[/cyan] {data.get('document_type')}\n"
-                        f"[cyan]Método:[/cyan] {data.get('processing_method')}\n"
-                        f"[cyan]Confiança:[/cyan] {data.get('confidence', 0.0):.2f}\n",
-                        title="Resultado da Extração",
-                        border_style="green"
-                    )
-                    console.print(result_panel)
+                    # Format result as markdown for better display
+                    result_md = f"""# ✅ Extração de PDF Bem-sucedida
+
+## 📄 Informações do Arquivo
+- **Arquivo:** `{data.get('file_path')}`
+- **Tipo de documento:** {data.get('document_type')}
+- **Método:** {data.get('processing_method')}
+- **Confiança:** {data.get('confidence', 0.0):.2f}
+
+## 📊 Dados Estruturados Extraídos
+"""
                     
                     # Show extracted data
                     if data.get("structured_data"):
                         structured = data.get("structured_data")
-                        console.print("[yellow]Dados Estruturados Extraídos:[/yellow]")
-                        console.print_json(json.dumps(structured, indent=2, ensure_ascii=False))
+                        result_md += f"""
+```json
+{json.dumps(structured, indent=2, ensure_ascii=False)}
+```
+"""
                         
                         # Show IRPF mapping if available
                         if data.get("irpf_mapping"):
-                            console.print("\n[yellow]Mapeamento IRPF Sugerido:[/yellow]")
-                            console.print_json(json.dumps(data.get("irpf_mapping"), indent=2, ensure_ascii=False))
+                            result_md += f"""
+## 📋 Mapeamento IRPF Sugerido
+```json
+{json.dumps(data.get("irpf_mapping"), indent=2, ensure_ascii=False)}
+```
+"""
                     else:
-                        console.print("[yellow]Nenhum dado estruturado extraído.[/yellow]")
+                        result_md += "\n⚠️ Nenhum dado estruturado extraído.\n"
                         
                     # Show raw text brief
                     if data.get("extracted_text"):
                         text = data.get("extracted_text")
-                        console.print(f"\n[dim]Texto extraído (primeiros 200 caracteres): {text[:200]}...[/dim]")
+                        result_md += f"""
+## 📝 Texto Extraído (Amostra)
+```
+{text[:300]}...
+```
+"""
+                    
+                    # Display using the unified response function
+                    display_response(result_md, "agent", force_markdown=True)
                 else:
-                    console.print(f"[red]❌ Erro na extração: {parsed.get('error', 'Erro desconhecido')}[/red]")
+                    error_msg = f"❌ Erro na extração: {parsed.get('error', 'Erro desconhecido')}"
+                    display_response(error_msg, "error")
             except json.JSONDecodeError:
-                console.print("[red]❌ Erro ao processar resposta da ferramenta[/red]")
-                console.print(result)
+                error_msg = "❌ Erro ao processar resposta da ferramenta"
+                display_response(error_msg, "error")
+                display_response(result, "info")
         else:
             # Find first available informes file
             informes_dir = Path("informes")
             if not informes_dir.exists():
-                console.print("[red]Pasta informes/ não encontrada[/red]")
+                display_response("Pasta informes/ não encontrada", "error")
                 return
                 
             # Prefer PDFs, but accept any file if no PDFs available
@@ -405,7 +469,7 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
                           next((f for f in informes_dir.iterdir()), None))
             
             if not test_file:
-                console.print("[red]Nenhum arquivo encontrado na pasta informes/[/red]")
+                display_response("Nenhum arquivo encontrado na pasta informes/", "error")
                 return
                 
             console.print(f"[blue]Testando extração com o arquivo:[/blue] {test_file.name}")
@@ -413,7 +477,7 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
             
     except Exception as e:
         logger.error(f"Error testing PDF extraction: {e}")
-        console.print(f"[red]❌ Erro no teste: {e}[/red]")
+        display_response(f"❌ Erro no teste: {e}", "error")
 
 def handle_special_commands(user_input: str) -> bool:
     """Handle special commands. Returns True if command was handled."""
@@ -471,17 +535,17 @@ def handle_special_commands(user_input: str) -> bool:
         else:
             console.print("[yellow]Pasta informes/ não encontrada[/yellow]")
         return True
-    
     elif command == "test-pdf" or command == "test-extraction":
         test_pdf_extraction()
         return True
+    
     elif command.startswith("test-pdf "):
         file_name = command[9:].strip()
         
         # Check if name is a pattern or partial match
         informes_dir = Path("informes")
         if not informes_dir.exists():
-            console.print("[red]Pasta informes/ não encontrada[/red]")
+            display_response("Pasta informes/ não encontrada", "error")
             return True
             
         # Try exact match first
@@ -499,12 +563,15 @@ def handle_special_commands(user_input: str) -> bool:
                 test_pdf_extraction(str(matches[0]))
             else:
                 # Multiple matches found
-                console.print(f"[yellow]Múltiplos arquivos encontrados para '{file_name}':[/yellow]")
-                for i, match in enumerate(matches, 1):
-                    console.print(f"[cyan]{i}.[/cyan] {match.name}")
-                console.print("\n[yellow]Use o nome completo do arquivo para especificar.[/yellow]")
+                match_list = "\n".join([f"{i+1}. `{match.name}`" for i, match in enumerate(matches)])
+                display_response(
+                    f"## Múltiplos arquivos encontrados para '{file_name}':\n\n{match_list}\n\n"
+                    "Use o nome completo do arquivo para especificar.", 
+                    "warning", 
+                    force_markdown=True
+                )
         else:
-            console.print(f"[red]Nenhum arquivo correspondente a '{file_name}' encontrado na pasta informes/[/red]")
+            display_response(f"Nenhum arquivo correspondente a '{file_name}' encontrado na pasta informes/", "error")
         return True
     
     elif command.startswith("backup "):
@@ -527,11 +594,13 @@ def main():
     try:
         # Display welcome message
         display_welcome()
-        
-        # Check environment setup
+          # Check environment setup
         if not check_environment():
-            console.print("[red]❌ Configuração do ambiente incompleta. Verifique as variáveis de ambiente.[/red]")
-            console.print("[yellow]Consulte o README.md para instruções de configuração.[/yellow]")
+            display_response(
+                "❌ Configuração do ambiente incompleta. Verifique as variáveis de ambiente.\n\n"
+                "Consulte o README.md para instruções de configuração.", 
+                "error"
+            )
             return 1
         
         # Ensure directories exist
@@ -551,9 +620,11 @@ def main():
         # Initialize agent
         console.print("[blue]🤖 Configurando agente IRPF...[/blue]")
         agent = IRPFAgent(tools=tools, verbose=True)
-        
         if not agent.agent_executor:
-            console.print("[red]❌ Falha na configuração do agente. Verifique as chaves de API.[/red]")
+            display_response(
+                "❌ Falha na configuração do agente. Verifique as chaves de API.", 
+                "error"
+            )
             return 1
         
         console.print("[green]✅ Agente IRPF configurado com sucesso![/green]")
@@ -595,16 +666,20 @@ def main():
                 
                 with console.status("[blue]Processando...[/blue]"):
                     response = agent.ask(user_input)
-                
-                # Display response with enhanced markdown formatting
+                  # Display response with enhanced markdown formatting
                 if response.get('success', False):
                     output = response.get('answer', 'Resposta não disponível.')
-                    display_agent_response(output)
+                    display_response(output, "agent")
                 else:
                     error_msg = response.get('error', 'Erro desconhecido')
                     answer = response.get('answer', 'Desculpe, tive problemas para processar sua solicitação.')
-                    console.print(f"[red]❌ {error_msg}[/red]")
-                    display_agent_response(answer)
+                    
+                    # Display error message
+                    display_response(f"❌ {error_msg}", "error")
+                    
+                    # If there's an answer despite the error, show it
+                    if answer and answer != error_msg:
+                        display_response(answer, "agent")
                 
             except KeyboardInterrupt:
                 console.print("\n\n[blue]👋 Interrompido pelo usuário. Até logo![/blue]")

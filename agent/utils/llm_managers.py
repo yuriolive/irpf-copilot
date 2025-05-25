@@ -100,10 +100,9 @@ class LLMManager:
                     return response
             except Exception as e:
                 logger.error(f"Claude Vertex also failed for {file_path.name}: {e}")
-        
-        logger.error("No LLM available or both failed for document processing.")
+            logger.error("No LLM available or both failed for document processing.")
         return ""
-    
+
     def _invoke_gemini(self, prompt: str, b64_data: str, mime_type: str, filename: str) -> str:
         """Invoke Gemini LLM for document processing."""
         logger.info(f"Using Gemini for document: {filename}")
@@ -111,20 +110,26 @@ class LLMManager:
         if not self.gemini_llm:
             logger.error("Attempted to use Gemini LLM, but it's not initialized")
             return ""
-            
+        
         message_content: List[Union[str, Dict[str, Any]]] = [{"type": "text", "text": prompt}]
         
+        # Handle different document types with proper Gemini formats
         if "pdf" in mime_type:
+            # PDFs use the "media" type format in Gemini
             message_content.append({
                 "type": "media",
-                "media_type": mime_type,
+                "mime_type": mime_type,
                 "data": b64_data
             })
         elif "image" in mime_type:
+            # Images use the "image_url" format in Gemini
             message_content.append({
                 "type": "image_url",
                 "image_url": {"url": f"data:{mime_type};base64,{b64_data}"}
             })
+        else:
+            logger.warning(f"Unsupported mime type for Gemini: {mime_type}")
+            raise ValueError(f"Unsupported mime type: {mime_type}")
         
         message = HumanMessage(content=message_content)
         response = self.gemini_llm.invoke([message])

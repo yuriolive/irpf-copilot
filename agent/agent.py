@@ -257,12 +257,13 @@ INFORMAÇÕES DO DBK ATUAL DISPONÍVEIS:
 - Ano calendário: {self.current_dbk_info.get('ano_calendario', '')}
 - Ano exercício: {self.current_dbk_info.get('ano_exercicio', '')}
 
-INSTRUÇÃO IMPORTANTE: Quando usar a ferramenta llm_pdf_tool com operação extract_to_xml, 
-SEMPRE inclua automaticamente os parâmetros cpf_declarante_irpf e ano_calendario com os valores acima.
-NÃO peça essas informações ao usuário, pois elas já estão disponíveis no DBK carregado.
+INSTRUÇÃO IMPORTANTE: A ferramenta llm_pdf_tool foi atualizada para detectar automaticamente essas informações 
+dos arquivos DBK disponíveis. Você NÃO precisa mais fornecer os parâmetros cpf_declarante_irpf e ano_calendario 
+manualmente. Simplesmente use:
 
-Exemplo correto de uso:
-{{"operation": "extract_to_xml", "file_path": "caminho/do/arquivo.pdf", "cpf_declarante_irpf": "{self.current_dbk_info.get('cpf_declarante', '')}", "ano_calendario": "{self.current_dbk_info.get('ano_calendario', '')}"}}
+{{"operation": "extract_to_xml", "file_path": "caminho/do/arquivo.pdf"}}
+
+A ferramenta buscará automaticamente nos DBK disponíveis e também tentará extrair as informações do próprio informe.
 """
             context_parts.append(dbk_context)
         
