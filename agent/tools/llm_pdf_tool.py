@@ -7,13 +7,15 @@ This version removes all traditional OCR dependencies in favor of native LLM vis
 import json
 import logging
 import base64
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from pathlib import Path
 import os
 import re
 from difflib import SequenceMatcher
 
 from langchain.tools import BaseTool
+from pydantic import Field
+from typing import Optional
 
 # LLM imports for PDF and image processing
 try:
@@ -59,6 +61,11 @@ class LLMPdfTool(BaseTool):
     {"operation": "extract_data", "file_path": "informes/banco_informe.pdf", "analysis_type": "financial_summary"}
     {"operation": "find_informes", "search_term": "99pay"}
     """
+    
+    # Declare LLM attributes as Pydantic fields
+    gemini_llm: Optional[Any] = Field(default=None, exclude=True)
+    claude_vertex_llm: Optional[Any] = Field(default=None, exclude=True)
+    claude_direct_client: Optional[Any] = Field(default=None, exclude=True)
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
