@@ -45,10 +45,13 @@ class OcrTool(BaseTool):
     - extract_bank_statement: Extract banking data from statements
     - list_supported_formats: List supported file formats
     - list_informes: List all available informes in the informes folder
-    - find_informe: Find informe files by name pattern
+    - find_informe: Find informe files by name pattern with smart matching
+    - suggest_files: Get suggestions for similar file names when search fails
     
     Input format: JSON string with operation and parameters
     Example: {"operation": "extract_data", "file_path": "informe.pdf", "document_type": "bank_statement"}
+    Example: {"operation": "find_informe", "search_term": "99pay"}
+    Example: {"operation": "suggest_files", "search_term": "banco"}
     """
     
     return_direct: bool = Field(default=False)
@@ -99,10 +102,12 @@ class OcrTool(BaseTool):
                 return self._list_available_informes()
             elif operation == "find_informe":
                 return self._find_informe_by_name(params)
+            elif operation == "suggest_files":
+                return self._suggest_similar_files(params)
             else:
                 return json.dumps({
                     "success": False,
-                    "error": f"Unknown operation: {operation}. Supported: extract_data, extract_tables, preprocess_image, extract_bank_statement, list_supported_formats, list_informes, find_informe"
+                    "error": f"Unknown operation: {operation}. Supported: extract_data, extract_tables, preprocess_image, extract_bank_statement, list_supported_formats, list_informes, find_informe, suggest_files"
                 })
         
         except Exception as e:
@@ -124,14 +129,29 @@ class OcrTool(BaseTool):
                 "success": False,
                 "error": "Missing 'file_path' parameter"
             })
-        
-        # If file_path is just a name, try to find it in informes folder
+          # If file_path is just a name, try to find it in informes folder
         if not "/" in file_path and not "\\" in file_path:
             find_result = self._find_informe_by_name({"search_term": file_path})
             find_data = json.loads(find_result)
             if find_data.get("success") and find_data.get("data", {}).get("files"):
-                file_path = find_data["data"]["files"][0]["path"]
-                logger.info(f"Found informe file: {file_path}")
+                # Use the best match (first one, which has highest confidence)
+                best_match = find_data["data"]["files"][0]
+                file_path = best_match["path"]
+                logger.info(f"Found informe file: {file_path} (match type: {best_match.get('match_type', 'unknown')}, confidence: {best_match.get('confidence', 0)})")
+            else:
+                # If no matches found, provide helpful information
+                available_files = find_data.get("data", {}).get("all_available_files", [])
+                if available_files:
+                    file_list = ", ".join([f["name"] for f in available_files])
+                    return json.dumps({
+                        "success": False,
+                        "error": f"File '{file_path}' not found. Available files in informes directory: {file_list}"
+                    })
+                else:
+                    return json.dumps({
+                        "success": False,
+                        "error": f"File '{file_path}' not found and no files available in informes directory"
+                    })
         
         file_path = Path(file_path)
         if not file_path.exists():
@@ -502,7 +522,7 @@ class OcrTool(BaseTool):
             })
     
     def _find_informe_by_name(self, params: Dict[str, Any]) -> str:
-        """Find informe files by name pattern (e.g., '99Pay', 'banco', etc.)."""
+        """Find informe files by name pattern using smart matching (e.g., '99Pay', 'banco', etc.)."""
         search_term = params.get("search_term", "").lower()
         if not search_term:
             return json.dumps({
@@ -517,25 +537,33 @@ class OcrTool(BaseTool):
                     "success": False,
                     "error": "Informes directory not found"
                 })
-                
-            matches = []
+    
+            # Get all supported files
+            all_files = []
             for ext in ['.pdf', '.png', '.jpg', '.jpeg', '.tiff', '.bmp']:
-                files = list(informes_dir.glob(f"*{ext}"))
-                for file in files:
-                    if search_term in file.name.lower():
-                        matches.append({
-                            "name": file.name,
-                            "path": str(file),
-                            "size": file.stat().st_size,
-                            "type": file.suffix.lower()
-                        })
+                all_files.extend(list(informes_dir.glob(f"*{ext}")))
+            
+            if not all_files:
+                return json.dumps({
+                    "success": True,
+                    "data": {
+                        "search_term": search_term,
+                        "matches_found": 0,
+                        "files": [],
+                        "message": "No supported files found in informes directory"
+                    }
+                })
+            
+            # Smart matching with multiple strategies
+            matches = self._smart_file_matching(all_files, search_term)
                         
             return json.dumps({
                 "success": True,
                 "data": {
                     "search_term": search_term,
                     "matches_found": len(matches),
-                    "files": matches
+                    "files": matches,
+                    "all_available_files": [{"name": f.name, "path": str(f)} for f in all_files[:10]]  # Show first 10 for reference
                 }
             })
                 
@@ -545,3 +573,108 @@ class OcrTool(BaseTool):
                 "success": False,
                 "error": f"Failed to find informe: {str(e)}"
             })
+
+    def _smart_file_matching(self, files: list, search_term: str) -> list:
+        """Implement smart file matching with multiple strategies."""
+        import re
+        from difflib import SequenceMatcher
+
+        search_term = search_term.lower()
+        
+        # Strategy 1: Exact substring match (highest priority)
+        exact_matches = []
+        for file in files:
+            filename_lower = file.name.lower()
+            if search_term in filename_lower:
+                exact_matches.append({
+                    "name": file.name,
+                    "path": str(file),
+                    "size": file.stat().st_size,
+                    "type": file.suffix.lower(),
+                    "match_type": "exact_substring",
+                    "confidence": 1.0
+                })
+        
+        # Strategy 2: Remove common separators and try again
+        fuzzy_matches = []
+        if not exact_matches:
+            # Normalize search term (remove spaces, underscores, hyphens)
+            normalized_search = re.sub(r'[_\-\s]', '', search_term)
+            
+            for file in files:
+                # Normalize filename
+                normalized_filename = re.sub(r'[_\-\s]', '', file.name.lower())
+                
+                # Check if normalized search term is in normalized filename
+                if normalized_search in normalized_filename:
+                    fuzzy_matches.append({
+                        "name": file.name,
+                        "path": str(file),
+                        "size": file.stat().st_size,
+                        "type": file.suffix.lower(),
+                        "match_type": "normalized_substring",
+                        "confidence": 0.8
+                    })
+        
+        # Strategy 3: Partial word matching
+        word_matches = []
+        if not exact_matches and not fuzzy_matches:
+            # Split search term into words
+            search_words = re.split(r'[_\-\s]+', search_term)
+            
+            for file in files:
+                filename_lower = file.name.lower()
+                matched_words = 0
+                
+                for word in search_words:
+                    if len(word) >= 2 and word in filename_lower:
+                        matched_words += 1
+                
+                # If at least 50% of words match
+                if matched_words > 0 and matched_words >= len(search_words) * 0.5:
+                    confidence = matched_words / len(search_words) * 0.6
+                    word_matches.append({
+                        "name": file.name,
+                        "path": str(file),
+                        "size": file.stat().st_size,
+                        "type": file.suffix.lower(),
+                        "match_type": "partial_words",
+                        "confidence": confidence,
+                        "matched_words": matched_words,
+                        "total_words": len(search_words)
+                    })
+        
+        # Strategy 4: Similarity matching (last resort)
+        similarity_matches = []
+        if not exact_matches and not fuzzy_matches and not word_matches:
+            for file in files:
+                filename_base = file.stem.lower()  # filename without extension
+                similarity = SequenceMatcher(None, search_term, filename_base).ratio()
+                
+                # Only consider if similarity is reasonably high
+                if similarity >= 0.4:
+                    similarity_matches.append({
+                        "name": file.name,
+                        "path": str(file),
+                        "size": file.stat().st_size,
+                        "type": file.suffix.lower(),
+                        "match_type": "similarity",
+                        "confidence": similarity * 0.5,  # Lower confidence for similarity matches
+                        "similarity_score": similarity
+                    })
+        
+        # Combine results in order of preference
+        all_matches = exact_matches + fuzzy_matches + word_matches + similarity_matches
+        
+        # Sort by confidence (highest first)
+        all_matches.sort(key=lambda x: x.get("confidence", 0), reverse=True)
+        
+        # Remove duplicates (same file matched by different strategies)
+        seen_paths = set()
+        final_matches = []
+        for match in all_matches:
+            if match["path"] not in seen_paths:
+                seen_paths.add(match["path"])
+                final_matches.append(match)
+        
+        return final_matches
