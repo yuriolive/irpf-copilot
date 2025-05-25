@@ -41,8 +41,7 @@ ai-agent-irpf/
 │   │   └── search_tool.py   # Busca de documentação
 │   └── utils/                # Utilitários
 │       ├── checksum.py      # Algoritmos de checksum
-│       ├── dbk_parser.py    # Parser de arquivos DBK
-│       └── pdf_processor.py # Processamento de PDFs
+│       └── dbk_parser.py    # Parser de arquivos DBK
 ├── dbks/                     # Arquivos DBK
 │   ├── original/            # Arquivos originais
 │   └── gerado/              # Arquivos processados

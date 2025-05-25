@@ -15,9 +15,8 @@ agent/
 │   ├── ocr_tool.py      # OCR para informes
 │   └── search_tool.py   # Busca documentação
 └── utils/                # Utilitários
-    ├── checksum.py      # ✅ Já implementado
-    ├── dbk_parser.py    # Parser DBK
-    └── pdf_processor.py # Processamento PDFs
+    ├── checksum.py      # Algoritmos de checksum
+    └── dbk_parser.py    # Parser DBK
 ```
 
 ### Padrões de Código
@@ -179,24 +178,8 @@ llm = ChatAnthropicVertex(
 
 ### 🎯 Em Planejamento (Prioridade Média)
 
-#### 7. PDF Processor (`agent/utils/pdf_processor.py`)
-```python
-# TODO: Utilitários para processamento PDF
-# - Extração de texto e tabelas
-# - Detecção de layout de informes bancários
-# - Normalização de dados extraídos
-```
 
-#### 8. Validadores Específicos
-```python
-# TODO: Validadores por tipo de registro
-# - ValidadorR16 (declarante)
-# - ValidadorR17 (rendimentos com imposto)
-# - ValidadorR21 (rendimentos PJ)
-# - ValidadorR27 (bens e direitos)
-```
-
-#### 9. Testes Automatizados
+#### 1. Testes Automatizados
 ```python
 # TODO: Suite completa de testes
 # - test_checksum.py (validação algoritmos)
