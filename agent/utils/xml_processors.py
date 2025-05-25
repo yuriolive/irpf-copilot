@@ -126,25 +126,51 @@ class XMLProcessor:
             logger.error(f"Unexpected error parsing LLM XML response: {e}. Raw response preview: {xml_response_str[:200]}", exc_info=True)
         
         return parsed_result
-    
     def format_field_value(self, value: Any, tipo: str, tamanho: int, decimais: int = 0) -> str:
         """Format field value according to IRPF specifications."""
         s_value = str(value if value is not None else "")
         
         if tipo == 'N':
-            s_value = re.sub(r'[^\d-]', '', s_value) 
-            is_negative = s_value.startswith('-')
-            if is_negative: 
-                s_value = s_value[1:]
-            if not s_value: 
-                s_value = "0"
-            
+            # Special handling for monetary values with decimals
             if decimais > 0:
-                if '.' not in str(value):
-                    s_value = s_value + "0" * decimais
+                # Handle decimal values properly
+                is_negative = s_value.startswith('-')
+                if is_negative: 
+                    s_value = s_value[1:]
+                
+                # Convert from decimal notation (6.40) to integer notation (640)
+                if '.' in s_value:
+                    # Split into integer and decimal parts
+                    parts = s_value.split('.')
+                    integer_part = re.sub(r'[^\d]', '', parts[0])  # Remove non-digits from integer part
+                    decimal_part = parts[1] if len(parts) > 1 else ""
+                    
+                    # Ensure decimal part has the right number of digits
+                    decimal_part = decimal_part.ljust(decimais, '0')[:decimais]
+                    
+                    # Combine integer and decimal parts
+                    s_value = integer_part + decimal_part
                 else:
-                    decimal_part = str(value).split('.')[1][:decimais]
-                    s_value = s_value + decimal_part.ljust(decimais, '0')
+                    # No decimal point, assume it's already in integer format or needs padding
+                    s_value = re.sub(r'[^\d]', '', s_value)
+                    if len(s_value) < decimais:
+                        # Value might be missing decimal places, add them
+                        s_value = s_value + "0" * decimais
+                
+                if not s_value: 
+                    s_value = "0" * (tamanho)
+                
+                # Add negative sign back if needed
+                if is_negative:
+                    s_value = '-' + s_value
+            else:
+                # Non-decimal numeric field
+                s_value = re.sub(r'[^\d-]', '', s_value) 
+                is_negative = s_value.startswith('-')
+                if is_negative: 
+                    s_value = s_value[1:]
+                if not s_value: 
+                    s_value = "0"
             
             target_num_len = tamanho
             if is_negative and tipo == 'NN': 

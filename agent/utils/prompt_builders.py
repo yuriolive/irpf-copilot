@@ -113,19 +113,34 @@ class PromptBuilder:
 
         **FOCO NOS REGISTROS DE DETALHE:**
         - Gere registros detalhados como REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (ID 84), REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMACAO_2 (ID 88), etc., quando aplicável.
-        - NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.
-
-        **INSTRUÇÕES PARA CAMPOS:**
+        - NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.        **INSTRUÇÕES PARA CAMPOS:**
         1. Use o atributo `Nome` exatamente como no `mapeamentoTxt.xml`.
         2. Inclua os atributos `Descricao`, `Tamanho`, `Tipo`, e `Decimais` (se aplicável para Tipo="N") como definidos no `mapeamentoTxt.xml`.
         3. O TEXTO DENTRO DO CAMPO `<Campo>...</Campo>` deve ser o VALOR EXTRAÍDO do informe.
         4. Se um campo não tiver valor no informe, gere a tag do campo vazia.
         5. Para o campo `NR_CONTROLE` em cada registro, use um número sequencial único começando em 1.
         6. Para campos de CPF/CNPJ, extraia apenas os números.
-        7. Para valores monetários, use ponto como separador decimal (ex: 1234.56).
-        8. Se você estiver INCERTO sobre um valor específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`
+        
+        **ATENÇÃO ESPECIAL PARA VALORES MONETÁRIOS:**
+        7. VALORES MONETÁRIOS devem ser extraídos EXATAMENTE como aparecem no documento:
+           - Se o documento mostra "R$ 6,40", o valor é 6.40 (seis reais e quarenta centavos)
+           - Se o documento mostra "R$ 1.234,56", o valor é 1234.56 (mil duzentos e trinta e quatro reais e cinquenta e seis centavos)
+           - Se o documento mostra "R$ 123.456,78", o valor é 123456.78 (cento e vinte e três mil, quatrocentos e cinquenta e seis reais e setenta e oito centavos)
+           - NUNCA multiplique por 100 ou adicione zeros extras
+           - No formato brasileiro: ponto (.) é separador de milhares, vírgula (,) é separador de decimais
+           - No XML final: use APENAS ponto (.) como separador decimal, sem separadores de milhares
+           - Exemplos de conversão correta:
+             * "R$ 6,40" → 6.40
+             * "R$ 640,40" → 640.40  
+             * "R$ 1.640,40" → 1640.40
+             * "R$ 12.345,67" → 12345.67
+        
+        8. Se você estiver INCERTO sobre um valor específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`        {additional_context if additional_context else ""}
 
-        {additional_context if additional_context else ""}
+        **EXEMPLOS DE EXTRAÇÃO DE VALORES MONETÁRIOS:**
+        - Documento mostra "Rendimento: R$ 6,40" → No XML: <Campo Nome="VR_VALOR">6.40</Campo>
+        - Documento mostra "Saldo: R$ 1.234,56" → No XML: <Campo Nome="VR_ATUAL">1234.56</Campo>
+        - Documento mostra "Total: R$ 12.345,67" → No XML: <Campo Nome="VR_RENDTO">12345.67</Campo>
 
         **FORMATO DE RESPOSTA OBRIGATÓRIO:**
         Responda EXATAMENTE neste formato XML:
