@@ -13,6 +13,7 @@ from rich.text import Text
 from rich.table import Table
 import logging
 import json
+import re
 
 # Add readline support for command history
 try:
@@ -38,6 +39,7 @@ from agent.agent import IRPFAgent
 from agent.tools.dbk_tool import DbkTool
 from agent.tools.search_tool import SearchTool
 from agent.tools.llm_pdf_tool import LLMPdfTool
+from agent.utils.markdown_utils import MarkdownDisplayer
 
 # Load environment variables
 load_dotenv()
@@ -55,7 +57,6 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
-
 
 def display_welcome():
     """Display welcome banner and initial instructions."""
@@ -75,7 +76,6 @@ def display_welcome():
         border_style="blue"
     )
     console.print(welcome_panel)
-
 
 def display_help():
     """Display available commands."""
@@ -112,7 +112,6 @@ def display_help():
     else:
         console.print("\n[yellow]⚠️ Readline não disponível - instale 'pyreadline3' para histórico de comandos[/yellow]")
 
-
 def check_directories():
     """Check and create necessary directories."""
     directories = [
@@ -125,7 +124,6 @@ def check_directories():
     for dir_path in directories:
         Path(dir_path).mkdir(parents=True, exist_ok=True)
         logger.info(f"Directory ensured: {dir_path}")
-
 
 def setup_readline():
     """Setup readline with history file for command persistence."""
@@ -206,7 +204,6 @@ def setup_readline():
     else:
         logger.info("Tab completion not available - some readline functions missing")
 
-
 def check_environment():
     """Check environment variables and setup."""
     required_vars = ["GOOGLE_API_KEY"]
@@ -233,7 +230,6 @@ def check_environment():
         console.print("[yellow]Claude Sonnet 4 não estará disponível como fallback[/yellow]")
     
     return True
-
 
 def display_status():
     """Display system status and file information."""
@@ -283,6 +279,53 @@ def display_status():
     
     console.print(status_table)
 
+def is_markdown_content(text: str) -> bool:
+    """Check if text appears to contain markdown formatting."""
+    if not text or len(text.strip()) < 10:
+        return False
+    
+    # Common markdown patterns
+    markdown_patterns = [
+        r'^#{1,6}\s+.+$',          # Headers
+        r'\*\*[^*]+\*\*',          # Bold text
+        r'\*[^*]+\*',              # Italic text
+        r'`[^`]+`',                # Inline code
+        r'```[\s\S]*?```',         # Code blocks
+        r'^\s*[-*+]\s+',           # Unordered lists
+        r'^\s*\d+\.\s+',           # Ordered lists
+        r'\[.+\]\(.+\)',           # Links
+        r'^\s*>\s+',               # Blockquotes
+        r'^\s*\|.+\|.+\|',        # Tables
+        r'---+',                   # Horizontal rules
+    ]
+    
+    for pattern in markdown_patterns:
+        if re.search(pattern, text, re.MULTILINE):
+            return True
+    
+    return False
+
+def display_agent_response(output: str):
+    """Display agent response with markdown formatting if detected."""
+    try:
+        # Check if the output appears to be markdown
+        if is_markdown_content(output):
+            # Initialize markdown displayer
+            md_displayer = MarkdownDisplayer(console)
+            
+            # Try to display as markdown
+            if md_displayer.display_content(output, "🤖 Resposta do Agente"):
+                return
+            else:
+                # Fallback to regular print if markdown display fails
+                console.print(output)
+        else:
+            # Regular text output
+            console.print(output)
+    except Exception as e:
+        logger.warning(f"Error formatting response as markdown: {e}")
+        # Fallback to regular print
+        console.print(output)
 
 def test_pdf_extraction(file_path=None, document_type="auto"):
     """Test PDF extraction directly with LLMPdfTool."""
@@ -371,7 +414,6 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
     except Exception as e:
         logger.error(f"Error testing PDF extraction: {e}")
         console.print(f"[red]❌ Erro no teste: {e}[/red]")
-
 
 def handle_special_commands(user_input: str) -> bool:
     """Handle special commands. Returns True if command was handled."""
@@ -480,7 +522,6 @@ def handle_special_commands(user_input: str) -> bool:
     
     return False
 
-
 def main():
     """Main entry point for the AI IRPF Agent."""
     try:
@@ -555,15 +596,15 @@ def main():
                 with console.status("[blue]Processando...[/blue]"):
                     response = agent.ask(user_input)
                 
-                # Display response
+                # Display response with enhanced markdown formatting
                 if response.get('success', False):
                     output = response.get('answer', 'Resposta não disponível.')
-                    console.print(output)
+                    display_agent_response(output)
                 else:
                     error_msg = response.get('error', 'Erro desconhecido')
                     answer = response.get('answer', 'Desculpe, tive problemas para processar sua solicitação.')
                     console.print(f"[red]❌ {error_msg}[/red]")
-                    console.print(answer)
+                    display_agent_response(answer)
                 
             except KeyboardInterrupt:
                 console.print("\n\n[blue]👋 Interrompido pelo usuário. Até logo![/blue]")
@@ -579,7 +620,6 @@ def main():
         return 1
     
     return 0
-
 
 if __name__ == "__main__":
     exit_code = main()
