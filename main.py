@@ -44,7 +44,7 @@ def display_welcome():
     """Display welcome banner and initial instructions."""
     title = Text("🧾 Agente Inteligente IRPF 2025", style="bold blue")
     subtitle = Text("Automatize sua declaração do Imposto de Renda", style="italic")
-      welcome_panel = Panel(
+    welcome_panel = Panel(
         f"{title}\n{subtitle}\n\n"
         "Este agente pode:\n"
         "• Ler e interpretar arquivos DBK\n"
@@ -75,7 +75,7 @@ def display_help():
     table.add_row("quit/exit/bye", "Encerra o programa")
     
     console.print(table)
-      console.print("\n[yellow]Exemplos de perguntas:[/yellow]")
+    console.print("\n[yellow]Exemplos de perguntas:[/yellow]")
     console.print("• 'Leia o arquivo DBK original e me mostre um resumo'")
     console.print("• 'Analise o informe 99Pay e extraia os dados bancários'") 
     console.print("• 'Liste todos os informes disponíveis na pasta'")
