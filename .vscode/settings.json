@@ -13,5 +13,9 @@
         "*.py": "python"
     },
     "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.autoImportCompletions": true
+    "python.analysis.autoImportCompletions": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.agent.thinkingTool": true,
+    "github.copilot.chat.testGeneration.instructions": [],
+    "copilot.vision.provider": "OpenAI"
 }
