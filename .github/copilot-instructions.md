@@ -2,7 +2,7 @@
 
 ## 🎯 Objetivo do Projeto
 
-Este projeto implementa um agente inteligente para automatizar a manipulação de arquivos DBK (declaração do Imposto de Renda Pessoa Física - IRPF 2025) usando LangChain, Gemini 2.5 Pro e Claude Sonnet 4.
+Este projeto implementa um agente inteligente para automatizar a manipulação de arquivos DBK (declaração do Imposto de Renda Pessoa Física - IRPF 2025) usando LangChain, Gemini 2.5 Flash e Claude Sonnet 4.
 
 ## 🏗️ Arquitetura Principal
 
@@ -58,7 +58,7 @@ class IRPFAgent:
         self.agent_executor = self._setup_agent()
     
     def _setup_agent(self) -> AgentExecutor:
-        # Setup LLM (Gemini 2.5 Pro primary, Claude Sonnet 4 fallback)
+        # Setup LLM (Gemini 2.5 Flash primary, Claude Sonnet 4 fallback)
         # Create ReAct agent with custom prompt
         # Return AgentExecutor
 ```
@@ -77,9 +77,9 @@ class IRPFAgent:
 
 ### Modelos de IA
 ```python
-# Primário: Gemini 2.5 Pro
+# Primário: Gemini 2.5 Flash
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-pro-preview-05-06",
+    model="gemini-2.5-flash-preview-05-20",
     temperature=0.1,
     max_output_tokens=4000
 )

@@ -141,7 +141,7 @@ def display_status():
     has_gcp_project = bool(os.getenv("GOOGLE_CLOUD_PROJECT"))
     
     status_table.add_row(
-        "Gemini 2.5 Pro", 
+        "Gemini 2.5 Flash", 
         "✅ Disponível" if has_google_key else "❌ Indisponível",
         "GOOGLE_API_KEY configurada" if has_google_key else "Variável GOOGLE_API_KEY não encontrada"
     )

@@ -2,7 +2,7 @@
 
 ## 📋 Descrição
 
-Este projeto implementa um agente inteligente baseado em LangChain e modelos de IA avançados (Gemini 2.5 Pro e Claude Sonnet 4) para automatizar a adição e atualização de dados em arquivos DBK de declaração do Imposto de Renda Pessoa Física (IRPF) 2025.
+Este projeto implementa um agente inteligente baseado em LangChain e modelos de IA avançados (Gemini 2.5 Flash e Claude Sonnet 4) para automatizar a adição e atualização de dados em arquivos DBK de declaração do Imposto de Renda Pessoa Física (IRPF) 2025.
 
 O agente é capaz de:
 - ✅ Interpretar e modificar arquivos DBK da Receita Federal
@@ -25,7 +25,7 @@ O agente é capaz de:
 - **Mapeamento inteligente** para campos específicos da declaração
 
 ### IA e Automação
-- **Modelos avançados**: Gemini 2.5 Pro (Google) e Claude Sonnet 4 (Anthropic)
+- **Modelos avançados**: Gemini 2.5 Flash (Google) e Claude Sonnet 4 (Anthropic)
 - **LangChain**: Orquestração de ferramentas e raciocínio
 - **Busca inteligente**: Documentação técnica e especificações
 
@@ -88,7 +88,7 @@ cp .env.example .env
 
 2. **Configure as variáveis de ambiente:**
 ```env
-# Para Gemini 2.5 Pro
+# Para Gemini 2.5 Flash
 GOOGLE_API_KEY=your_google_api_key
 
 # Para Claude Sonnet 4 via Vertex AI
@@ -179,9 +179,9 @@ O agente iniciará em modo conversacional onde você pode:
 
 ## 🤖 Modelos de IA
 
-### Gemini 2.5 Pro (Primário)
+### Gemini 2.5 Flash (Primário)
 ```python
-model = "gemini-2.5-pro-preview-05-06"
+model = "gemini-2.5-flash-preview-05-20"
 temperature = 0.1
 max_tokens = 4000
 ```

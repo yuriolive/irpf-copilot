@@ -34,7 +34,7 @@ class IRPFAgent:
     """
     Agente principal para processamento de arquivos DBK do IRPF.
     
-    Este agente utiliza LangChain com modelos de IA avançados (Gemini 2.5 Pro
+    Este agente utiliza LangChain com modelos de IA avançados (Gemini 2.5 Flash
     e Claude Sonnet 4) para automatizar a manipulação de declarações do IR.
     """
     
@@ -104,12 +104,12 @@ class IRPFAgent:
         temperature = float(os.getenv("AGENT_TEMPERATURE", "0.1"))
         max_tokens = int(os.getenv("MAX_OUTPUT_TOKENS", "4000"))
         
-        # Tentar Gemini 2.5 Pro primeiro
+        # Tentar Gemini 2.5 Flash primeiro
         if preferred_model in ["auto", "gemini"] and os.getenv("GOOGLE_API_KEY"):
             try:
-                logger.info("Configurando Gemini 2.5 Pro...")
+                logger.info("Configurando Gemini 2.5 Flash...")
                 return ChatGoogleGenerativeAI(
-                    model="gemini-2.5-pro-preview-05-06",
+                    model="gemini-2.5-flash-preview-05-20",
                     temperature=temperature,
                     max_output_tokens=max_tokens,
                     google_api_key=os.getenv("GOOGLE_API_KEY")
