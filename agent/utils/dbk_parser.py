@@ -515,35 +515,135 @@ class DbkParser:
     
     def create_record(self, record_type: str, data: Dict[str, Any]) -> DbkRecord:
         """Create a new record of the specified type with the given data."""
-        # Simplified record creation
-        record_data = {
-            'record_type': record_type,
-            'content': data.get('content', ''),
-            **data  # Include all provided data
-        }
-        
-        # Handle sequence conversion with proper type checking
-        sequence_value = data.get('sequence') or data.get('sequencial')
-        sequence: Optional[int] = None
-        
-        if sequence_value is not None:
-            if isinstance(sequence_value, int):
-                sequence = sequence_value
-            elif isinstance(sequence_value, str) and sequence_value.isdigit():
-                sequence = int(sequence_value)
-            # If it's any other type or non-digit string, sequence remains None
-        
-        record = DbkRecord(
-            record_type=record_type,
-            sequence=sequence,
-            data=record_data,
-            raw_line=data.get('raw_line', ''),
-            line_number=0,
-            is_valid=True,
-            validation_errors=[]
-        )
-        
-        return record
+        try:
+            # Get record definition from XMLProcessor if available
+            record_definition = None
+            if self.xml_processor and hasattr(self.xml_processor, 'record_definitions'):
+                # Find record definition by identificador
+                for record_name, definition in self.xml_processor.record_definitions.items():
+                    if definition.get('identificador') == record_type:
+                        record_definition = definition
+                        break
+            
+            # Generate a properly formatted DBK line
+            if record_definition:
+                # Use XMLProcessor to format the record properly
+                raw_line = self._format_record_line(record_type, data, record_definition)
+            else:
+                # Fallback: create a basic line with checksum placeholder
+                content = data.get('content', '')
+                if content:
+                    raw_line = content.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ') + '0000000000'
+                else:
+                    # Create basic line format: TYPE + padding + checksum
+                    raw_line = record_type.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ') + '0000000000'
+            
+            # Calculate proper checksum for the line
+            try:
+                checksum = calcular_checksum_automatico(raw_line[:-10])  # Exclude existing checksum
+                raw_line = raw_line[:-10] + checksum
+            except Exception as e:
+                logger.warning(f"Failed to calculate checksum for new record: {e}")
+                # Keep the placeholder checksum
+            
+            # Handle sequence conversion with proper type checking
+            sequence_value = data.get('sequence') or data.get('sequencial')
+            sequence: Optional[int] = None
+            
+            if sequence_value is not None:
+                if isinstance(sequence_value, int):
+                    sequence = sequence_value
+                elif isinstance(sequence_value, str) and sequence_value.isdigit():
+                    sequence = int(sequence_value)
+            
+            # Create record with full data
+            record_data = {
+                'record_type': record_type,
+                'content': raw_line[:self.DEFAULT_RECORD_LENGTH - 10],  # Content without checksum
+                **data  # Include all provided data
+            }
+            
+            record = DbkRecord(
+                record_type=record_type,
+                sequence=sequence,
+                data=record_data,
+                raw_line=raw_line,
+                line_number=0,
+                checksum=raw_line[-10:] if len(raw_line) >= 10 else None,
+                is_valid=True,
+                validation_errors=[]
+            )
+            
+            return record
+            
+        except Exception as e:
+            logger.error(f"Error creating record: {e}")
+            # Fallback: create minimal record
+            fallback_line = record_type.ljust(self.DEFAULT_RECORD_LENGTH, ' ')
+            return DbkRecord(
+                record_type=record_type,
+                sequence=None,
+                data={'record_type': record_type, **data},
+                raw_line=fallback_line,
+                line_number=0,
+                is_valid=False,
+                validation_errors=[f"Failed to create properly formatted record: {e}"]
+            )
+    
+    def _format_record_line(self, record_type: str, data: Dict[str, Any], record_definition: Dict[str, Any]) -> str:
+        """Format a record line according to IRPF specifications."""
+        try:
+            # Start with record type
+            line_parts = [record_type]
+            
+            # Add CPF if present (common field)
+            if 'NR_CPF' in data:
+                line_parts.append(data['NR_CPF'])
+            elif 'cpf' in data:
+                line_parts.append(data['cpf'])
+            
+            # Format fields according to definition
+            if 'campos' in record_definition:
+                for campo in record_definition['campos']:
+                    field_name = campo.get('nome', '')
+                    field_value = data.get(field_name, '')
+                    field_type = campo.get('tipo', 'C')
+                    field_size = int(campo.get('tamanho', 10))
+                    field_decimals = int(campo.get('decimais', 0))
+                    
+                    if self.xml_processor:
+                        formatted_value = self.xml_processor.format_field_value(
+                            field_value, field_type, field_size, field_decimals
+                        )
+                    else:
+                        # Simple formatting fallback
+                        if field_type == 'N':
+                            formatted_value = str(field_value).zfill(field_size)
+                        else:
+                            formatted_value = str(field_value).ljust(field_size)[:field_size]
+                    
+                    line_parts.append(formatted_value)
+            
+            # Join parts and pad to correct length
+            line = ''.join(line_parts)
+            
+            # Ensure line is correct length (excluding checksum)
+            content_length = self.DEFAULT_RECORD_LENGTH - 10
+            if len(line) > content_length:
+                line = line[:content_length]
+            elif len(line) < content_length:
+                line = line.ljust(content_length, ' ')
+            
+            return line + '0000000000'  # Add placeholder checksum
+            
+        except Exception as e:
+            logger.error(f"Error formatting record line: {e}")
+            # Fallback: basic format
+            content = str(data.get('content', ''))
+            line = record_type + content
+            if len(line) > self.DEFAULT_RECORD_LENGTH - 10:
+                line = line[:self.DEFAULT_RECORD_LENGTH - 10]
+            return line.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ') + '0000000000'
     
     def create_backup(self, file_path: str) -> str:
         """Create a backup of a file and return the backup path."""

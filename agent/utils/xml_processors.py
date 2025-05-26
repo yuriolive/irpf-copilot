@@ -76,7 +76,6 @@ class XMLProcessor:
             logger.error(f"Error loading mapeamentoTxt.xml: {e}", exc_info=True)
         
         return definitions
-    
     def parse_llm_xml_response(self, xml_response_str: str) -> Dict[str, Any]:
         """Parse LLM XML response and extract records with uncertainty points."""
         parsed_result = {"registros": [], "uncertainty_points": [], "llm_notes": []}
@@ -89,29 +88,38 @@ class XMLProcessor:
                 xml_response_str = xml_response_str.strip()[:-3]
             xml_response_str = xml_response_str.strip()
 
+            # Handle single <Registro> element by wrapping it
+            if xml_response_str.strip().startswith("<Registro") and not xml_response_str.strip().startswith("<Registros"):
+                xml_response_str = f"<root>{xml_response_str}</root>"
+
             # Use a parser that can handle comments
             parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
             
             try:
                 root = ET.fromstring(xml_response_str, parser)
                 
-                for child in root:
-                    if isinstance(child, ET.Element):
-                        if child.tag == "Registro":
-                            parsed_result["registros"].append(child)
-                    elif hasattr(child, 'text') and child.text:
-                        # This is a comment
-                        comment_text = child.text.strip()
-                        if "LLM_UNCERTAINTY" in comment_text:
-                            parsed_result["uncertainty_points"].append(comment_text)
-                        elif "LLM_NOTE" in comment_text:
-                            parsed_result["llm_notes"].append(comment_text)
+                # If root is a Registro element, process it directly
+                if root.tag == "Registro":
+                    parsed_result["registros"].append(root)
+                else:
+                    # Process children
+                    for child in root:
+                        if isinstance(child, ET.Element):
+                            if child.tag == "Registro":
+                                parsed_result["registros"].append(child)
+                        elif hasattr(child, 'text') and child.text:
+                            # This is a comment
+                            comment_text = child.text.strip()
+                            if "LLM_UNCERTAINTY" in comment_text:
+                                parsed_result["uncertainty_points"].append(comment_text)
+                            elif "LLM_NOTE" in comment_text:
+                                parsed_result["llm_notes"].append(comment_text)
 
             except ET.ParseError as pe_outer:
                 logger.warning(f"Failed to parse as well-formed XML: {pe_outer}. Attempting manual extraction.")
                 
                 # Manual extraction fallback
-                registro_matches = re.findall(r'<Registro[^>]*>.*?</Registro>', xml_response_str, re.DOTALL)
+                registro_matches = re.findall(r'<Registro[^>]*(?:\s*/\s*>|>.*?</Registro>)', xml_response_str, re.DOTALL)
                 for match in registro_matches:
                     try:
                         reg_element = ET.fromstring(match)

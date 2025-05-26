@@ -399,6 +399,7 @@ class DbkTool(BaseTool):
         except Exception as e:
             logger.error(f"Erro em update_record: {str(e)}", exc_info=True)
             return format_error_response(e, "update_record")
+
     def _add_record(self, input_data: Dict[str, Any]) -> str:
         """Adiciona um novo registro ao arquivo."""
         file_path = input_data.get('file_path')
@@ -662,21 +663,31 @@ class DbkTool(BaseTool):
             
             added_records = []
             all_uncertainty_points = []
-            
-            # Process each XML record
+              # Process each XML record
             for i, xml_record in enumerate(xml_records):
                 try:
                     # Parse XML record
                     parsed_xml = self.xml_processor.parse_llm_xml_response(xml_record)
                     
                     if parsed_xml.get('registros'):
-                        xml_data = parsed_xml['registros'][0]  # First record
-                        record_type = xml_data.get('identificador', 'unknown')
+                        registro_element = parsed_xml['registros'][0]  # First record element
                         
-                        # Convert XML campos to data dict
-                        data = {}
-                        for campo in xml_data.get('campos', []):
-                            data[campo.get('nome', '')] = campo.get('valor', '')
+                        # Extract record name and attributes from XML element
+                        record_name = registro_element.get('Nome', 'unknown')
+                        
+                        # Convert element attributes to data dict
+                        data = dict(registro_element.attrib)
+                        
+                        # Remove 'Nome' from data as it's used for record identification
+                        if 'Nome' in data:
+                            del data['Nome']
+                        
+                        # Create new record using record_name (e.g., "REG_BEM" -> "27")
+                        if record_name in self.xml_processor.record_definitions:
+                            record_type = self.xml_processor.record_definitions[record_name]['identificador']
+                        else:
+                            logger.warning(f"Record type '{record_name}' not found in definitions, using as-is")
+                            record_type = record_name
                         
                         # Create new record
                         new_record = self.parser.create_record(record_type, data)
@@ -687,6 +698,7 @@ class DbkTool(BaseTool):
                         added_records.append({
                             'index': i,
                             'type': record_type,
+                            'record_name': record_name,
                             'data': data
                         })
                         

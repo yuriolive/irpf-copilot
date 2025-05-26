@@ -4,6 +4,27 @@
 
 Este projeto implementa um agente inteligente para automatizar a manipulação de arquivos DBK (declaração do Imposto de Renda Pessoa Física - IRPF 2025) usando LangChain, Gemini 2.5 Flash e Claude Sonnet 4.
 
+## ⚠️ REGRA CRÍTICA DE TESTES
+
+**SEMPRE usar os scripts de teste fornecidos:**
+- **Windows:** `run_tests.bat [comando]`
+- **Linux/macOS:** `make test-[comando]`
+
+**NUNCA executar pytest diretamente** - os scripts garantem configuração correta do ambiente.
+
+Exemplos:
+```bash
+# Windows
+run_tests.bat basic          # Testes básicos
+run_tests.bat all            # Todos os testes com cobertura
+run_tests.bat dbk_tool       # Testes específicos
+
+# Linux/macOS  
+make test                    # Testes básicos
+make test-all               # Todos os testes com cobertura
+make test-dbk-tool          # Testes específicos
+```
+
 ## 🏗️ Arquitetura Principal
 
 ### Estrutura de Pastas
@@ -139,8 +160,9 @@ llm = ChatAnthropicVertex(
     tipos de informes (por exemplo, recebimentos de pessoa juridica se a pessoa é funcionário de alguma empresa, etc).
 - [ ] Códigos atualizados de campos estão disponíveis no xml e arquivos referenciados no xml:
     https://downloadirpf.receita.fazenda.gov.br/irpf/2025/irpf/update/latest.xml . Acho que seria interessante
-    antes de iniciar o programa verificar se temos os códigos atualiados se não baixar localmente e salva-los de
+    antes de iniciar o programa verificar se temos os códigos atualizados se não baixar localmente e salva-los de
     alguma forma que o programa consiga acessar.
+- [ ] Lidar com campos no DBK que são somatórios ou agregações de outros campos, por exemplo, os campos 19, 20, 23 e 24.
 
 ### ℹ️ A Validar
 - [ ] Converter a documentação, laiautes e códigos de referência em C# para um formato mais amigável para as LLMs, possivelmente Markdown.
@@ -342,14 +364,31 @@ T9      000000001...totais...5678901234                 # Trailer
 
 ## 🚀 Comandos Úteis
 
+### Execução de Testes (OBRIGATÓRIO)
+**SEMPRE usar os scripts de teste fornecidos:**
+
 ```bash
-# Executar com UV
+# Windows - Usar SEMPRE o arquivo batch
+run_tests.bat basic          # Testes básicos
+run_tests.bat all            # Todos os testes com cobertura
+run_tests.bat dbk_tool       # Testes específicos do DBK tool
+run_tests.bat custom test_dbk_parsing  # Teste específico
+run_tests.bat help           # Ver todas as opções
+
+# Linux/macOS - Usar SEMPRE o Makefile
+make test                    # Testes básicos
+make test-all               # Todos os testes com cobertura
+make test-dbk-tool          # Testes específicos do DBK tool
+make test-custom TEST=dbk_parsing  # Teste específico
+make help                   # Ver todas as opções
+```
+
+### Outros Comandos
+```bash
+# Executar aplicação principal
 uv run main.py
 
-# Testes
-uv run pytest -v
-
-# Linting
+# Linting (se necessário)
 uv run black .
 uv run flake8 .
 
@@ -360,3 +399,40 @@ uv add package-name
 ---
 
 **💡 Dica**: Sempre consulte a documentação em `llm-aux-docs/` antes de implementar funcionalidades relacionadas ao formato DBK. Os algoritmos de checksum são CRÍTICOS e já estão validados em `utils/checksum.py`.
+
+## 🧪 Política de Testes
+
+### Execução de Testes - REGRA OBRIGATÓRIA
+- **SEMPRE usar os scripts de teste fornecidos:**
+  - **Windows:** `run_tests.bat [comando]`
+  - **Linux/macOS:** `make test-[comando]`
+- **NUNCA executar pytest diretamente** sem usar os scripts
+- **Os scripts garantem configuração correta** de ambiente e dependências
+
+### Implementação Obrigatória de Testes
+- **TODOS os arquivos de teste em `tests/` DEVEM ser completamente implementados**
+- **Não deixar funções de teste vazias ou com apenas `pass`**
+- **Cada arquivo de teste deve ter cobertura completa da funcionalidade associada**
+- **Usar mocks apropriados quando necessário para isolar funcionalidades**
+- **Incluir testes de casos de erro e edge cases**
+- **Testes devem ser executáveis e passar com sucesso**
+
+### Estrutura de Testes Obrigatória
+```python
+# tests/test_<module>.py - Deve implementar TODOS os testes
+class Test<Module>:
+    def test_functionality_1(self):
+        # Implementação completa obrigatória
+        assert expected_behavior
+    
+    def test_error_handling(self):
+        # Teste de casos de erro obrigatório
+        with pytest.raises(ExpectedException):
+            problematic_operation()
+```
+
+### Arquivos de Teste Associados
+- `tests/test_dbk_tool.py` → `agent/tools/dbk_tool.py`
+- `tests/test_dbk_parsing.py` → `agent/utils/dbk_parser.py`
+- `tests/test_agent.py` → `agent/agent.py`
+- `tests/test_main.py` → `main.py`
