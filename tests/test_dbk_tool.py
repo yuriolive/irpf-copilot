@@ -91,7 +91,6 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         
         assert result_data["success"] is False
         assert "não encontrado" in result_data["error"] or "does not exist" in result_data["error"]
-    
     @patch('agent.tools.dbk_tool.DbkParser.analyze_dbk_file')
     def test_read_dbk_success(self, mock_analyze, dbk_tool, sample_dbk_file):
         """Test successful read_dbk operation."""
@@ -101,7 +100,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
             "file_size": 100
         }
         
-        query = f'{{"operation": "read_dbk", "file_path": "{sample_dbk_file}"}}'
+        query = json.dumps({"operation": "read_dbk", "file_path": str(sample_dbk_file)})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -127,7 +126,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
             "errors": []
         }
         
-        query = f'{{"operation": "validate_dbk", "file_path": "{sample_dbk_file}"}}'
+        query = json.dumps({"operation": "validate_dbk", "file_path": str(sample_dbk_file)})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -148,13 +147,12 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         mock_record2.record_type = "27"
         mock_record2.data = {"bem": "teste"}
         mock_record2.is_valid = True
-        
         mock_parse.return_value = {
             "records": [mock_record1, mock_record2],
             "encoding": "latin-1"
         }
         
-        query = f'{{"operation": "list_records", "file_path": "{sample_dbk_file}"}}'
+        query = json.dumps({"operation": "list_records", "file_path": str(sample_dbk_file)})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -175,10 +173,9 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         mock_record.checksum = "1234567890"
         mock_record.is_valid = True
         mock_record.validation_errors = None
-        
         mock_parse.return_value = {"records": [mock_record]}
         
-        query = f'{{"operation": "get_record", "file_path": "{sample_dbk_file}", "record_index": 0}}'
+        query = json.dumps({"operation": "get_record", "file_path": str(sample_dbk_file), "record_index": 0})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -192,7 +189,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         with patch('agent.tools.dbk_tool.DbkParser.parse_dbk_file') as mock_parse:
             mock_parse.return_value = {"records": []}
             
-            query = f'{{"operation": "get_record", "file_path": "{sample_dbk_file}", "record_index": 0}}'
+            query = json.dumps({"operation": "get_record", "file_path": str(sample_dbk_file), "record_index": 0})
             result = dbk_tool._run(query)
             result_data = json.loads(result)
             
@@ -216,9 +213,8 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         mock_create.return_value = mock_record
         mock_add.return_value = {"records": [mock_record]}
         mock_write.return_value = True
-        
         data = {"NR_CPF": "12345678901", "CD_BEM": "61"}
-        query = f'{{"operation": "add_record", "file_path": "{sample_dbk_file}", "record_type": "27", "data": {json.dumps(data)}}}'
+        query = json.dumps({"operation": "add_record", "file_path": str(sample_dbk_file), "record_type": "27", "data": data})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -257,7 +253,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         mock_add.return_value = {"records": [mock_record]}
         mock_write.return_value = True
         
-        query = f'{{"operation": "add_xml_record", "file_path": "{sample_dbk_file}", "xml_record": {json.dumps(sample_xml_record)}}}'
+        query = json.dumps({"operation": "add_xml_record", "file_path": str(sample_dbk_file), "xml_record": sample_xml_record})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -316,9 +312,8 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         mock_create.return_value = mock_record
         mock_add.return_value = {"records": [mock_record]}
         mock_write.return_value = True
-        
         xml_records = [sample_xml_record, sample_xml_record]
-        query = f'{{"operation": "add_xml_records", "file_path": "{sample_dbk_file}", "xml_records": {json.dumps(xml_records)}}}'
+        query = json.dumps({"operation": "add_xml_records", "file_path": str(sample_dbk_file), "xml_records": xml_records})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -334,7 +329,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         """Test successful backup_file operation."""
         mock_backup.return_value = "backup_path_with_timestamp.dbk"
         
-        query = f'{{"operation": "backup_file", "file_path": "{sample_dbk_file}"}}'
+        query = json.dumps({"operation": "backup_file", "file_path": str(sample_dbk_file)})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -371,9 +366,8 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         
         mock_update.return_value = {"records": [mock_record]}
         mock_write.return_value = True
-        
         update_data = {"CD_BEM": "62"}
-        query = f'{{"operation": "update_record", "file_path": "{sample_dbk_file}", "record_index": 0, "data": {json.dumps(update_data)}}}'
+        query = json.dumps({"operation": "update_record", "file_path": str(sample_dbk_file), "record_index": 0, "data": update_data})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -391,12 +385,11 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
             "output_path": "output_path",
             "operations_completed": 2
         }
-        
         operations = [
             {"type": "add_record", "record_type": "27", "data": {"bem": "test1"}},
             {"type": "add_record", "record_type": "27", "data": {"bem": "test2"}}
         ]
-        query = f'{{"operation": "batch_update", "file_path": "{sample_dbk_file}", "operations": {json.dumps(operations)}}}'
+        query = json.dumps({"operation": "batch_update", "file_path": str(sample_dbk_file), "operations": operations})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -417,9 +410,8 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         mock_get_output.return_value = "output_path"
         mock_write.return_value = True
         mock_validate.return_value = {"is_valid": True, "errors": []}
-        
         data = {"records": [], "header": "test"}
-        query = f'{{"operation": "write_dbk", "file_path": "{sample_dbk_file}", "data": {json.dumps(data)}}}'
+        query = json.dumps({"operation": "write_dbk", "file_path": str(sample_dbk_file), "data": data})
         result = dbk_tool._run(query)
         result_data = json.loads(result)
         
@@ -449,9 +441,8 @@ class TestDbkToolIntegration:
         
         with open(dbk_path, 'w', encoding='latin-1') as f:
             f.write(content)
-        
         # Test read operation
-        query = f'{{"operation": "read_dbk", "file_path": "{dbk_path}"}}'
+        query = json.dumps({"operation": "read_dbk", "file_path": str(dbk_path)})
         result = dbk_tool_no_backup._run(query)
         result_data = json.loads(result)
         

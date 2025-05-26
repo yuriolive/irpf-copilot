@@ -65,10 +65,7 @@ def format_success_response(data: Any, operation: str = "") -> str:
     Returns:
         Formatted success response string
     """
-    if isinstance(data, dict):
-        response = {"success": True, **data}
-    else:
-        response = {"success": True, "result": data}
+    response = {"success": True, "data": data}
     
     if operation:
         response["operation"] = operation
