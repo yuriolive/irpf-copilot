@@ -201,11 +201,13 @@ class LLMPdfTool(BaseTool):
                 ano_calendario = str(ano_calendario)
 
             file_path = Path(file_path_str)
-            
+
             # Validate file
             validation_result = FileUtils.validate_file_for_processing(file_path)
             if not validation_result["valid"]:
-                return json.dumps({"success": False, "error": validation_result["error"]})            # Check if LLM is available
+                return json.dumps({"success": False, "error": validation_result["error"]})
+            
+            # Check if LLM is available
             if not self.llm_manager or not self.llm_manager.has_available_llm():
                 return json.dumps({
                     "success": False,
