@@ -4,6 +4,7 @@ Tests for DBK Tool - Complete integration and unit tests.
 
 import json
 import os
+import re
 import pytest
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
@@ -464,5 +465,347 @@ class TestDbkToolIntegration:
         assert "success" in json.loads(result)
 
 
+class TestDbkToolXMLProcessing:
+    """Test suite specifically for XML processing in DbkTool."""
+    
+    @pytest.fixture
+    def dbk_tool_no_backup(self):
+        """Create a DbkTool instance with backup disabled for testing."""
+        tool = DbkTool()
+        tool.auto_backup = False
+        return tool
+    
+    @pytest.fixture
+    def real_xml_record(self):
+        """Real XML record that matches the format from llm_pdf_tool."""
+        return '''<Registro Nome="REG_BEM" Identificador="27" Descricao="declaracao de bens e direitos">
+        <Campo Nome="NR_REG" Descricao="Tipo do registro" Tamanho="2" Tipo="N">27</Campo>
+        <Campo Nome="NR_CPF" Descricao="CPF contribuinte" Tamanho="11" Tipo="C">15499258732</Campo>
+        <Campo Nome="CD_BEM" Descricao="Tipo do bem ou direito" Tamanho="2" Tipo="N">61</Campo>
+        <Campo Nome="IN_EXTERIOR" Descricao="0 se Brasil 1 se Exterior" Tamanho="1" Tipo="N">0</Campo>
+        <Campo Nome="CD_PAIS" Descricao="Codigo do País" Tamanho="3" Tipo="N">000</Campo>
+        <Campo Nome="TX_BEM" Descricao="Descrição do bem" Tamanho="512" Tipo="C">Conta de Pagamento 99PAY</Campo>
+        <Campo Nome="VR_ANTER" Descricao="Valor em 31/12 do ano anterior" Tamanho="13" Tipo="N" Decimais="2">0000000038387</Campo>
+        <Campo Nome="VR_ATUAL" Descricao="Valor em 31/12 do ano calendário" Tamanho="13" Tipo="N" Decimais="2">0000000555177</Campo>
+        <Campo Nome="NR_BANCO" Descricao="Codigo do Banco" Tamanho="3" Tipo="N">000</Campo>
+        <Campo Nome="NR_AGENCIA" Descricao="Número da Agência Bancária" Tamanho="4" Tipo="N">0001</Campo>
+        <Campo Nome="NR_CONTA" Descricao="Número da conta bancária" Tamanho="20" Tipo="C">15199959</Campo>
+        <Campo Nome="NM_CPFCNPJ" Descricao="CNPJ da Instituição Financeira" Tamanho="14" Tipo="C">24313102000125</Campo>
+        <Campo Nome="IN_TIPO_BENEFIC" Descricao="T-Titular, D-Dependente" Tamanho="1" Tipo="C">T</Campo>
+        <Campo Nome="NR_CPF_BENEFIC" Descricao="CPF do beneficiário do bem" Tamanho="11" Tipo="C">15499258732</Campo>
+        <Campo Nome="CD_GRUPO_BEM" Descricao="Grupo do Bem" Tamanho="2" Tipo="C">61</Campo>
+        <Campo Nome="NR_CONTROLE" Descricao="Numero de Controle" Tamanho="10" Tipo="N">0000000001</Campo>
+    </Registro>'''
+    
+    def test_xml_processor_parse_real_xml(self, dbk_tool_no_backup, real_xml_record):
+        """Test that XMLProcessor correctly parses real XML from llm_pdf_tool."""
+        xml_processor = dbk_tool_no_backup.xml_processor
+        
+        parsed_result = xml_processor.parse_llm_xml_response(real_xml_record)
+        
+        # Should have one registro
+        assert len(parsed_result["registros"]) == 1
+        
+        # First registro should be an XML Element
+        registro = parsed_result["registros"][0]
+        assert hasattr(registro, 'tag')  # XML Element has tag attribute
+        assert registro.tag == "Registro"
+        
+        # Should have correct attributes
+        assert registro.get("Nome") == "REG_BEM"
+        assert registro.get("Identificador") == "27"
+        
+        # Should have campos
+        campos = registro.findall("Campo")
+        assert len(campos) > 0
+        
+        # Verify some specific campos
+        nr_reg_campo = next((c for c in campos if c.get("Nome") == "NR_REG"), None)
+        assert nr_reg_campo is not None
+        assert nr_reg_campo.text == "27"
+        
+        nr_cpf_campo = next((c for c in campos if c.get("Nome") == "NR_CPF"), None)
+        assert nr_cpf_campo is not None
+        assert nr_cpf_campo.text == "15499258732"
+    
+    def test_add_xml_record_extracts_correct_type(self, dbk_tool_no_backup, real_xml_record, temp_dir):
+        """Test that add_xml_record correctly extracts record type from XML."""
+        # Create a test DBK file
+        dbk_path = temp_dir / "test.dbk"
+        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+T9      000000000000000000010000000000000000000000000000001234567890"""
+        
+        with open(dbk_path, 'w', encoding='latin-1') as f:
+            f.write(content)
+        
+        # Test the add_xml_record operation
+        query = json.dumps({
+            "operation": "add_xml_record", 
+            "file_path": str(dbk_path), 
+            "xml_record": real_xml_record
+        })
+        
+        result = dbk_tool_no_backup._run(query)
+        result_data = json.loads(result)
+        
+        # Should be successful
+        assert result_data["success"] is True
+        
+        # Should extract correct record type (27, not "unknown")
+        added_record = result_data["data"]["added_record"]
+        assert added_record["type"] == "27"
+        assert added_record["type"] != "unknown"
+        
+        # Should have extracted field data correctly
+        extracted_data = added_record["data"]
+        assert "NR_REG" in extracted_data
+        assert extracted_data["NR_REG"] == "27"
+        assert "NR_CPF" in extracted_data
+        assert extracted_data["NR_CPF"] == "15499258732"
+    
+    def test_add_xml_record_with_different_record_types(self, dbk_tool_no_backup, temp_dir):
+        """Test add_xml_record with different record types."""
+        # Create a test DBK file
+        dbk_path = temp_dir / "test.dbk"
+        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+T9      000000000000000000010000000000000000000000000000001234567890"""
+        
+        with open(dbk_path, 'w', encoding='latin-1') as f:
+            f.write(content)
+        
+        # Test with different record types
+        test_cases = [
+            ("27", "REG_BEM"),
+            ("16", "REG_RENDPJ"),
+            ("21", "REG_RENDPF")
+        ]
+        
+        for identificador, nome in test_cases:
+            xml_record = f'''<Registro Nome="{nome}" Identificador="{identificador}">
+            <Campo Nome="NR_REG" Tipo="N">{identificador}</Campo>
+            <Campo Nome="NR_CPF" Tipo="C">15499258732</Campo>
+            </Registro>'''
+            
+            query = json.dumps({
+                "operation": "add_xml_record", 
+                "file_path": str(dbk_path), 
+                "xml_record": xml_record
+            })
+            
+            result = dbk_tool_no_backup._run(query)
+            result_data = json.loads(result)
+            
+            # Should be successful
+            assert result_data["success"] is True, f"Failed for record type {identificador}"
+            
+            # Should extract correct record type
+            added_record = result_data["data"]["added_record"]
+            assert added_record["type"] == identificador, f"Wrong type for {identificador}: got {added_record['type']}"
+    
+    def test_add_xml_record_invalid_xml(self, dbk_tool_no_backup, temp_dir):
+        """Test add_xml_record with invalid XML."""
+        # Create a test DBK file
+        dbk_path = temp_dir / "test.dbk"
+        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+T9      000000000000000000010000000000000000000000000000001234567890"""
+        
+        with open(dbk_path, 'w', encoding='latin-1') as f:
+            f.write(content)
+        
+        # Test with invalid XML
+        invalid_xml = "<Registro><Campo>Invalid</Campo>"  # Missing closing tag
+        
+        query = json.dumps({
+            "operation": "add_xml_record", 
+            "file_path": str(dbk_path), 
+            "xml_record": invalid_xml
+        })
+        
+        result = dbk_tool_no_backup._run(query)
+        result_data = json.loads(result)
+        
+        # Should fail gracefully
+        assert result_data["success"] is False
+        assert "error" in result_data
+    
+    def test_add_xml_record_no_identificador(self, dbk_tool_no_backup, temp_dir):
+        """Test add_xml_record with XML missing Identificador attribute."""
+        # Create a test DBK file
+        dbk_path = temp_dir / "test.dbk"
+        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+T9      000000000000000000010000000000000000000000000000001234567890"""
+        
+        with open(dbk_path, 'w', encoding='latin-1') as f:
+            f.write(content)
+        
+        # XML without Identificador attribute
+        xml_record = '''<Registro Nome="REG_BEM">
+        <Campo Nome="NR_REG" Tipo="N">27</Campo>
+        <Campo Nome="NR_CPF" Tipo="C">15499258732</Campo>
+        </Registro>'''
+        
+        query = json.dumps({
+            "operation": "add_xml_record", 
+            "file_path": str(dbk_path), 
+            "xml_record": xml_record
+        })
+        
+        result = dbk_tool_no_backup._run(query)
+        result_data = json.loads(result)
+        
+        # Should still work but type should be "unknown"
+        assert result_data["success"] is True
+        added_record = result_data["data"]["added_record"]
+        assert added_record["type"] == "unknown"
+
+
+class TestDbkToolFieldFormatting:
+    """Test specific formatting issues that cause blank fields."""
+    
+    @pytest.fixture
+    def dbk_tool_with_mock_xml_processor(self):
+        """Create DbkTool with mocked XMLProcessor that simulates the record_definitions structure."""
+        tool = DbkTool()
+        
+        # Mock XMLProcessor with record definitions in dict format (as it actually is)
+        mock_xml_processor = Mock()
+        mock_xml_processor.record_definitions = {
+            "REG_BEM": {
+                "identificador": "27",
+                "descricao": "Declaração de bens e direitos",
+                "campos": {  # NOTE: This is a DICT, not a list
+                    "NR_REG": {"tipo": "N", "tamanho": 2, "decimais": 0},
+                    "NR_CPF": {"tipo": "C", "tamanho": 11, "decimais": 0},
+                    "CD_BEM": {"tipo": "N", "tamanho": 2, "decimais": 0},
+                    "TX_BEM": {"tipo": "C", "tamanho": 512, "decimais": 0},
+                    "VR_ATUAL": {"tipo": "N", "tamanho": 13, "decimais": 2}
+                }
+            }
+        }
+        mock_xml_processor.format_field_value.return_value = "FORMATTED"
+        
+        tool.xml_processor = mock_xml_processor
+        tool.parser.xml_processor = mock_xml_processor
+        
+        return tool
+    
+    def test_format_record_line_with_dict_campos(self, dbk_tool_with_mock_xml_processor):
+        """Test that record formatting works correctly when campos is a dict (not list)."""
+        tool = dbk_tool_with_mock_xml_processor
+        
+        # Create test data that would normally cause the "'str' object has no attribute 'get'" error
+        test_data = {
+            "NR_REG": "27",
+            "NR_CPF": "15499258732",
+            "CD_BEM": "61",
+            "TX_BEM": "Conta de pagamento na 99PAY",
+            "VR_ATUAL": "0000000555177"
+        }
+        
+        record_definition = tool.xml_processor.record_definitions["REG_BEM"]
+        
+        # This should NOT raise "'str' object has no attribute 'get'" error
+        try:
+            result = tool.parser._format_record_line("27", test_data, record_definition)
+            assert result is not None
+            assert len(result) == 500  # Default DBK record length
+            assert result.startswith("27")  # Should start with record type
+            # Should not be just blank fields
+            assert result.strip() != "27" + " " * 480 + "0000000000"
+        except AttributeError as e:
+            if "'str' object has no attribute 'get'" in str(e):
+                pytest.fail(f"The old bug is still present: {e}")
+            else:
+                raise
+    
+    def test_create_record_generates_proper_fields(self, dbk_tool_with_mock_xml_processor):
+        """Test that created records have proper field data, not blank fields."""
+        tool = dbk_tool_with_mock_xml_processor
+        
+        test_data = {
+            "NR_REG": "27",
+            "NR_CPF": "15499258732", 
+            "CD_BEM": "61",
+            "TX_BEM": "Conta de pagamento na 99PAY",
+            "VR_ATUAL": "0000000555177"
+        }
+        
+        # Create a record
+        record = tool.parser.create_record("27", test_data)
+        
+        # Check that the record is valid
+        assert record is not None
+        assert record.record_type == "27"
+        assert record.is_valid is True
+        
+        # Check that the raw line has actual content, not just blank fields
+        assert record.raw_line is not None
+        assert len(record.raw_line) == 500
+        assert record.raw_line.startswith("27")
+        
+        # Most importantly: should NOT be just the record type followed by blanks
+        expected_blank_line = "27" + " " * 480 + "0000000000"
+        assert record.raw_line != expected_blank_line, f"Record line should have field data, not just blanks: {record.raw_line[:50]}..."
+    
+    def test_add_xml_record_field_formatting_end_to_end(self, dbk_tool_with_mock_xml_processor, temp_dir):
+        """End-to-end test that XML records are properly formatted with field data."""
+        tool = dbk_tool_with_mock_xml_processor
+        
+        # Create a test DBK file
+        test_file = temp_dir / "test.DBK"
+        test_file.write_text("IRPF    202520243500083749215832\n", encoding='latin-1')
+        
+        # Mock the XML processor parse method
+        mock_parsed_xml = {
+            'registros': [Mock()],  # ElementTree.Element mock
+            'uncertainty_points': [],
+            'llm_notes': []
+        }
+        
+        # Configure the mock XML element
+        xml_element = mock_parsed_xml['registros'][0]
+        xml_element.get.return_value = "27"  # Identificador
+        xml_element.findall.return_value = [
+            Mock(get=lambda attr: "NR_REG" if attr == "Nome" else None, text="27"),
+            Mock(get=lambda attr: "NR_CPF" if attr == "Nome" else None, text="15499258732"),
+            Mock(get=lambda attr: "CD_BEM" if attr == "Nome" else None, text="61"),
+        ]
+        
+        tool.xml_processor.parse_llm_xml_response.return_value = mock_parsed_xml
+        
+        # Test adding an XML record
+        test_input = json.dumps({
+            'operation': 'add_xml_record',
+            'file_path': str(test_file),
+            'xml_record': '<Registro Nome="REG_BEM" Identificador="27"><Campo Nome="NR_REG">27</Campo></Registro>'
+        })
+        
+        with patch('agent.tools.dbk_tool.DbkParser.create_backup'):
+            with patch('agent.tools.dbk_tool.DbkParser.get_output_path', return_value=str(test_file)):
+                result = tool._run(test_input)
+        
+        parsed_result = json.loads(result)
+        assert parsed_result.get('success') is True
+        
+        # Read the generated file and check it has proper content
+        generated_content = test_file.read_text(encoding='latin-1')
+        lines = generated_content.strip().split('\n')
+        
+        # Find the added record (should be second line)
+        added_record_line = None
+        for line in lines:
+            if line.startswith('27'):
+                added_record_line = line
+                break
+        
+        assert added_record_line is not None, "Should have added a record starting with '27'"
+        
+        # The record should NOT be just "27" followed by blanks and checksum
+        expected_blank_line_pattern = r'^27\s{480,490}\d{10}$'
+        assert not re.match(expected_blank_line_pattern, added_record_line), \
+            f"Record should have field data, not just blanks: {added_record_line[:50]}..."
+
+
+# ...existing code...
 if __name__ == "__main__":
     pytest.main([__file__])

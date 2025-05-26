@@ -586,15 +586,17 @@ class DbkTool(BaseTool):
             
             # Parse existing file
             parsed_data = self.parser.parse_dbk_file(Path(file_path))
-            
-            # Convert XML data to DbkRecord format and add to file
-            xml_data = parsed_xml['registros'][0]  # First record
-            record_type = xml_data.get('identificador', 'unknown')
+              # Convert XML data to DbkRecord format and add to file
+            xml_element = parsed_xml['registros'][0]  # First record (ElementTree element)
+            record_type = xml_element.get('Identificador', 'unknown')
             
             # Convert XML campos to data dict
             data = {}
-            for campo in xml_data.get('campos', []):
-                data[campo.get('nome', '')] = campo.get('valor', '')
+            for campo in xml_element.findall('Campo'):
+                campo_nome = campo.get('Nome', '')
+                campo_valor = campo.text or ''
+                if campo_nome:
+                    data[campo_nome] = campo_valor
             
             # Create new record
             new_record = self.parser.create_record(record_type, data)

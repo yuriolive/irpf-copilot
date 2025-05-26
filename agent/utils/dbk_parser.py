@@ -589,7 +589,6 @@ class DbkParser:
                 is_valid=False,
                 validation_errors=[f"Failed to create properly formatted record: {e}"]
             )
-    
     def _format_record_line(self, record_type: str, data: Dict[str, Any], record_definition: Dict[str, Any]) -> str:
         """Format a record line according to IRPF specifications."""
         try:
@@ -604,25 +603,49 @@ class DbkParser:
             
             # Format fields according to definition
             if 'campos' in record_definition:
-                for campo in record_definition['campos']:
-                    field_name = campo.get('nome', '')
-                    field_value = data.get(field_name, '')
-                    field_type = campo.get('tipo', 'C')
-                    field_size = int(campo.get('tamanho', 10))
-                    field_decimals = int(campo.get('decimais', 0))
-                    
-                    if self.xml_processor:
-                        formatted_value = self.xml_processor.format_field_value(
-                            field_value, field_type, field_size, field_decimals
-                        )
-                    else:
-                        # Simple formatting fallback
-                        if field_type == 'N':
-                            formatted_value = str(field_value).zfill(field_size)
+                campos = record_definition['campos']
+                # Handle both dict and list formats for campos
+                if isinstance(campos, dict):
+                    # campos is a dict {field_name: field_info}
+                    for field_name, campo in campos.items():
+                        field_value = data.get(field_name, '')
+                        field_type = campo.get('tipo', 'C')
+                        field_size = int(campo.get('tamanho', 10))
+                        field_decimals = int(campo.get('decimais', 0))
+                        
+                        if self.xml_processor:
+                            formatted_value = self.xml_processor.format_field_value(
+                                field_value, field_type, field_size, field_decimals
+                            )
                         else:
-                            formatted_value = str(field_value).ljust(field_size)[:field_size]
-                    
-                    line_parts.append(formatted_value)
+                            # Simple formatting fallback
+                            if field_type == 'N':
+                                formatted_value = str(field_value).zfill(field_size)
+                            else:
+                                formatted_value = str(field_value).ljust(field_size)[:field_size]
+                        
+                        line_parts.append(formatted_value)
+                else:
+                    # campos is a list [campo_info, ...]
+                    for campo in campos:
+                        field_name = campo.get('nome', '')
+                        field_value = data.get(field_name, '')
+                        field_type = campo.get('tipo', 'C')
+                        field_size = int(campo.get('tamanho', 10))
+                        field_decimals = int(campo.get('decimais', 0))
+                        
+                        if self.xml_processor:
+                            formatted_value = self.xml_processor.format_field_value(
+                                field_value, field_type, field_size, field_decimals
+                            )
+                        else:
+                            # Simple formatting fallback
+                            if field_type == 'N':
+                                formatted_value = str(field_value).zfill(field_size)
+                            else:
+                                formatted_value = str(field_value).ljust(field_size)[:field_size]
+                        
+                        line_parts.append(formatted_value)
             
             # Join parts and pad to correct length
             line = ''.join(line_parts)
