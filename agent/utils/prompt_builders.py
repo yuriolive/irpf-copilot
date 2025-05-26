@@ -13,6 +13,11 @@ class PromptBuilder:
     ) -> str:
         """Create an intelligent XML extraction prompt for IRPF documents."""
         
+        order_instruction = """
+        IMPORTANTE: Ao gerar o XML para cada registro, os campos (<Campo>) DEVEM seguir rigorosamente a ORDEM apresentada nos exemplos abaixo.
+        Não altere a sequência dos campos dentro de um <Registro>.
+        """
+
         reg_rendpj_example = """
         <Registro Nome="REG_RENDPJ" Identificador="21" Descricao="Rendimentos Recebidos de PJ pelo Titular">
             <Campo Nome="NR_REG" Descricao="Tipo do registro - '21'" Tamanho="2" Tipo="N">21</Campo>
@@ -101,6 +106,8 @@ class PromptBuilder:
         {context_block}
 
         **TEMPLATES DE REGISTROS:**
+        {order_instruction}
+
         {reg_rendpj_example}
         {reg_bem_example}
         {reg_rend_isento_detalhe_example}
