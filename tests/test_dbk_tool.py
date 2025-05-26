@@ -480,7 +480,7 @@ class TestDbkToolXMLProcessing:
         """Real XML record that matches the format from llm_pdf_tool."""
         return '''<Registro Nome="REG_BEM" Identificador="27" Descricao="declaracao de bens e direitos">
         <Campo Nome="NR_REG" Descricao="Tipo do registro" Tamanho="2" Tipo="N">27</Campo>
-        <Campo Nome="NR_CPF" Descricao="CPF contribuinte" Tamanho="11" Tipo="C">15499258732</Campo>
+        <Campo Nome="NR_CPF" Descricao="CPF contribuinte" Tamanho="11" Tipo="C">38534819149</Campo>
         <Campo Nome="CD_BEM" Descricao="Tipo do bem ou direito" Tamanho="2" Tipo="N">61</Campo>
         <Campo Nome="IN_EXTERIOR" Descricao="0 se Brasil 1 se Exterior" Tamanho="1" Tipo="N">0</Campo>
         <Campo Nome="CD_PAIS" Descricao="Codigo do País" Tamanho="3" Tipo="N">000</Campo>
@@ -492,7 +492,7 @@ class TestDbkToolXMLProcessing:
         <Campo Nome="NR_CONTA" Descricao="Número da conta bancária" Tamanho="20" Tipo="C">15199959</Campo>
         <Campo Nome="NM_CPFCNPJ" Descricao="CNPJ da Instituição Financeira" Tamanho="14" Tipo="C">24313102000125</Campo>
         <Campo Nome="IN_TIPO_BENEFIC" Descricao="T-Titular, D-Dependente" Tamanho="1" Tipo="C">T</Campo>
-        <Campo Nome="NR_CPF_BENEFIC" Descricao="CPF do beneficiário do bem" Tamanho="11" Tipo="C">15499258732</Campo>
+        <Campo Nome="NR_CPF_BENEFIC" Descricao="CPF do beneficiário do bem" Tamanho="11" Tipo="C">38534819149</Campo>
         <Campo Nome="CD_GRUPO_BEM" Descricao="Grupo do Bem" Tamanho="2" Tipo="C">61</Campo>
         <Campo Nome="NR_CONTROLE" Descricao="Numero de Controle" Tamanho="10" Tipo="N">0000000001</Campo>
     </Registro>'''
@@ -526,13 +526,13 @@ class TestDbkToolXMLProcessing:
         
         nr_cpf_campo = next((c for c in campos if c.get("Nome") == "NR_CPF"), None)
         assert nr_cpf_campo is not None
-        assert nr_cpf_campo.text == "15499258732"
+        assert nr_cpf_campo.text == "38534819149"
     
     def test_add_xml_record_extracts_correct_type(self, dbk_tool_no_backup, real_xml_record, temp_dir):
         """Test that add_xml_record correctly extracts record type from XML."""
         # Create a test DBK file
         dbk_path = temp_dir / "test.dbk"
-        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+        content = """IRPF    20252024385348191491TESTE DA SILVA                     010119901234567890
 T9      000000000000000000010000000000000000000000000000001234567890"""
         
         with open(dbk_path, 'w', encoding='latin-1') as f:
@@ -561,13 +561,13 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         assert "NR_REG" in extracted_data
         assert extracted_data["NR_REG"] == "27"
         assert "NR_CPF" in extracted_data
-        assert extracted_data["NR_CPF"] == "15499258732"
+        assert extracted_data["NR_CPF"] == "38534819149"
     
     def test_add_xml_record_with_different_record_types(self, dbk_tool_no_backup, temp_dir):
         """Test add_xml_record with different record types."""
         # Create a test DBK file
         dbk_path = temp_dir / "test.dbk"
-        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+        content = """IRPF    20252024385348191491TESTE DA SILVA                     010119901234567890
 T9      000000000000000000010000000000000000000000000000001234567890"""
         
         with open(dbk_path, 'w', encoding='latin-1') as f:
@@ -583,7 +583,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         for identificador, nome in test_cases:
             xml_record = f'''<Registro Nome="{nome}" Identificador="{identificador}">
             <Campo Nome="NR_REG" Tipo="N">{identificador}</Campo>
-            <Campo Nome="NR_CPF" Tipo="C">15499258732</Campo>
+            <Campo Nome="NR_CPF" Tipo="C">38534819149</Campo>
             </Registro>'''
             
             query = json.dumps({
@@ -606,7 +606,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         """Test add_xml_record with invalid XML."""
         # Create a test DBK file
         dbk_path = temp_dir / "test.dbk"
-        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+        content = """IRPF    20252024385348191491TESTE DA SILVA                     010119901234567890
 T9      000000000000000000010000000000000000000000000000001234567890"""
         
         with open(dbk_path, 'w', encoding='latin-1') as f:
@@ -632,7 +632,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         """Test add_xml_record with XML missing Identificador attribute."""
         # Create a test DBK file
         dbk_path = temp_dir / "test.dbk"
-        content = """IRPF    20252024154992587321TESTE DA SILVA                     010119901234567890
+        content = """IRPF    20252024385348191491TESTE DA SILVA                     010119901234567890
 T9      000000000000000000010000000000000000000000000000001234567890"""
         
         with open(dbk_path, 'w', encoding='latin-1') as f:
@@ -641,7 +641,7 @@ T9      000000000000000000010000000000000000000000000000001234567890"""
         # XML without Identificador attribute
         xml_record = '''<Registro Nome="REG_BEM">
         <Campo Nome="NR_REG" Tipo="N">27</Campo>
-        <Campo Nome="NR_CPF" Tipo="C">15499258732</Campo>
+        <Campo Nome="NR_CPF" Tipo="C">38534819149</Campo>
         </Registro>'''
         
         query = json.dumps({
@@ -696,7 +696,7 @@ class TestDbkToolFieldFormatting:
         # Create test data that would normally cause the "'str' object has no attribute 'get'" error
         test_data = {
             "NR_REG": "27",
-            "NR_CPF": "15499258732",
+            "NR_CPF": "38534819149",
             "CD_BEM": "61",
             "TX_BEM": "Conta de pagamento na 99PAY",
             "VR_ATUAL": "0000000555177"
@@ -724,7 +724,7 @@ class TestDbkToolFieldFormatting:
         
         test_data = {
             "NR_REG": "27",
-            "NR_CPF": "15499258732", 
+            "NR_CPF": "38534819149", 
             "CD_BEM": "61",
             "TX_BEM": "Conta de pagamento na 99PAY",
             "VR_ATUAL": "0000000555177"
@@ -761,15 +761,24 @@ class TestDbkToolFieldFormatting:
             'uncertainty_points': [],
             'llm_notes': []
         }
-        
-        # Configure the mock XML element
+          # Configure the mock XML element
         xml_element = mock_parsed_xml['registros'][0]
         xml_element.get.return_value = "27"  # Identificador
-        xml_element.findall.return_value = [
-            Mock(get=lambda attr: "NR_REG" if attr == "Nome" else None, text="27"),
-            Mock(get=lambda attr: "NR_CPF" if attr == "Nome" else None, text="15499258732"),
-            Mock(get=lambda attr: "CD_BEM" if attr == "Nome" else None, text="61"),
-        ]
+        
+        # Create properly mocked campo elements with correct get() behavior
+        campo_nr_reg = Mock()
+        campo_nr_reg.get.side_effect = lambda attr, default='': "NR_REG" if attr == "Nome" else default
+        campo_nr_reg.text = "27"
+        
+        campo_nr_cpf = Mock()
+        campo_nr_cpf.get.side_effect = lambda attr, default='': "NR_CPF" if attr == "Nome" else default
+        campo_nr_cpf.text = "38534819149"
+        
+        campo_cd_bem = Mock()
+        campo_cd_bem.get.side_effect = lambda attr, default='': "CD_BEM" if attr == "Nome" else default
+        campo_cd_bem.text = "61"
+        
+        xml_element.findall.return_value = [campo_nr_reg, campo_nr_cpf, campo_cd_bem]
         
         tool.xml_processor.parse_llm_xml_response.return_value = mock_parsed_xml
         

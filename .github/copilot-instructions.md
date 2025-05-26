@@ -372,7 +372,7 @@ T9      000000001...totais...5678901234                 # Trailer
 run_tests.bat basic          # Testes básicos
 run_tests.bat all            # Todos os testes com cobertura
 run_tests.bat dbk_tool       # Testes específicos do DBK tool
-run_tests.bat custom test_dbk_parsing  # Teste específico
+run_tests.bat custom dbk_parsing  # Teste específico
 run_tests.bat help           # Ver todas as opções
 
 # Linux/macOS - Usar SEMPRE o Makefile

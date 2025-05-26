@@ -583,20 +583,36 @@ class DbkTool(BaseTool):
             if self.auto_backup:
                 backup_path = self.parser.create_backup(file_path)
                 logger.info(f"Backup criado: {backup_path}")
-            
-            # Parse existing file
+              # Parse existing file
             parsed_data = self.parser.parse_dbk_file(Path(file_path))
-              # Convert XML data to DbkRecord format and add to file
-            xml_element = parsed_xml['registros'][0]  # First record (ElementTree element)
-            record_type = xml_element.get('Identificador', 'unknown')
             
-            # Convert XML campos to data dict
-            data = {}
-            for campo in xml_element.findall('Campo'):
-                campo_nome = campo.get('Nome', '')
-                campo_valor = campo.text or ''
-                if campo_nome:
-                    data[campo_nome] = campo_valor
+            # Convert XML data to DbkRecord format and add to file
+            xml_element = parsed_xml['registros'][0]  # First record (ElementTree element or dict)
+            
+            # Handle both ElementTree.Element and dict formats for backward compatibility
+            if hasattr(xml_element, 'get') and hasattr(xml_element, 'findall'):
+                # ElementTree.Element format (real XML parsing)
+                record_type = xml_element.get('Identificador', 'unknown')
+                
+                # Convert XML campos to data dict
+                data = {}
+                for campo in xml_element.findall('Campo'):
+                    campo_nome = campo.get('Nome', '')
+                    campo_valor = campo.text or ''
+                    if campo_nome:
+                        data[campo_nome] = campo_valor
+            else:
+                # Dict format (mocked or legacy format)
+                record_type = xml_element.get('identificador', 'unknown')
+                
+                # Convert dict campos to data dict
+                data = {}
+                campos = xml_element.get('campos', [])
+                for campo in campos:
+                    campo_nome = campo.get('nome', '')
+                    campo_valor = campo.get('valor', '')
+                    if campo_nome:
+                        data[campo_nome] = campo_valor
             
             # Create new record
             new_record = self.parser.create_record(record_type, data)
