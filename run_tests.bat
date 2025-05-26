@@ -10,7 +10,7 @@ if "%1"=="" (
     set COMMAND=%1
 )
 
-echo 🤖 AI Agent IRPF - Test Runner (Windows)
+echo AI Agent IRPF - Test Runner (Windows)
 echo ==================================================
 
 if "%COMMAND%"=="help" goto :help
@@ -44,42 +44,42 @@ echo   python run_tests.py check
 goto :end
 
 :basic
-echo 🧪 Running basic tests...
-python run_tests.py basic
+echo Running basic tests...
+python -X utf8 run_tests.py basic
 goto :end
 
 :unit
-echo 🧪 Running unit tests...
-python run_tests.py unit
+echo Running unit tests...
+python -X utf8 run_tests.py unit
 goto :end
 
 :integration
-echo 🧪 Running integration tests...
-python run_tests.py integration
+echo Running integration tests...
+python -X utf8 run_tests.py integration
 goto :end
 
 :all
-echo 🧪 Running all tests with coverage...
-python run_tests.py all
+echo Running all tests with coverage...
+python -X utf8 run_tests.py all
 goto :end
 
 :fast
-echo 🧪 Running fast tests...
-python run_tests.py fast
+echo Running fast tests...
+python -X utf8 run_tests.py fast
 goto :end
 
 :standalone
-echo 🧪 Running standalone tests...
-python run_tests.py standalone
+echo Running standalone tests...
+python -X utf8 run_tests.py standalone
 goto :end
 
 :check
-echo 🔍 Checking environment...
-python run_tests.py check
+echo Checking environment...
+python -X utf8 run_tests.py check
 goto :end
 
 :clean
-echo 🧹 Cleaning up test artifacts...
+echo Cleaning up test artifacts...
 if exist .pytest_cache rmdir /s /q .pytest_cache
 if exist htmlcov rmdir /s /q htmlcov
 if exist .coverage del .coverage
