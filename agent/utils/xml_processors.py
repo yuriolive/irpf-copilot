@@ -76,6 +76,7 @@ class XMLProcessor:
             logger.error(f"Error loading mapeamentoTxt.xml: {e}", exc_info=True)
         
         return definitions
+
     def parse_llm_xml_response(self, xml_response_str: str) -> Dict[str, Any]:
         """Parse LLM XML response and extract records with uncertainty points."""
         parsed_result = {"registros": [], "uncertainty_points": [], "llm_notes": []}
@@ -134,6 +135,7 @@ class XMLProcessor:
             logger.error(f"Unexpected error parsing LLM XML response: {e}. Raw response preview: {xml_response_str[:200]}", exc_info=True)
         
         return parsed_result
+
     def format_field_value(self, value: Any, tipo: str, tamanho: int, decimais: int = 0) -> str:
         """Format field value according to IRPF specifications."""
         s_value = str(value if value is not None else "")
@@ -281,5 +283,5 @@ class XMLProcessor:
                 },
                 "fields": record_info["campos"]
             }
-        
+
         return details

@@ -668,19 +668,33 @@ class DbkTool(BaseTool):
                 try:
                     # Parse XML record
                     parsed_xml = self.xml_processor.parse_llm_xml_response(xml_record)
-                    
                     if parsed_xml.get('registros'):
                         registro_element = parsed_xml['registros'][0]  # First record element
                         
-                        # Extract record name and attributes from XML element
-                        record_name = registro_element.get('Nome', 'unknown')
-                        
-                        # Convert element attributes to data dict
-                        data = dict(registro_element.attrib)
-                        
-                        # Remove 'Nome' from data as it's used for record identification
-                        if 'Nome' in data:
-                            del data['Nome']
+                        # Check if it's an XML Element or dict
+                        if hasattr(registro_element, 'attrib'):
+                            # It's an XML Element
+                            record_name = registro_element.get('Nome', 'unknown')
+                            data = dict(registro_element.attrib)
+                            
+                            # Remove 'Nome' from data as it's used for record identification
+                            if 'Nome' in data:
+                                del data['Nome']
+                                
+                            # Also extract field values from child elements
+                            for campo in registro_element.findall('Campo'):
+                                campo_nome = campo.get('Nome')
+                                campo_valor = campo.text or ''
+                                if campo_nome:
+                                    data[campo_nome] = campo_valor
+                        else:
+                            # It's already a dict (fallback case)
+                            record_name = registro_element.get('Nome', 'unknown')
+                            data = dict(registro_element)
+                            
+                            # Remove 'Nome' from data as it's used for record identification
+                            if 'Nome' in data:
+                                del data['Nome']
                         
                         # Create new record using record_name (e.g., "REG_BEM" -> "27")
                         if record_name in self.xml_processor.record_definitions:
