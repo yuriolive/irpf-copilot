@@ -261,7 +261,8 @@ def check_environment():
 
 def main():
     """Main function to handle command line arguments."""
-    parser = argparse.ArgumentParser(description="Test runner for AI Agent IRPF")    parser.add_argument(
+    parser = argparse.ArgumentParser(description="Test runner for AI Agent IRPF")
+    parser.add_argument(
         "command", 
         nargs="?", 
         choices=["basic", "unit", "integration", "all", "fast", "standalone", "check", "dbk_tool", "help"],
@@ -282,7 +283,7 @@ def main():
     
     print("🤖 AI Agent IRPF - Test Runner")
     print("=" * 50)
-      if args.command == "help" or (not args.command and not args.test and not args.list):
+    if args.command == "help" or (not args.command and not args.test and not args.list):
         print("\nAvailable commands:")
         print("  basic       - Run basic functionality tests")
         print("  unit        - Run unit tests only")
@@ -296,7 +297,8 @@ def main():
         print("\nOptions:")
         print("  --test PATH - Run specific test file or function")
         print("  --list      - List available tests")
-        print("\nExamples:")        print("  python run_tests.py basic")
+        print("\nExamples:")
+        print("  python run_tests.py basic")
         print("  python run_tests.py all")
         print("  python run_tests.py dbk_tool")
         print("  python run_tests.py --test tests/test_basic.py")
@@ -329,7 +331,8 @@ def main():
     elif args.command == "all":
         success = run_all_tests()
     elif args.command == "fast":
-        success = run_fast_tests()    elif args.command == "standalone":
+        success = run_fast_tests()
+    elif args.command == "standalone":
         success = run_standalone_tests()
     elif args.command == "check":
         success = check_environment()
