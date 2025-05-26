@@ -257,9 +257,8 @@ def test_pdf_extraction():
             
         # Prepare query
         query = json.dumps({
-            "operation": "extract_data",
-            "file_path": str(test_file),
-            "document_type": "auto"
+            "operation": "extract_to_xml",
+            "file_path": str(test_file)
         })
         
         # Process file
@@ -269,32 +268,35 @@ def test_pdf_extraction():
         # Parse result
         parsed = json.loads(result)
         if parsed.get("success"):
-            print(f"✅ Extraction successful using {parsed.get('method')}")
+            print(f"✅ Extraction successful")
             
-            # Get document type from extracted data
-            extracted_data = parsed.get("extracted_data", {})
-            document_type = extracted_data.get("document_type") or extracted_data.get("institution_detected") or "Unknown"
-            confidence = parsed.get("confidence", 0.0)
+            # Show extracted information
+            file_path = parsed.get("file_path", "Unknown")
+            cpf = parsed.get("cpf_declarante_irpf", "Unknown")
+            ano = parsed.get("ano_calendario", "Unknown")
+            record_count = parsed.get("record_count", 0)
             
-            print(f"✅ Document type identified: {document_type}")
-            print(f"✅ Confidence level: {confidence:.2f}")
+            print(f"✅ File processed: {Path(file_path).name}")
+            print(f"✅ CPF declarante: {cpf}")
+            print(f"✅ Ano calendário: {ano}")
+            print(f"✅ XML records generated: {record_count}")
             
-            # Check for structured data
-            if extracted_data:
-                print("✅ Structured data extracted successfully")
-                # Print a sample of keys
-                keys = list(extracted_data.keys())[:5]
-                print(f"   Data keys: {', '.join(keys)}...")
-                
-                # Show some specific financial data if available
-                if extracted_data.get("financial_data"):
-                    print("   💰 Financial data detected")
-                if extracted_data.get("taxpayer_info"):
-                    print("   👤 Taxpayer info detected")
-                if extracted_data.get("irpf_mapping"):
-                    print("   📋 IRPF mapping suggestions available")
+            # Check for XML records
+            xml_records = parsed.get("xml_records", [])
+            if xml_records:
+                print("✅ XML records extracted successfully")
+                print(f"   Records: {len(xml_records)} found")
             else:
-                print("⚠️  No structured data extracted")
+                print("⚠️  No XML records extracted")
+            
+            # Check for uncertainty points and notes
+            uncertainty_points = parsed.get("uncertainty_points", [])
+            llm_notes = parsed.get("llm_notes", [])
+            
+            if uncertainty_points:
+                print(f"⚠️  LLM reported {len(uncertainty_points)} uncertainty points")
+            if llm_notes:
+                print(f"ℹ️  LLM provided {len(llm_notes)} notes")
                 
             return True
         else:
