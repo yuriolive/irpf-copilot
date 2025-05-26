@@ -16,16 +16,34 @@ def run_command(cmd, description="Running command"):
     print(f"   Command: {' '.join(cmd)}")
     
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        # Use utf-8 encoding and handle errors gracefully
+        result = subprocess.run(
+            cmd, 
+            capture_output=True, 
+            text=True, 
+            check=True,
+            encoding='utf-8',
+            errors='replace'  # Replace invalid characters instead of failing
+        )
         print(f"✅ {description} - Success")
         if result.stdout:
             print(f"   Output: {result.stdout}")
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ {description} - Failed")
-        print(f"   Error: {e.stderr}")
+        if e.stderr:
+            # Handle encoding errors in stderr
+            try:
+                error_msg = e.stderr
+            except UnicodeDecodeError:
+                error_msg = str(e.stderr.encode('utf-8', errors='replace').decode('utf-8'))
+            print(f"   Error: {error_msg}")
         if e.stdout:
-            print(f"   Output: {e.stdout}")
+            try:
+                output_msg = e.stdout
+            except UnicodeDecodeError:
+                output_msg = str(e.stdout.encode('utf-8', errors='replace').decode('utf-8'))
+            print(f"   Output: {output_msg}")
         return False
     except FileNotFoundError:
         print(f"❌ {description} - Command not found")
@@ -113,8 +131,43 @@ def run_specific_test(test_path):
     print(f"\n🧪 Running Specific Test: {test_path}")
     print("=" * 50)
     
-    cmd = [sys.executable, "-m", "pytest", test_path, "-v"]
-    return run_command(cmd, f"Running {test_path}")
+    # Add environment variable to ensure UTF-8 encoding
+    env = os.environ.copy()
+    env['PYTHONIOENCODING'] = 'utf-8'
+    
+    cmd = [sys.executable, "-m", "pytest", test_path, "-v", "--tb=short"]
+    return run_command_with_env(cmd, f"Running {test_path}", env)
+
+def run_command_with_env(cmd, description, env):
+    """Run a command with custom environment and return its result."""
+    print(f"🔄 {description}")
+    print(f"   Command: {' '.join(cmd)}")
+    
+    try:
+        # Use utf-8 encoding and handle errors gracefully
+        result = subprocess.run(
+            cmd, 
+            capture_output=True, 
+            text=True, 
+            check=True,
+            encoding='utf-8',
+            errors='replace',
+            env=env
+        )
+        print(f"✅ {description} - Success")
+        if result.stdout:
+            print(f"   Output: {result.stdout}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ {description} - Failed")
+        if e.stderr:
+            print(f"   Error: {e.stderr}")
+        if e.stdout:
+            print(f"   Output: {e.stdout}")
+        return False
+    except FileNotFoundError:
+        print(f"❌ {description} - Command not found")
+        return False
 
 def run_standalone_tests():
     """Run standalone test functions (backward compatibility)."""
@@ -138,6 +191,26 @@ def run_standalone_tests():
             print(f"⚠️ Test file {test_file} not found")
     
     return success
+
+def run_dbk_tool_tests():
+    """Run DBK tool tests specifically with proper encoding."""
+    print("\n🧪 Running DBK Tool Tests")
+    print("=" * 50)
+    
+    # Set environment for proper encoding
+    env = os.environ.copy()
+    env['PYTHONIOENCODING'] = 'utf-8'
+    env['PYTHONUTF8'] = '1'
+    
+    cmd = [
+        sys.executable, "-m", "pytest", 
+        "tests/test_dbk_tool.py", 
+        "-v", 
+        "--tb=short",
+        "--capture=no",  # Don't capture output to avoid encoding issues
+        "-x"  # Stop on first failure
+    ]
+    return run_command_with_env(cmd, "Running DBK tool tests", env)
 
 def check_environment():
     """Check if the environment is set up correctly."""
@@ -188,11 +261,10 @@ def check_environment():
 
 def main():
     """Main function to handle command line arguments."""
-    parser = argparse.ArgumentParser(description="Test runner for AI Agent IRPF")
-    parser.add_argument(
+    parser = argparse.ArgumentParser(description="Test runner for AI Agent IRPF")    parser.add_argument(
         "command", 
         nargs="?", 
-        choices=["basic", "unit", "integration", "all", "fast", "standalone", "check", "help"],
+        choices=["basic", "unit", "integration", "all", "fast", "standalone", "check", "dbk_tool", "help"],
         default="basic",
         help="Type of tests to run"
     )
@@ -210,8 +282,7 @@ def main():
     
     print("🤖 AI Agent IRPF - Test Runner")
     print("=" * 50)
-    
-    if args.command == "help" or (not args.command and not args.test and not args.list):
+      if args.command == "help" or (not args.command and not args.test and not args.list):
         print("\nAvailable commands:")
         print("  basic       - Run basic functionality tests")
         print("  unit        - Run unit tests only")
@@ -220,13 +291,14 @@ def main():
         print("  fast        - Run tests excluding slow ones")
         print("  standalone  - Run standalone test functions")
         print("  check       - Check environment setup")
+        print("  dbk_tool    - Run DBK tool tests specifically")
         print("  help        - Show this help message")
         print("\nOptions:")
         print("  --test PATH - Run specific test file or function")
         print("  --list      - List available tests")
-        print("\nExamples:")
-        print("  python run_tests.py basic")
+        print("\nExamples:")        print("  python run_tests.py basic")
         print("  python run_tests.py all")
+        print("  python run_tests.py dbk_tool")
         print("  python run_tests.py --test tests/test_basic.py")
         print("  python run_tests.py --test tests/test_basic.py::TestChecksumFunctions::test_checksum_calculation")
         return 0
@@ -257,11 +329,12 @@ def main():
     elif args.command == "all":
         success = run_all_tests()
     elif args.command == "fast":
-        success = run_fast_tests()
-    elif args.command == "standalone":
+        success = run_fast_tests()    elif args.command == "standalone":
         success = run_standalone_tests()
     elif args.command == "check":
         success = check_environment()
+    elif args.command == "dbk_tool":
+        success = run_dbk_tool_tests()
     
     if success:
         print("\n✅ All tests completed successfully!")

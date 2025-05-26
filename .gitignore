@@ -63,3 +63,4 @@ logs/
 htmlcov/
 .pytest_cache/
 .history/
+coverage.xml

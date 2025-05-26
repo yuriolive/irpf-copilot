@@ -1,12 +1,11 @@
 # Makefile for AI Agent IRPF project
-.PHONY: help test test-basic test-unit test-integration test-all test-fast test-standalone test-check install-deps clean
+.PHONY: help test test-basic test-unit test-integration test-all test-fast test-standalone test-check test-custom install-deps clean
 
 # Default target
 help:
 	@echo "🤖 AI Agent IRPF - Available Commands"
 	@echo "=================================="
-	@echo ""
-	@echo "Testing:"
+	@echo ""	@echo "Testing:"
 	@echo "  test             - Run basic tests (default)"
 	@echo "  test-basic       - Run basic functionality tests"
 	@echo "  test-unit        - Run unit tests only"
@@ -15,16 +14,17 @@ help:
 	@echo "  test-fast        - Run tests excluding slow ones"
 	@echo "  test-standalone  - Run standalone test functions"
 	@echo "  test-check       - Check environment setup"
+	@echo "  test-custom      - Run custom test file (usage: make test-custom TEST=test_name)"
 	@echo ""
 	@echo "Development:"
 	@echo "  install-deps     - Install development dependencies"
 	@echo "  clean           - Clean up test artifacts"
 	@echo "  format          - Format code with black"
 	@echo "  lint            - Run code linting"
-	@echo ""
-	@echo "Examples:"
+	@echo ""	@echo "Examples:"
 	@echo "  make test                    # Run basic tests"
 	@echo "  make test-all                # Run all tests with coverage"
+	@echo "  make test-custom TEST=dbk_tool # Run specific test file"
 	@echo "  python run_tests.py --help   # See more options"
 
 # Test targets
@@ -58,6 +58,19 @@ test-check:
 	@echo "🔍 Checking environment..."
 	python run_tests.py check
 
+test-custom:
+	@if [ -z "$(TEST)" ]; then \
+		echo "❌ Error: Please specify a test file name."; \
+		echo "Usage: make test-custom TEST=test_name"; \
+		echo "Examples:"; \
+		echo "  make test-custom TEST=dbk_tool"; \
+		echo "  make test-custom TEST=basic"; \
+		echo "  make test-custom TEST=agent"; \
+		exit 1; \
+	fi
+	@echo "🧪 Running custom test: $(TEST)"
+	python run_tests.py --test tests/test_$(TEST).py
+
 # Development targets
 install-deps:
 	@echo "📦 Installing dependencies..."
@@ -89,6 +102,10 @@ test-checksum:
 test-dbk:
 	@echo "🧪 Testing DBK parsing..."
 	python run_tests.py --test tests/test_dbk_parsing.py
+
+test-dbk-tool:
+	@echo "🧪 Testing DBK tool functionality..."
+	python run_tests.py --test tests/test_dbk_tool.py
 
 test-agent:
 	@echo "🧪 Testing agent functionality..."

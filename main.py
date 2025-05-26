@@ -5,6 +5,7 @@ Provides an interactive CLI interface for manipulating DBK files.
 
 import os
 import sys
+import atexit
 from pathlib import Path
 from dotenv import load_dotenv
 from rich.console import Console
@@ -183,9 +184,7 @@ def setup_readline():
             logger.info(f"Saved {history_length} command history entries")
         except Exception as e:
             logger.warning(f"Failed to save command history: {e}")
-    
     # Register exit function
-    import atexit
     atexit.register(save_history)
     
     # Set tab completion if available
@@ -321,19 +320,28 @@ def display_agent_response(output: str, force_markdown: bool = False, is_error: 
                 return
             else:
                 # Fallback to regular print if markdown display fails
+                title_color = "red" if is_error else "blue"
+                title_icon = "❌" if is_error else "🤖"
+                console.print(f"\n[bold {title_color}]{title_icon} {'Erro do Agente' if is_error else 'Resposta do Agente'}:[/bold {title_color}]")
                 if is_error:
                     console.print(f"[red]{output}[/red]")
                 else:
                     console.print(output)
         else:
-            # Regular text output with error styling if needed
+            # Regular text output with proper header and styling
+            title_color = "red" if is_error else "blue"
+            title_icon = "❌" if is_error else "🤖"
+            console.print(f"\n[bold {title_color}]{title_icon} {'Erro do Agente' if is_error else 'Resposta do Agente'}:[/bold {title_color}]")
             if is_error:
                 console.print(f"[red]{output}[/red]")
             else:
                 console.print(output)
     except Exception as e:
         logger.warning(f"Error formatting response as markdown: {e}")
-        # Fallback to regular print
+        # Fallback to regular print with header
+        title_color = "red" if is_error else "blue"
+        title_icon = "❌" if is_error else "🤖"
+        console.print(f"\n[bold {title_color}]{title_icon} {'Erro do Agente' if is_error else 'Resposta do Agente'}:[/bold {title_color}]")
         if is_error:
             console.print(f"[red]{output}[/red]")
         else:
@@ -660,13 +668,11 @@ def main():
                 # Handle special commands
                 if handle_special_commands(user_input):
                     continue
-                
                 # Process with agent
-                console.print("\n[bold blue]Agente:[/bold blue] ", end="")
-                
                 with console.status("[blue]Processando...[/blue]"):
                     response = agent.ask(user_input)
-                  # Display response with enhanced markdown formatting
+                
+                # Display response with enhanced markdown formatting
                 if response.get('success', False):
                     output = response.get('answer', 'Resposta não disponível.')
                     display_response(output, "agent")

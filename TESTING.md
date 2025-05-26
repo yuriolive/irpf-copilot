@@ -102,6 +102,7 @@ run_tests.bat all
 run_tests.bat unit          # Unit tests only
 run_tests.bat integration   # Integration tests only
 run_tests.bat fast          # Fast tests (exclude slow)
+run_tests.bat custom test_name # Run specific test file
 run_tests.bat check         # Environment check
 run_tests.bat clean         # Clean artifacts
 ```
@@ -121,6 +122,7 @@ make test-all
 make test-unit              # Unit tests only
 make test-integration       # Integration tests only
 make test-fast              # Fast tests
+make test-custom TEST=name  # Run specific test file
 make test-check             # Environment check
 make clean                  # Clean artifacts
 ```
@@ -608,6 +610,7 @@ run_tests.bat all           # All tests + coverage
 run_tests.bat unit          # Unit tests only
 run_tests.bat integration   # Integration tests only
 run_tests.bat fast          # Fast tests
+run_tests.bat custom test_name # Run specific test (e.g., dbk_tool)
 run_tests.bat check         # Environment check
 run_tests.bat clean         # Clean artifacts
 
@@ -623,6 +626,7 @@ make test-all              # All tests + coverage
 make test-unit             # Unit tests only
 make test-integration      # Integration tests only
 make test-fast             # Fast tests
+make test-custom TEST=name # Run specific test (e.g., TEST=dbk_tool)
 make test-check            # Environment check
 make clean                 # Clean artifacts
 

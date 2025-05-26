@@ -46,6 +46,7 @@ class DbkTool(BaseTool):
     description: str = """Ferramenta completa para manipulação de arquivos DBK do IRPF.
     
     Utiliza mapeamentoTxt.xml para parsing e geração precisa de registros DBK.
+    INTEGRAÇÃO PERFEITA com llm_pdf_tool - aceita XML diretamente!
     
     Operações disponíveis:
     1. read_dbk - Ler e analisar arquivo DBK completo
@@ -54,9 +55,11 @@ class DbkTool(BaseTool):
     4. list_records - Listar todos os registros com resumo
     5. get_record - Obter detalhes de registro específico por índice/tipo
     6. update_record - Atualizar dados de registro existente
-    7. add_record - Adicionar novo registro ao arquivo
-    8. batch_update - Fazer múltiplas operações em um único batch (evita backups intermediários)
-    9. backup_file - Criar backup com timestamp
+    7. add_record - Adicionar novo registro ao arquivo (aceita JSON)
+    8. add_xml_record - Adicionar novo registro usando XML do llm_pdf_tool
+    9. add_xml_records - Adicionar múltiplos registros XML de uma vez
+    10. batch_update - Fazer múltiplas operações em um único batch
+    11. backup_file - Criar backup com timestamp
     
     Formatos de entrada JSON:
     - {"operation": "read_dbk", "file_path": "caminho/arquivo.dbk"}
@@ -64,7 +67,10 @@ class DbkTool(BaseTool):
     - {"operation": "list_records", "file_path": "arquivo.dbk"}
     - {"operation": "get_record", "file_path": "arquivo.dbk", "record_index": 0}
     - {"operation": "update_record", "file_path": "arquivo.dbk", "record_index": 1, "data": {...}}
-    - {"operation": "batch_update", "file_path": "arquivo.dbk", "operations": [{"type": "add_record", "record_type": "R21", "data": {...}}, {"type": "add_record", "record_type": "R27", "data": {...}}]}
+    - {"operation": "add_record", "file_path": "arquivo.dbk", "record_type": "R21", "data": {...}}
+    - {"operation": "add_xml_record", "file_path": "arquivo.dbk", "xml_record": "<Registro Nome=...>"}
+    - {"operation": "add_xml_records", "file_path": "arquivo.dbk", "xml_records": ["<Registro...>", "<Registro...>"]}
+    - {"operation": "batch_update", "file_path": "arquivo.dbk", "operations": [...]}
     - {"operation": "backup_file", "file_path": "arquivo.dbk"}
     
     SEGURANÇA:
@@ -73,12 +79,11 @@ class DbkTool(BaseTool):
     - Encoding Latin-1 para compatibilidade
     - Verificação de integridade pós-modificação
     - Arquivos modificados são salvos na pasta 'gerado', mantendo originais intocados
-    """
-    # Configurações de segurança
+    """    # Configurações de segurança
     auto_backup: bool = Field(default=True, exclude=True)
     validate_checksums: bool = Field(default=True, exclude=True)
     parser: DbkParser = Field(default_factory=DbkParser, exclude=True)
-    xml_processor: Optional[XMLProcessor] = Field(default=None, exclude=True)
+    xml_processor: XMLProcessor = Field(default_factory=XMLProcessor, exclude=True)
     path_manager: WorkspacePathManager = Field(default_factory=WorkspacePathManager, exclude=True)
     
     def __init__(self, **kwargs):
@@ -89,10 +94,14 @@ class DbkTool(BaseTool):
         self.path_manager = WorkspacePathManager()
         
         # Set up XML processor (uses default mapeamentoTxt.xml path from data folder)
-        self.xml_processor = XMLProcessor()
+        # Only override if not already set by Field default_factory
+        if not hasattr(self, 'xml_processor') or self.xml_processor is None:
+            object.__setattr__(self, 'xml_processor', XMLProcessor())
         
         # Initialize parser with XML processor
-        self.parser = DbkParser(xml_processor=self.xml_processor)
+        # Only override if not already set by Field default_factory
+        if not hasattr(self, 'parser') or self.parser is None:
+            object.__setattr__(self, 'parser', DbkParser(xml_processor=self.xml_processor))
     
     def _run(self, query: str) -> str:
         """Executa operação DBK baseada no JSON de entrada."""
@@ -120,6 +129,10 @@ class DbkTool(BaseTool):
                 return self._update_record(input_data)
             elif operation == "add_record":
                 return self._add_record(input_data)
+            elif operation == "add_xml_record":
+                return self._add_xml_record(input_data)
+            elif operation == "add_xml_records":
+                return self._add_xml_records(input_data)
             elif operation == "batch_update":
                 return self._batch_update(input_data)
             elif operation == "write_dbk":
@@ -319,14 +332,73 @@ class DbkTool(BaseTool):
         except Exception as e:
             logger.error(f"Erro em backup_file: {str(e)}", exc_info=True)
             return format_error_response(e, "backup_file")
-    
     def _update_record(self, input_data: Dict[str, Any]) -> str:
         """Atualiza um registro existente."""
-        # Implementation would go here
-        return format_error_response(
-            NotImplementedError("Método update_record ainda não implementado"),
-            "update_record"
-        )
+        file_path = input_data.get('file_path')
+        record_index = input_data.get('record_index')
+        data = input_data.get('data', {})
+        
+        if not file_path:
+            return format_error_response(
+                ValueError("file_path é obrigatório para update_record"),
+                "update_record"
+            )
+            
+        if record_index is None:
+            return format_error_response(
+                ValueError("record_index é obrigatório para update_record"),
+                "update_record"
+            )
+        
+        try:
+            # Create backup if configured
+            if self.auto_backup:
+                backup_path = self.parser.create_backup(file_path)
+                logger.info(f"Backup criado: {backup_path}")
+            
+            # Parse existing file
+            parsed_data = self.parser.parse_dbk_file(Path(file_path))
+            records = parsed_data.get('records', [])
+            
+            # Validate record index
+            if record_index < 0 or record_index >= len(records):
+                return format_error_response(
+                    ValueError(f"Índice de registro inválido: {record_index}. Total: {len(records)}"),
+                    "update_record"
+                )
+            
+            # Get current record and update with new data
+            current_record = records[record_index]
+            current_record.data.update(data)
+            
+            # Update sequence and validation
+            updated_data = self.parser.update_record(parsed_data, record_index, current_record)
+            
+            # Determine output path
+            output_path = self.parser.get_output_path(file_path)
+            
+            # Write updated file
+            success = self.parser.write_dbk_file(updated_data, Path(output_path))
+            
+            if success:
+                return format_success_response({
+                    'file_path': output_path,
+                    'updated_record': {
+                        'index': record_index,
+                        'type': current_record.record_type,
+                        'data': current_record.data
+                    },
+                    'total_records': len(updated_data.get('records', []))
+                }, 'update_record')
+            else:
+                return format_error_response(
+                    Exception("Falha ao salvar arquivo DBK"),
+                    "update_record"
+                )
+                
+        except Exception as e:
+            logger.error(f"Erro em update_record: {str(e)}", exc_info=True)
+            return format_error_response(e, "update_record")
     def _add_record(self, input_data: Dict[str, Any]) -> str:
         """Adiciona um novo registro ao arquivo."""
         file_path = input_data.get('file_path')
@@ -419,14 +491,236 @@ class DbkTool(BaseTool):
         except Exception as e:
             logger.error(f"Erro em batch_update: {str(e)}", exc_info=True)
             return format_error_response(e, "batch_update")
-    
     def _write_dbk(self, input_data: Dict[str, Any]) -> str:
         """Salva alterações em um arquivo DBK com validação."""
-        # Implementation would go here
-        return format_error_response(
-            NotImplementedError("Método write_dbk ainda não implementado"),
-            "write_dbk"
-        )
+        file_path = input_data.get('file_path')
+        data = input_data.get('data')
+        
+        if not file_path:
+            return format_error_response(
+                ValueError("file_path é obrigatório para write_dbk"),
+                "write_dbk"
+            )
+        
+        if not data:
+            return format_error_response(
+                ValueError("data é obrigatório para write_dbk"),
+                "write_dbk"
+            )
+        
+        try:
+            # Create backup if configured
+            if self.auto_backup:
+                backup_path = self.parser.create_backup(file_path)
+                logger.info(f"Backup criado: {backup_path}")
+            
+            # Determine output path
+            output_path = self.parser.get_output_path(file_path)
+            
+            # Write file
+            success = self.parser.write_dbk_file(data, Path(output_path))
+            
+            if success:
+                # Validate written file
+                if self.validate_checksums:
+                    validation_result = self.parser.validate_dbk_file(Path(output_path))
+                    if not validation_result.get('is_valid', False):
+                        return format_error_response(
+                            Exception(f"Arquivo salvo mas validação falhou: {validation_result.get('errors', [])}"),
+                            "write_dbk"
+                        )
+                
+                return format_success_response({
+                    'file_path': output_path,
+                    'records_written': len(data.get('records', [])),
+                    'validation': 'passed' if self.validate_checksums else 'skipped'
+                }, 'write_dbk')
+            else:
+                return format_error_response(
+                    Exception("Falha ao salvar arquivo DBK"),
+                    "write_dbk"
+                )
+                
+        except Exception as e:
+            logger.error(f"Erro em write_dbk: {str(e)}", exc_info=True)
+            return format_error_response(e, "write_dbk")
+    
+    def _add_xml_record(self, input_data: Dict[str, Any]) -> str:
+        """Adiciona um novo registro usando XML do llm_pdf_tool."""
+        file_path = input_data.get('file_path')
+        xml_record = input_data.get('xml_record', '')
+        
+        if not file_path:
+            return format_error_response(
+                ValueError("file_path é obrigatório para add_xml_record"),
+                "add_xml_record"
+            )
+        
+        if not xml_record:
+            return format_error_response(
+                ValueError("xml_record é obrigatório para add_xml_record"),
+                "add_xml_record"
+            )
+        try:
+            # Ensure xml_processor is available
+            if not self.xml_processor:
+                return format_error_response(
+                    ValueError("XMLProcessor não inicializado"),
+                    "add_xml_record"
+                )
+            
+            # Parse XML record to get data
+            parsed_xml = self.xml_processor.parse_llm_xml_response(xml_record)
+            
+            if not parsed_xml.get('registros'):
+                return format_error_response(
+                    ValueError("XML não contém registros válidos"),
+                    "add_xml_record"
+                )
+            
+            # Create backup if configured
+            if self.auto_backup:
+                backup_path = self.parser.create_backup(file_path)
+                logger.info(f"Backup criado: {backup_path}")
+            
+            # Parse existing file
+            parsed_data = self.parser.parse_dbk_file(Path(file_path))
+            
+            # Convert XML data to DbkRecord format and add to file
+            xml_data = parsed_xml['registros'][0]  # First record
+            record_type = xml_data.get('identificador', 'unknown')
+            
+            # Convert XML campos to data dict
+            data = {}
+            for campo in xml_data.get('campos', []):
+                data[campo.get('nome', '')] = campo.get('valor', '')
+            
+            # Create new record
+            new_record = self.parser.create_record(record_type, data)
+            
+            # Add to parsed data
+            updated_data = self.parser.add_record(parsed_data, new_record)
+            
+            # Determine output path
+            output_path = self.parser.get_output_path(file_path)
+            
+            # Write updated file
+            success = self.parser.write_dbk_file(updated_data, Path(output_path))
+            
+            if success:
+                return format_success_response({
+                    'file_path': output_path,
+                    'added_record': {
+                        'type': record_type,
+                        'xml_source': xml_record[:200] + ('...' if len(xml_record) > 200 else ''),
+                        'data': data
+                    },
+                    'total_records': len(updated_data.get('records', [])),
+                    'uncertainty_points': parsed_xml.get('uncertainty_points', [])
+                }, 'add_xml_record')
+            else:
+                return format_error_response(
+                    Exception("Falha ao salvar arquivo DBK"),
+                    "add_xml_record"
+                )
+            
+        except Exception as e:
+            logger.error(f"Erro em add_xml_record: {str(e)}", exc_info=True)
+            return format_error_response(e, "add_xml_record")
+    
+    def _add_xml_records(self, input_data: Dict[str, Any]) -> str:
+        """Adiciona múltiplos registros XML de uma vez."""
+        file_path = input_data.get('file_path')
+        xml_records = input_data.get('xml_records', [])
+        
+        if not file_path:
+            return format_error_response(
+                ValueError("file_path é obrigatório para add_xml_records"),
+                "add_xml_records"
+            )        
+        if not xml_records:
+            return format_error_response(
+                ValueError("xml_records é obrigatório para add_xml_records"),
+                "add_xml_records"
+            )
+        
+        try:
+            # Ensure xml_processor is available
+            if not self.xml_processor:
+                return format_error_response(
+                    ValueError("XMLProcessor não inicializado"),
+                    "add_xml_records"
+                )
+            
+            # Create backup if configured
+            if self.auto_backup:
+                backup_path = self.parser.create_backup(file_path)
+                logger.info(f"Backup criado: {backup_path}")
+            
+            # Parse existing file
+            parsed_data = self.parser.parse_dbk_file(Path(file_path))
+            
+            added_records = []
+            all_uncertainty_points = []
+            
+            # Process each XML record
+            for i, xml_record in enumerate(xml_records):
+                try:
+                    # Parse XML record
+                    parsed_xml = self.xml_processor.parse_llm_xml_response(xml_record)
+                    
+                    if parsed_xml.get('registros'):
+                        xml_data = parsed_xml['registros'][0]  # First record
+                        record_type = xml_data.get('identificador', 'unknown')
+                        
+                        # Convert XML campos to data dict
+                        data = {}
+                        for campo in xml_data.get('campos', []):
+                            data[campo.get('nome', '')] = campo.get('valor', '')
+                        
+                        # Create new record
+                        new_record = self.parser.create_record(record_type, data)
+                        
+                        # Add to parsed data
+                        parsed_data = self.parser.add_record(parsed_data, new_record)
+                        
+                        added_records.append({
+                            'index': i,
+                            'type': record_type,
+                            'data': data
+                        })
+                        
+                        # Collect uncertainty points
+                        all_uncertainty_points.extend(parsed_xml.get('uncertainty_points', []))
+                        
+                except Exception as e:
+                    logger.warning(f"Erro ao processar registro XML {i}: {str(e)}")
+                    continue
+            
+            # Determine output path
+            output_path = self.parser.get_output_path(file_path)
+            
+            # Write updated file
+            success = self.parser.write_dbk_file(parsed_data, Path(output_path))
+            
+            if success:
+                return format_success_response({
+                    'file_path': output_path,
+                    'added_records': added_records,
+                    'records_processed': len(xml_records),
+                    'records_added': len(added_records),
+                    'total_records': len(parsed_data.get('records', [])),
+                    'uncertainty_points': all_uncertainty_points
+                }, 'add_xml_records')
+            else:
+                return format_error_response(
+                    Exception("Falha ao salvar arquivo DBK"),
+                    "add_xml_records"
+                )
+            
+        except Exception as e:
+            logger.error(f"Erro em add_xml_records: {str(e)}", exc_info=True)
+            return format_error_response(e, "add_xml_records")
     
     async def _arun(self, query: str) -> str:
         """Versão assíncrona da execução."""
