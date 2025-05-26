@@ -120,12 +120,15 @@ class PromptBuilder:
 
         **FOCO NOS REGISTROS DE DETALHE:**
         - Gere registros detalhados como REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (ID 84), REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMACAO_2 (ID 88), etc., quando aplicável.
-        - NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.        **INSTRUÇÕES PARA CAMPOS:**
+        - NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.
+        
+        **INSTRUÇÕES PARA CAMPOS:**
         1. Use o atributo `Nome` exatamente como no `mapeamentoTxt.xml`.
         2. Inclua os atributos `Descricao`, `Tamanho`, `Tipo`, e `Decimais` (se aplicável para Tipo="N") como definidos no `mapeamentoTxt.xml`.
         3. O TEXTO DENTRO DO CAMPO `<Campo>...</Campo>` deve ser o VALOR EXTRAÍDO do informe.
         4. Se um campo não tiver valor no informe, gere a tag do campo vazia.
-        5. Para o campo `NR_CONTROLE` em cada registro, use um número sequencial único começando em 1.
+        5. Para o campo `NR_CONTROLE` em cada registro, use o texto 0000000000, exemplo:
+            <Campo Nome="NR_CONTROLE" Descricao="Numero de Controle" Tamanho="10" Tipo="N">0000000000</Campo>
         6. Para campos de CPF/CNPJ, extraia apenas os números.
         
         **ATENÇÃO ESPECIAL PARA VALORES MONETÁRIOS:**
