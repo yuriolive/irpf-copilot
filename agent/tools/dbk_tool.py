@@ -327,22 +327,98 @@ class DbkTool(BaseTool):
             NotImplementedError("Método update_record ainda não implementado"),
             "update_record"
         )
-    
     def _add_record(self, input_data: Dict[str, Any]) -> str:
         """Adiciona um novo registro ao arquivo."""
-        # Implementation would go here
-        return format_error_response(
-            NotImplementedError("Método add_record ainda não implementado"),
-            "add_record"
-        )
-    
+        file_path = input_data.get('file_path')
+        record_type = input_data.get('record_type')
+        data = input_data.get('data', {})
+        
+        if not file_path:
+            return format_error_response(
+                ValueError("file_path é obrigatório para add_record"),
+                "add_record"
+            )
+        
+        if not record_type:
+            return format_error_response(
+                ValueError("record_type é obrigatório para add_record"),
+                "add_record"
+            )
+        
+        try:
+            # Create backup if configured
+            if self.auto_backup:
+                backup_path = self.parser.create_backup(file_path)
+                logger.info(f"Backup criado: {backup_path}")
+            
+            # Parse existing file
+            parsed_data = self.parser.parse_dbk_file(Path(file_path))
+            
+            # Create new record
+            new_record = self.parser.create_record(record_type, data)
+            
+            # Add to parsed data
+            updated_data = self.parser.add_record(parsed_data, new_record)
+            
+            # Determine output path
+            output_path = self.parser.get_output_path(file_path)
+            
+            # Write updated file
+            success = self.parser.write_dbk_file(updated_data, Path(output_path))
+            
+            if success:
+                return format_success_response({
+                    'file_path': output_path,
+                    'added_record': {
+                        'type': record_type,
+                        'data': data
+                    },
+                    'total_records': len(updated_data.get('records', []))
+                }, 'add_record')
+            else:
+                return format_error_response(
+                    Exception("Falha ao salvar arquivo DBK"),
+                    "add_record"
+                )
+            
+        except Exception as e:
+            logger.error(f"Erro em add_record: {str(e)}", exc_info=True)
+            return format_error_response(e, "add_record")
     def _batch_update(self, input_data: Dict[str, Any]) -> str:
         """Executa múltiplas operações em um único batch."""
-        # Implementation would go here
-        return format_error_response(
-            NotImplementedError("Método batch_update ainda não implementado"),
-            "batch_update"
-        )
+        file_path = input_data.get('file_path')
+        operations = input_data.get('operations', [])
+        
+        if not file_path:
+            return format_error_response(
+                ValueError("file_path é obrigatório para batch_update"),
+                "batch_update"
+            )
+        
+        if not operations:
+            return format_error_response(
+                ValueError("operations é obrigatório para batch_update"),
+                "batch_update"
+            )
+        
+        try:
+            # Create backup if configured
+            if self.auto_backup:
+                backup_path = self.parser.create_backup(file_path)
+                logger.info(f"Backup criado: {backup_path}")
+            
+            # Execute batch operations
+            results = self.parser.update_file_with_operations(file_path, operations)
+            
+            return format_success_response({
+                'file_path': results.get('output_path', file_path),
+                'operations_executed': len(operations),
+                'results': results
+            }, 'batch_update')
+            
+        except Exception as e:
+            logger.error(f"Erro em batch_update: {str(e)}", exc_info=True)
+            return format_error_response(e, "batch_update")
     
     def _write_dbk(self, input_data: Dict[str, Any]) -> str:
         """Salva alterações em um arquivo DBK com validação."""
