@@ -317,31 +317,12 @@ class PromptBuilder:
         **LÓGICA PARA REGISTROS SEM EXEMPLO DETALHADO NO PROMPT:**
         - Se você identificar dados em um informe que claramente se encaixam em um dos "Outros Registros Detalhados Disponíveis" listados acima, mas para o qual NÃO há um exemplo XML completo neste prompt:
             - **NÃO tente adivinhar a estrutura dos campos.**
-            - Em vez disso, adicione um ponto de incerteza (`uncertainty_points`) na sua resposta, usando o seguinte formato JSON:
-            ```json
-            {
-                "type": "MISSING_RECORD_EXAMPLE",
-                "record_name": "NOME_DO_REGISTRO_IDENTIFICADO",
-                "identifier": "ID_DO_REGISTRO",
-                "reason": "Dados encontrados para este registro, mas sem exemplo detalhado de campos no prompt. Necessário consultar mapeamentoTxt.xml para estrutura completa.",
-                "data_found_summary": "Resumo dos dados relevantes encontrados no informe para este registro (ex: 'CNPJ: 12.345.678/0001-90, Valor: R$ 500,00, Descrição: Despesa com médico')."
-            }
-            ```
+            - Em vez disso, adicione um ponto de incerteza (`uncertainty_points`) na sua resposta.
             - Continue processando outros registros para os quais você tem exemplos ou informações suficientes.
 
         **LÓGICA PARA DADOS AUSENTES OU NÃO INFERÍVEIS (PERGUNTAR AO USUÁRIO):**
         - Se um campo **obrigatório ou altamente relevante** para um registro identificado (seja ele com exemplo ou listado em "Outros Registros Detalhados Disponíveis") **não puder ser inferido** do documento nem do `CONTEXTO ADICIONAL` fornecido:
-            - Adicione um ponto de incerteza (`uncertainty_points`) na sua resposta, usando o seguinte formato JSON:
-            ```json
-            {
-                "type": "USER_INPUT_REQUIRED",
-                "field_name": "NOME_DO_CAMPO_XML_FALTANTE",
-                "record_name": "NOME_DO_REGISTRO_XML_AO_QUAL_O_CAMPO_PERTENCE",
-                "description": "Explicação clara do dado necessário e por que ele é importante (ex: 'Valor do bem em 31/12 do ano anterior, não encontrado no informe atual nem no contexto do DBK anterior. Essencial para o registro de bens.').",
-                "context_from_document": "Trecho ou resumo do documento que levou a essa necessidade (ex: 'Informe de rendimentos mostra saldo atual de R$ X, mas não o saldo do ano anterior para este bem/investimento.').",
-                "suggested_options": "Lista de opções ou formato esperado (ex: 'Formato: 1234.56' ou 'Opções: 0-Não, 1-Sim')."
-            }
-            ```
+            - Adicione um ponto de incerteza (`uncertainty_points`) na sua resposta.
             - **Exemplos de cenários para `USER_INPUT_REQUIRED`:**
                 - `NR_CPF_BENEFIC` para um dependente se o nome do dependente for mencionado, mas o CPF não estiver no `CONTEXTO ADICIONAL`.
                 - `CNPJ_DA_FONTE_PAGADORA` ou `NOME_DA_FONTE_PAGADORA` se o informe não os fornecer para um rendimento que os exige.
@@ -370,8 +351,6 @@ class PromptBuilder:
              * "R$ 640,40" → 640.40  
              * "R$ 1.640,40" → 1640.40
              * "R$ 12.345,67" → 12345.67
-        
-        8. Se você estiver INCERTO sobre um valor específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`        
 
         **EXEMPLOS DE EXTRAÇÃO DE VALORES MONETÁRIOS:**
         - Documento mostra "Rendimento: R$ 6,40" → No XML: <Campo Nome="VR_VALOR">6.40</Campo>
@@ -385,6 +364,8 @@ class PromptBuilder:
         <!-- LLM_NOTE: Notas gerais sobre a extração -->
         <!-- Registros extraídos aqui -->
         </ListaRegistros>
+
+        Se você estiver INCERTO sobre algo específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`
         """
         
         return prompt
