@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 class LLMManager:
     """Manages LLM instances and provides unified interface for document processing."""
+    max_output_tokens = 20000  # Default max output tokens for LLMs
+    temperature = 0.1  # Default temperature for LLMs
     
     def __init__(self):
         self.gemini_llm: Optional[ChatGoogleGenerativeAI] = None
@@ -40,8 +42,8 @@ class LLMManager:
             try:
                 self.gemini_llm = ChatGoogleGenerativeAI(
                     model="gemini-2.5-flash-preview-05-20",
-                    temperature=0.1,
-                    max_output_tokens=4000
+                    temperature=self.temperature,
+                    max_output_tokens=self.max_output_tokens,
                 )
                 logger.info("Gemini LLM configured successfully")
             except Exception as e:
@@ -51,8 +53,8 @@ class LLMManager:
             try:
                 self.claude_vertex_llm = ChatAnthropicVertex(
                     model="claude-sonnet-4@20250514",
-                    temperature=0.1,
-                    max_output_tokens=4000
+                    temperature=self.temperature,
+                    max_output_tokens=self.max_output_tokens,
                 )
                 logger.info("Claude Vertex LLM configured successfully")
             except Exception as e:
