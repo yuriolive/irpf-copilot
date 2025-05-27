@@ -352,7 +352,7 @@ class PromptBuilder:
         1. Use o atributo `Nome` exatamente como no `mapeamentoTxt.xml`.
         2. Inclua os atributos `Descricao`, `Tamanho`, `Tipo`, e `Decimais` (se aplicável para Tipo="N") como definidos no `mapeamentoTxt.xml`.
         3. O TEXTO DENTRO DO CAMPO `<Campo>...</Campo>` deve ser o VALOR EXTRAÍDO do informe.
-        4. Se um campo não tiver valor no informe, preencha-o com um placeholder vazio (`{campo_vazio}`) ou o valor padrão indicado (ex: "0" para numéricos, "" para texto).
+        4. Se um campo não tiver valor no informe, preencha-o com o valor padrão indicado (ex: "0" para numéricos, "" para texto).
         5. Para o campo `NR_CONTROLE` em cada registro, use o texto 0000000000, exemplo:
             <Campo Nome="NR_CONTROLE" Descricao="Numero de Controle" Tamanho="10" Tipo="N">0000000000</Campo>
         6. Para campos de CPF/CNPJ, extraia apenas os números.
