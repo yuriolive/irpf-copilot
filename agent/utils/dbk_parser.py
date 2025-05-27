@@ -590,83 +590,181 @@ class DbkParser:
                 validation_errors=[f"Failed to create properly formatted record: {e}"]
             )
     def _format_record_line(self, record_type: str, data: Dict[str, Any], record_definition: Dict[str, Any]) -> str:
-        """Format a record line according to IRPF specifications."""
+        """Format a record line according to IRPF specifications.
+        
+        This method properly formats a DBK record line by:
+        1. Starting with the record identifier
+        2. Processing all fields in the correct order according to the record definition
+        3. Using XMLProcessor.format_field_value() for proper field formatting
+        4. Concatenating all formatted fields into a single fixed-width line
+        5. Ensuring the line is exactly the right length for checksum calculation
+        
+        Args:
+            record_type: The record identifier (e.g., "R27", "IRPF")
+            data: Dictionary containing field values
+            record_definition: Record definition from mapeamentoTxt.xml
+            
+        Returns:
+            Formatted DBK line ready for checksum calculation (without checksum)
+        """
         try:
-            # Start with record type
-            line_parts = [record_type]
+            # Start building the line with the record identifier
+            line_content = record_type
             
-            # Add CPF if present (common field)
-            if 'NR_CPF' in data:
-                line_parts.append(data['NR_CPF'])
-            elif 'cpf' in data:
-                line_parts.append(data['cpf'])
-            
-            # Format fields according to definition
+            # Process fields according to the record definition
             if 'campos' in record_definition:
                 campos = record_definition['campos']
-                # Handle both dict and list formats for campos
+                
+                # Handle campos as dictionary format {field_name: field_info}
                 if isinstance(campos, dict):
-                    # campos is a dict {field_name: field_info}
-                    for field_name, campo in campos.items():
+                    # Process fields in the order they appear in the definition
+                    for field_name, field_spec in campos.items():
                         field_value = data.get(field_name, '')
-                        field_type = campo.get('tipo', 'C')
-                        field_size = int(campo.get('tamanho', 10))
-                        field_decimals = int(campo.get('decimais', 0))
+                        field_type = field_spec.get('tipo', 'C')
+                        field_size = int(field_spec.get('tamanho', 10))
+                        field_decimals = int(field_spec.get('decimais', 0))
                         
+                        # Use XMLProcessor for proper field formatting
                         if self.xml_processor:
                             formatted_value = self.xml_processor.format_field_value(
                                 field_value, field_type, field_size, field_decimals
                             )
                         else:
-                            # Simple formatting fallback
-                            if field_type == 'N':
-                                formatted_value = str(field_value).zfill(field_size)
-                            else:
-                                formatted_value = str(field_value).ljust(field_size)[:field_size]
+                            # Fallback formatting if XMLProcessor is not available
+                            formatted_value = self._fallback_format_field(
+                                field_value, field_type, field_size, field_decimals
+                            )
                         
-                        line_parts.append(formatted_value)
-                else:
-                    # campos is a list [campo_info, ...]
-                    for campo in campos:
-                        field_name = campo.get('nome', '')
+                        line_content += formatted_value
+                
+                # Handle campos as list format [campo_info, ...]
+                elif isinstance(campos, list):
+                    for field_spec in campos:
+                        field_name = field_spec.get('nome', '')
                         field_value = data.get(field_name, '')
-                        field_type = campo.get('tipo', 'C')
-                        field_size = int(campo.get('tamanho', 10))
-                        field_decimals = int(campo.get('decimais', 0))
+                        field_type = field_spec.get('tipo', 'C')
+                        field_size = int(field_spec.get('tamanho', 10))
+                        field_decimals = int(field_spec.get('decimais', 0))
                         
+                        # Use XMLProcessor for proper field formatting
                         if self.xml_processor:
                             formatted_value = self.xml_processor.format_field_value(
                                 field_value, field_type, field_size, field_decimals
                             )
                         else:
-                            # Simple formatting fallback
-                            if field_type == 'N':
-                                formatted_value = str(field_value).zfill(field_size)
-                            else:
-                                formatted_value = str(field_value).ljust(field_size)[:field_size]
+                            # Fallback formatting if XMLProcessor is not available
+                            formatted_value = self._fallback_format_field(
+                                field_value, field_type, field_size, field_decimals
+                            )
                         
-                        line_parts.append(formatted_value)
+                        line_content += formatted_value
             
-            # Join parts and pad to correct length
-            line = ''.join(line_parts)
-            
-            # Ensure line is correct length (excluding checksum)
+            # Ensure the line is exactly the right length (excluding checksum)
             content_length = self.DEFAULT_RECORD_LENGTH - 10
-            if len(line) > content_length:
-                line = line[:content_length]
-            elif len(line) < content_length:
-                line = line.ljust(content_length, ' ')
             
-            return line + '0000000000'  # Add placeholder checksum
+            if len(line_content) > content_length:
+                # Truncate if too long
+                line_content = line_content[:content_length]
+                logger.warning(f"Record line truncated to {content_length} characters for record type {record_type}")
+            elif len(line_content) < content_length:
+                # Pad with spaces if too short
+                line_content = line_content.ljust(content_length, ' ')
+            
+            # Return the content without checksum (checksum will be added later)
+            return line_content + '0000000000'  # Add placeholder checksum
             
         except Exception as e:
-            logger.error(f"Error formatting record line: {e}")
-            # Fallback: basic format
-            content = str(data.get('content', ''))
-            line = record_type + content
-            if len(line) > self.DEFAULT_RECORD_LENGTH - 10:
-                line = line[:self.DEFAULT_RECORD_LENGTH - 10]
-            return line.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ') + '0000000000'
+            logger.error(f"Error formatting record line for type {record_type}: {e}", exc_info=True)
+            # Fallback: create a basic line format
+            return self._create_fallback_line(record_type, data)
+    
+    def _fallback_format_field(self, value: Any, field_type: str, field_size: int, field_decimals: int = 0) -> str:
+        """Fallback field formatting when XMLProcessor is not available.
+        
+        Implements the basic field formatting rules:
+        - C/A/I: left-justified, right-padded with spaces
+        - N: right-justified, left-padded with zeros
+        
+        Args:
+            value: The field value to format
+            field_type: Field type (C, N, A, I)
+            field_size: Target field size
+            field_decimals: Number of decimal places for numeric fields
+            
+        Returns:
+            Formatted field value
+        """
+        s_value = str(value if value is not None else "")
+        
+        if field_type == 'N':
+            # Numeric field: right-justified, zero-padded
+            # Remove non-numeric characters except minus sign
+            import re
+            clean_value = re.sub(r'[^\d-]', '', s_value)
+            if not clean_value:
+                clean_value = "0"
+            
+            # Handle decimal places for monetary values
+            if field_decimals > 0:
+                # Ensure the number includes decimal places
+                if '.' not in s_value and len(clean_value) <= field_size - field_decimals:
+                    # Assume it's in decimal format, convert to integer format
+                    clean_value = clean_value + '0' * field_decimals
+            
+            # Pad with zeros to the left
+            formatted_value = clean_value.zfill(field_size)
+            
+            # Truncate if too long
+            if len(formatted_value) > field_size:
+                formatted_value = formatted_value[-field_size:]
+                
+        else:
+            # Character/Alphanumeric/Indicator: left-justified, space-padded
+            formatted_value = s_value.ljust(field_size, ' ')
+            
+            # Truncate if too long
+            if len(formatted_value) > field_size:
+                formatted_value = formatted_value[:field_size]
+        
+        return formatted_value
+    
+    def _create_fallback_line(self, record_type: str, data: Dict[str, Any]) -> str:
+        """Create a fallback line when normal formatting fails.
+        
+        Args:
+            record_type: The record identifier
+            data: Field data dictionary
+            
+        Returns:
+            Basic formatted line with placeholder checksum
+        """
+        try:
+            # Start with record type
+            content = record_type
+            
+            # Add any content that was provided
+            if 'content' in data:
+                content += str(data['content'])
+            else:
+                # Add key fields if available
+                for key in ['cpf', 'NR_CPF', 'nome', 'NM_NOME']:
+                    if key in data:
+                        content += str(data[key])
+            
+            # Ensure proper length
+            content_length = self.DEFAULT_RECORD_LENGTH - 10
+            if len(content) > content_length:
+                content = content[:content_length]
+            else:
+                content = content.ljust(content_length, ' ')
+            
+            return content + '0000000000'  # Add placeholder checksum
+            
+        except Exception as e:
+            logger.error(f"Error creating fallback line: {e}")
+            # Absolute fallback
+            basic_line = record_type.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ')
+            return basic_line + '0000000000'
     
     def create_backup(self, file_path: str) -> str:
         """Create a backup of a file and return the backup path."""
