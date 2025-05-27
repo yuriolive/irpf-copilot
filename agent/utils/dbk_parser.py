@@ -510,6 +510,7 @@ class DbkParser:
             if record.record_type not in ['IRPF', 'T9'] and record.sequence is not None:
                 record.sequence = sequence
                 if 'sequence' in record.data:
+                    
                     record.data['sequence'] = str(sequence)  # Store as string in data dict
                 sequence += 1
     
@@ -520,7 +521,7 @@ class DbkParser:
             record_definition = None
             if self.xml_processor and hasattr(self.xml_processor, 'record_definitions'):
                 # Find record definition by identificador
-                for record_name, definition in self.xml_processor.record_definitions.items():
+                for _, definition in self.xml_processor.record_definitions.items():
                     if definition.get('identificador') == record_type:
                         record_definition = definition
                         break
@@ -530,13 +531,8 @@ class DbkParser:
                 # Use XMLProcessor to format the record properly
                 raw_line = self._format_record_line(record_type, data, record_definition)
             else:
-                # Fallback: create a basic line with checksum placeholder
-                content = data.get('content', '')
-                if content:
-                    raw_line = content.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ') + '0000000000'
-                else:
-                    # Create basic line format: TYPE + padding + checksum
-                    raw_line = record_type.ljust(self.DEFAULT_RECORD_LENGTH - 10, ' ') + '0000000000'
+                # Raise error when record definition isn't found
+                raise ValueError(f"Record definition for '{record_type}' not found. Cannot create record without proper definition.")
             
             # Calculate proper checksum for the line
             try:
@@ -578,17 +574,8 @@ class DbkParser:
             
         except Exception as e:
             logger.error(f"Error creating record: {e}")
-            # Fallback: create minimal record
-            fallback_line = record_type.ljust(self.DEFAULT_RECORD_LENGTH, ' ')
-            return DbkRecord(
-                record_type=record_type,
-                sequence=None,
-                data={'record_type': record_type, **data},
-                raw_line=fallback_line,
-                line_number=0,
-                is_valid=False,
-                validation_errors=[f"Failed to create properly formatted record: {e}"]
-            )
+            # Re-raise the error instead of using a fallback
+            raise ValueError(f"Failed to create properly formatted record: {e}") from e
     def _format_record_line(self, record_type: str, data: Dict[str, Any], record_definition: Dict[str, Any]) -> str:
         """Format a record line according to IRPF specifications.
         
@@ -625,16 +612,10 @@ class DbkParser:
                         field_decimals = int(field_spec.get('decimais', 0))
                         
                         # Use XMLProcessor for proper field formatting
-                        if self.xml_processor:
-                            formatted_value = self.xml_processor.format_field_value(
-                                field_value, field_type, field_size, field_decimals
-                            )
-                        else:
-                            # Fallback formatting if XMLProcessor is not available
-                            formatted_value = self._fallback_format_field(
-                                field_value, field_type, field_size, field_decimals
-                            )
-                        
+                        formatted_value = self.xml_processor.format_field_value(
+                            field_value, field_type, field_size, field_decimals
+                        )
+
                         line_content += formatted_value
                 
                 # Handle campos as list format [campo_info, ...]
@@ -647,15 +628,9 @@ class DbkParser:
                         field_decimals = int(field_spec.get('decimais', 0))
                         
                         # Use XMLProcessor for proper field formatting
-                        if self.xml_processor:
-                            formatted_value = self.xml_processor.format_field_value(
-                                field_value, field_type, field_size, field_decimals
-                            )
-                        else:
-                            # Fallback formatting if XMLProcessor is not available
-                            formatted_value = self._fallback_format_field(
-                                field_value, field_type, field_size, field_decimals
-                            )
+                        formatted_value = self.xml_processor.format_field_value(
+                            field_value, field_type, field_size, field_decimals
+                        )
                         
                         line_content += formatted_value
             
@@ -677,57 +652,7 @@ class DbkParser:
             logger.error(f"Error formatting record line for type {record_type}: {e}", exc_info=True)
             # Fallback: create a basic line format
             return self._create_fallback_line(record_type, data)
-    
-    def _fallback_format_field(self, value: Any, field_type: str, field_size: int, field_decimals: int = 0) -> str:
-        """Fallback field formatting when XMLProcessor is not available.
-        
-        Implements the basic field formatting rules:
-        - C/A/I: left-justified, right-padded with spaces
-        - N: right-justified, left-padded with zeros
-        
-        Args:
-            value: The field value to format
-            field_type: Field type (C, N, A, I)
-            field_size: Target field size
-            field_decimals: Number of decimal places for numeric fields
-            
-        Returns:
-            Formatted field value
-        """
-        s_value = str(value if value is not None else "")
-        
-        if field_type == 'N':
-            # Numeric field: right-justified, zero-padded
-            # Remove non-numeric characters except minus sign
-            import re
-            clean_value = re.sub(r'[^\d-]', '', s_value)
-            if not clean_value:
-                clean_value = "0"
-            
-            # Handle decimal places for monetary values
-            if field_decimals > 0:
-                # Ensure the number includes decimal places
-                if '.' not in s_value and len(clean_value) <= field_size - field_decimals:
-                    # Assume it's in decimal format, convert to integer format
-                    clean_value = clean_value + '0' * field_decimals
-            
-            # Pad with zeros to the left
-            formatted_value = clean_value.zfill(field_size)
-            
-            # Truncate if too long
-            if len(formatted_value) > field_size:
-                formatted_value = formatted_value[-field_size:]
-                
-        else:
-            # Character/Alphanumeric/Indicator: left-justified, space-padded
-            formatted_value = s_value.ljust(field_size, ' ')
-            
-            # Truncate if too long
-            if len(formatted_value) > field_size:
-                formatted_value = formatted_value[:field_size]
-        
-        return formatted_value
-    
+
     def _create_fallback_line(self, record_type: str, data: Dict[str, Any]) -> str:
         """Create a fallback line when normal formatting fails.
         

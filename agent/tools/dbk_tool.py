@@ -492,6 +492,7 @@ class DbkTool(BaseTool):
         except Exception as e:
             logger.error(f"Erro em batch_update: {str(e)}", exc_info=True)
             return format_error_response(e, "batch_update")
+    
     def _write_dbk(self, input_data: Dict[str, Any]) -> str:
         """Salva alterações em um arquivo DBK com validação."""
         file_path = input_data.get('file_path')

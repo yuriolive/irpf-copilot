@@ -83,8 +83,11 @@ class TestDbkParsing:
         
         # If successful, should have records
         if parsed_result.get('success'):
-            assert 'records' in parsed_result
-            assert isinstance(parsed_result['records'], list)
+            # Updated to match actual structure: data -> analysis -> records
+            assert 'data' in parsed_result
+            assert 'analysis' in parsed_result['data']
+            assert 'records' in parsed_result['data']['analysis']
+            assert isinstance(parsed_result['data']['analysis']['records'], list)
     
     def test_invalid_operation(self):
         """Test handling of invalid operations."""
@@ -141,8 +144,8 @@ class TestDbkToolRecordDefinitions:
         
         definitions = tool.xml_processor.record_definitions
         
-        # Should have some common record types
-        expected_records = ['IRPF', 'R16', 'R21', 'T9']
+        # Should have some common record types (using actual Nome values from XML)
+        expected_records = ['REG_HEADER', 'REG_TRAILLER', 'REG_BEM', 'REG_DEPENDENTE']
         
         for record_type in expected_records:
             if record_type in definitions:
@@ -165,10 +168,10 @@ class TestDbkToolRecordDefinitions:
         # Should have multiple record types
         assert len(record_types) > 0
         
-        # Should include common IRPF record types
-        common_types = ['IRPF', 'T9']
+        # Should include common IRPF record types (using actual Nome values from XML)
+        common_types = ['REG_TRAILLER', 'REG_HEADER']  # T9 maps to REG_TRAILLER, IR maps to REG_HEADER
         found_common = any(rtype in record_types for rtype in common_types)
-        assert found_common, f"Expected to find common record types in {record_types}"
+        assert found_common, f"Expected to find common record types in {record_types[:10]}..."
 
 # Standalone test function for backward compatibility
 def test_dbk_parsing():
