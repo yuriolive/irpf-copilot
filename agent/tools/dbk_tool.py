@@ -32,7 +32,6 @@ class DbkTool(BaseTool):
     
     Operações disponíveis:
     - read_dbk: Ler e analisar arquivo DBK
-    - write_dbk: Salvar arquivo DBK com validações
     - validate_dbk: Validar integridade de arquivo DBK
     - list_records: Listar registros do arquivo
     - get_record: Obter registro específico
@@ -50,16 +49,15 @@ class DbkTool(BaseTool):
     
     Operações disponíveis:
     1. read_dbk - Ler e analisar arquivo DBK completo
-    2. write_dbk - Salvar arquivo DBK com validações de checksum
-    3. validate_dbk - Validar integridade de checksums e estrutura
-    4. list_records - Listar todos os registros com resumo
-    5. get_record - Obter detalhes de registro específico por índice/tipo
-    6. update_record - Atualizar dados de registro existente
-    7. add_record - Adicionar novo registro ao arquivo (aceita JSON)
-    8. add_xml_record - Adicionar novo registro usando XML do llm_pdf_tool
-    9. add_xml_records - Adicionar múltiplos registros XML de uma vez
-    10. batch_update - Fazer múltiplas operações em um único batch
-    11. backup_file - Criar backup com timestamp
+    2. validate_dbk - Validar integridade de checksums e estrutura
+    3. list_records - Listar todos os registros com resumo
+    4. get_record - Obter detalhes de registro específico por índice/tipo
+    5. update_record - Atualizar dados de registro existente
+    6. add_record - Adicionar novo registro ao arquivo (aceita JSON)
+    7. add_xml_record - Adicionar novo registro usando XML do llm_pdf_tool
+    8. add_xml_records - Adicionar múltiplos registros XML de uma vez
+    9. batch_update - Fazer múltiplas operações em um único batch
+    10. backup_file - Criar backup com timestamp
     
     Formatos de entrada JSON:
     - {"operation": "read_dbk", "file_path": "caminho/arquivo.dbk"}
@@ -135,8 +133,6 @@ class DbkTool(BaseTool):
                 return self._add_xml_records(input_data)
             elif operation == "batch_update":
                 return self._batch_update(input_data)
-            elif operation == "write_dbk":
-                return self._write_dbk(input_data)
             else:
                 return format_error_response(
                     ValueError(f"Operação desconhecida: {operation}"), 
@@ -493,59 +489,6 @@ class DbkTool(BaseTool):
             logger.error(f"Erro em batch_update: {str(e)}", exc_info=True)
             return format_error_response(e, "batch_update")
     
-    def _write_dbk(self, input_data: Dict[str, Any]) -> str:
-        """Salva alterações em um arquivo DBK com validação."""
-        file_path = input_data.get('file_path')
-        data = input_data.get('data')
-        
-        if not file_path:
-            return format_error_response(
-                ValueError("file_path é obrigatório para write_dbk"),
-                "write_dbk"
-            )
-        
-        if not data:
-            return format_error_response(
-                ValueError("data é obrigatório para write_dbk"),
-                "write_dbk"
-            )
-        
-        try:
-            # Create backup if configured
-            if self.auto_backup:
-                backup_path = self.parser.create_backup(file_path)
-                logger.info(f"Backup criado: {backup_path}")
-            
-            # Determine output path
-            output_path = self.parser.get_output_path(file_path)
-            
-            # Write file
-            success = self.parser.write_dbk_file(data, Path(output_path))
-            
-            if success:
-                # Validate written file
-                if self.validate_checksums:
-                    validation_result = self.parser.validate_dbk_file(Path(output_path))
-                    if not validation_result.get('is_valid', False):
-                        return format_error_response(
-                            Exception(f"Arquivo salvo mas validação falhou: {validation_result.get('errors', [])}"),
-                            "write_dbk"
-                        )
-                
-                return format_success_response({
-                    'file_path': output_path,
-                    'records_written': len(data.get('records', [])),
-                    'validation': 'passed' if self.validate_checksums else 'skipped'
-                }, 'write_dbk')
-            else:
-                return format_error_response(
-                    Exception("Falha ao salvar arquivo DBK"),
-                    "write_dbk"
-                )
-                
-        except Exception as e:
-            logger.error(f"Erro em write_dbk: {str(e)}", exc_info=True)
-            return format_error_response(e, "write_dbk")
     
     def _add_xml_record(self, input_data: Dict[str, Any]) -> str:
         """Adiciona um novo registro usando XML do llm_pdf_tool."""
