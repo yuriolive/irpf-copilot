@@ -181,23 +181,27 @@ class PromptBuilder:
         
         context_block = ""
         if additional_context:
-            context_block = f"\nCONTEXTO ADICIONAL FORNECIDO PELO AGENTE (use para refinar sua extração):\n{additional_context}\n"
+            context_block = f"""
+            CONTEXTO ADICIONAL FORNECIDO PELO AGENTE (use para refinar sua extração e preencher campos como CPF do titular, ano calendário, e dados de dependentes/bens do ano anterior):
+            {additional_context}
+            """
         
         prompt = f"""
         Você é um especialista em converter informes de rendimentos financeiros brasileiros para o formato XML do arquivo .DBK do IRPF,
         seguindo EXATAMENTE as especificações do mapeamentoTxt.xml.
 
         **INSTRUÇÕES CRÍTICAS:**
-        1. PRIMEIRO: Identifique no documento o CPF do beneficiário dos rendimentos e o ano calendário/exercício
-        2. Analise o documento identificando TODOS os rendimentos, aplicações financeiras, conta corrente/poupança e investimentos
-        3. Para CADA tipo de rendimento identificado, gere o registro XML correspondente usando os templates abaixo
-        4. Use o CPF identificado no documento para preencher todos os campos NR_CPF e NR_CPF_BENEFIC
-        5. Use o ano calendário identificado no documento
-        6. Se o documento mencionar dependentes, use o CPF do dependente nos registros relacionados a ele
+        1. PRIMEIRO: Identifique no documento o CPF do beneficiário dos rendimentos e o ano calendário/exercício. Use o CONTEXTO ADICIONAL para obter o CPF do titular e o ano calendário se não estiverem explícitos no informe.
+        2. Analise o documento identificando TODOS os rendimentos, aplicações financeiras, conta corrente/poupança, investimentos, pagamentos e dívidas.
+        3. Para CADA tipo de informação identificada, gere o registro XML correspondente.
+        4. Use o CPF identificado no documento (ou do CONTEXTO ADICIONAL) para preencher todos os campos NR_CPF e NR_CPF_BENEFIC.
+        5. Use o ano calendário identificado no documento (ou do CONTEXTO ADICIONAL).
+        6. Se o documento mencionar dependentes, use o CPF do dependente nos registros relacionados a ele, obtendo o CPF do CONTEXTO ADICIONAL se necessário.
+        7. Se alguma informação faltar e não puder ser inferida para a geração do registro, gere um registro de incerteza (uncertainty_point) solicitando mais detalhes sobre a estrutura do registro. NÃO tente adivinhar ou ignorar registros sem exemplo completo.
 
         {context_block}
 
-        **TEMPLATES DE REGISTROS:**
+        **TEMPLATES DE REGISTROS (Exemplos Detalhados):**
         {order_instruction}
 
         {reg_rendpj_example}
@@ -208,17 +212,17 @@ class PromptBuilder:
         {reg_rend_isento_tipo5_example}
         {reg_rend_exclusiva_detalhe_example}
 
-        **REGRAS DE MAPEAMENTO:**
-        - REG_RENDPJ (21): Para salários, rendimentos de trabalho, aluguéis recebidos
-        - REG_BEM (27): Para contas bancárias, investimentos, imóveis, veículos, etc.
+        **REGRAS DE MAPEAMENTO E ESCOLHA DE REGISTROS:**
+        - REG_RENDPJ (21): Para salários, rendimentos de trabalho, aluguéis recebidos (tributáveis de PJ).
+        - REG_BEM (27): Para contas bancárias, investimentos, imóveis, veículos, criptoativos, etc.
         
         **RENDIMENTOS ISENTOS - ESCOLHA DO REGISTRO CORRETO:**
-        - REG_RENDIMENTO_ISENTO_TIPO2 (83): Para tipos 19, 20, 21 (sem necessidade de informar fonte pagadora)
-        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (84): Para tipos 1,2,4,9,10,12,13,14,16 (com fonte pagadora)
-        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_4 (85): Para tipo 11 - aposentadorias/pensões com detalhes de IRRF e previdência
-        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_5 (86): Para tipo 11 "outros" - quando precisar de campo descrição
+        - REG_RENDIMENTO_ISENTO_TIPO2 (83): Para tipos 19 (meação/divórcio), 20 (ganhos líquidos ações até R$20.000), 21 (ganhos líquidos ouro até R$20.000) - sem necessidade de informar fonte pagadora.
+        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (84): Para tipos 1, 2, 4, 9, 10, 12, 13, 14, 16 (com fonte pagadora).
+        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_4 (85): Para tipo 11 - aposentadorias/pensões com isenção para maiores de 65 anos, com detalhes de IRRF e previdência.
+        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_5 (86): Para tipo 11 "outros" - quando precisar de campo descrição.
 
-        **TIPOS DE RENDIMENTOS ISENTOS MAIS COMUNS:**
+        **TIPOS DE RENDIMENTOS ISENTOS MAIS COMUNS (NR_COD):**
         - Tipo 1: Aposentadoria, reforma ou pensão, transferência para a reserva remunerada ou reforma de militares
         - Tipo 2: Pensões, proventos da inatividade e reformas motivadas por acidente em serviço e molestias profissionais
         - Tipo 4: Indenizações por rescisão de contrato de trabalho, inclusive a título de PDV, e por acidente de trabalho
@@ -238,15 +242,117 @@ class PromptBuilder:
           * Se tiver detalhes de IRRF e previdência: REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_4 (85) com NR_COD=11
           * Se for classificação "outros" com descrição: REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_5 (86) com NR_COD=11
 
+        **RENDIMENTOS DE TRIBUTAÇÃO EXCLUSIVA/DEFINITIVA - ESCOLHA DO REGISTRO CORRETO:**
+        - REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMACAO_2 (88): Para tipos 6 (Aplicações Financeiras), 10 (Juros sobre Capital Próprio), 11 (Participação nos Lucros e Resultados).
+        - REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMAÇÃO_3 (89): Para tipo 12 ("Outros" rendimentos de tributação exclusiva), quando precisar de campo descrição.
+
         **FOCO NOS REGISTROS DE DETALHE:**
-        - Gere registros detalhados como REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_3 (ID 84), REG_RENDIMENTO_EXCLUSIVO_TIPO_INFORMACAO_2 (ID 88), etc., quando aplicável.
+        - Gere registros detalhados (ex: 83, 84, 85, 86, 88, 89, 21, 27, etc.), quando aplicável.
         - NÃO gere os registros consolidados REG_RENDISENTOS (ID 23) ou REG_RENDEXCLUSIVA (ID 24). A consolidação será feita posteriormente.
-        
+
+        **OUTROS REGISTROS DETALHADOS DISPONÍVEIS (para os quais você deve extrair dados se encontrar, mesmo sem exemplo completo):**
+        - REG_RENDPF (Identificador 22): Rendimentos Recebidos de PF e Exterior (Carnê-Leão).
+        - REG_PAGAMENTO (Identificador 26): Relação de pagamentos efetuados (despesas dedutíveis, etc.).
+        - REG_DIVIDA (Identificador 28): Dívidas e ônus reais.
+        - REG_DETALHEPENSAO (Identificador 31): Detalhes de Pensão (geralmente para aposentadorias/pensões, mas pode ser mais genérico).
+        - REG_RENDPJDEPENDENTE (Identificador 32): Rendimentos Tributáveis Recebidos de PJ pelos Dependentes.
+        - REG_LUCROSDIVIDENDOS (Identificador 33): Relação de lucros e dividendos (detalhado).
+        - REG_DOACOESCAMPANHA (Identificador 34): Doações a campanhas eleitorais.
+        - REG_ALIMENTANDO (Identificador 35): Detalhes de Alimentandos.
+        - REG_PROPRIETARIOUSUFRUTUARIOBEM (Identificador 36): Proprietários ou usufrutuários do bem.
+        - REG_APLICACOES_FINANCEIRAS_EXTERIOR (Identificador 37): Detalhes de Aplicações Financeiras no Exterior.
+        - REG_FINALESPOLIO (Identificador 38): Informações de Final de Espólio.
+        - REG_SAIDA (Identificador 39): Saída Definitiva do País.
+        - REG_RENDAVARMENSAL (Identificador 40): Renda Variável Mensal.
+        - REG_RENDAVARANUAL (Identificador 41): Renda Variável Anual.
+        - REG_RENDAVARINVESTMENSAL (Identificador 42): Fundos de Investimento Imobiliário Mensal.
+        - REG_RENDAVARTOTAISINVEST (Identificador 43): Totais de Alguns Campos Renda Variável.
+        - REG_RRATITULAR (Identificador 45): Rendimentos recebidos acumuladamente pelo titular.
+        - REG_RRATITULAR_PENSAO (Identificador 46): Relação de pensão para RRA pelo titular.
+        - REG_RRADEPENDENTE (Identificador 47): Rendimentos recebidos acumuladamente pelos dependentes.
+        - REG_RRADEPENDENTE_PENSAO (Identificador 48): Relação de pensão para RRA pelos dependentes.
+        - REG_RENDIMENTOS_TRABALHO_NAO_ASSALARIADO_PF (Identificador 49): Lançamentos Pessoas Físicas e Exterior (Carnê-Leão).
+        - REG_ATIVIDADE_RURAL_ID_IMOVEL (Identificador 50): Atividade Rural Identificação do Imóvel.
+        - REG_ATIVIDADE_RURAL_REC_DESP_BRASIL (Identificador 51): Atividade Rural Receitas e Despesas Brasil.
+        - REG_ATIVIDADE_RURAL_APURACAO_RESULTADO (Identificador 52): Atividade Rural - Apuração do Resultado Tributável.
+        - REG_ATIVIDADE_RURAL_MOV_REBANHO (Identificador 53): Atividade Rural Movimentação do Rebanho.
+        - REG_ATIVIDADE_RURAL_BENS (Identificador 54): Anexo da Atividade Rural - Bens.
+        - REG_ATIVIDADE_RURAL_DIVIDAS (Identificador 55): Anexo da Atividade Rural - Dívidas.
+        - REG_ATIVIDADE_RURAL_REC_DESP_EXT (Identificador 56): Atividade Rural – Receitas e Despesas - Exterior.
+        - REG_ATIVIDADE_RURAL_PROPRIETARIO (Identificador 57): Atividade Rural - Proprietário Imóvel Rural.
+        - REG_HERDEIROS (Identificador 58): Herdeiros.
+        - REG_PERCENTUAL_BEM (Identificador 59): Quadro auxiliar de percentual do bem da ficha Bens e Direitos.
+        - REG_GCAP (Identificador 60): Ganho de Capital (consolidado).
+        - REG_GCAP_BEMIMOVEL (Identificador 61): Ganho de Capital Bem Imóvel.
+        - REG_GCAP_BEMMOVEL (Identificador 62): Ganho de Capital Bem Móvel.
+        - REG_GCAP_PSOCIETARIA (Identificador 63): Ganho de Capital Participação Societária.
+        - REG_GCAP_EXTERIOR (Identificador 64): GCAP Exterior - Campos de alienação comuns a alienação no exterior.
+        - REG_GCAP_ADQUIRENTES (Identificador 65): Ganhos de Capital - Adquirentes.
+        - REG_GCAP_AMPLIACAO_REFORMA (Identificador 66): Ganhos de Capital - Ampliação/Reforma.
+        - REG_GCAP_AMPLIACAO_REFORMA_EXT (Identificador 67): Ganhos de Capital - Ampliação/Reforma Informações no Exterior.
+        - REG_GCAP_APURACAO_IMOVEL (Identificador 68): Ganhos de Capital - Apuração de Imóveis.
+        - REG_GCAP_APURACAO_MOVEL (Identificador 69): Ganhos de Capital - Apuração de Móveis.
+        - REG_GCAP_APURACAO_AMBAS (Identificador 70): Ganhos de Capital - Apuração Ambas.
+        - REG_GCAP_PARCELA_IMOVEL (Identificador 71): Ganhos de Capital - Parcela de Imóvel.
+        - REG_GCAP_PARCELA_MOVEL (Identificador 72): Ganhos de Capital - Parcela de Móvel.
+        - REG_GCAP_CUSTO_AQUIS_PS (Identificador 73): Ganhos de Capital - Espécie (Custo de Aquisição de Participação Societária).
+        - REG_GCAP_ESPECIE (Identificador 74): Ganhos de Capital - Espécie (Moeda Estrangeira).
+        - REG_GCAP_FAIXAS_TRIBUTACAO (Identificador 75): Ganhos de Capital - Faixas Tributação.
+        - REG_GCAP_TOTALIZACAO_MOEDAS_ALIENADAS (Identificador 76): Ganhos de Capital - Totalização Moedas Alienadas.
+        - REG_RENDPJ_EXIG_TIT (Identificador 80): Rendimentos Tributáveis Recebidos de PJ Exigibilidade Suspensa Titular.
+        - REG_RENDPJ_EXIG_DEPEN (Identificador 81): Rendimentos Tributáveis Recebidos de PJ Exigibilidade Suspensa Dependentes.
+        - REG_DETALHETRANSFERENCIAS (Identificador 82): Detalhes das Transferências Patrimoniais.
+        - REG_RENDIMENTO_ISENTO_TIPO_INFORMACAO_6 (Identificador 87): Detalhes do Ganho com Ouro da ficha Rendimentos Isentos.
+        - REG_DOACAO (Identificador 90): Relação de doações efetuadas.
+        - REG_DOACAO_ECA (Identificador 91): Relação de doações na declaração - Estatuto da Criança e do Adolescente.
+        - REG_DOACAO_IDOSO (Identificador 92): Relação de doações na declaração - Estatuto do Idoso.
+        - REG_INDENIZACOES (Identificador 93): Detalhes de indenizações da ficha Rendimentos Isentos.
+        - REG_IRRF_ANOS_ANTERIORES (Identificador 94): Detalhes de IRRF anos anteriores da ficha Rendimentos Isentos.
+        - REG_JUROS_CAPITAL_PROPRIO (Identificador 95): Detalhes de juros sobre capital próprio da ficha Rendimentos com tributação exclusiva.
+        - REG_PARTICIPACAO_LUCROS_RESULTADOS (Identificador 96): Detalhes de participação em lucros e resultados da ficha Rendimentos com tributação exclusiva.
+        - REG_OUTROS_RENDIMENTOS (Identificador 97): Detalhes de outros rendimentos das fichas Rendimentos isentos e Rendimentos com tributação exclusiva.
+        - REG_DETALHEPOUPANCA (Identificador 98): Detalhes do Rendimento de Caderneta de Poupança e Letras Hipotecárias da ficha Rendimentos Isentos.
+        - REG_DETALHERENDAPLICFINAN (Identificador 99): Detalhes dos Rendimentos de Aplicações Financeiras da ficha Rendimentos Suj. Tributação Exclusiva.
+
+        **LÓGICA PARA REGISTROS SEM EXEMPLO DETALHADO NO PROMPT:**
+        - Se você identificar dados em um informe que claramente se encaixam em um dos "Outros Registros Detalhados Disponíveis" listados acima, mas para o qual NÃO há um exemplo XML completo neste prompt:
+            - **NÃO tente adivinhar a estrutura dos campos.**
+            - Em vez disso, adicione um ponto de incerteza (`uncertainty_points`) na sua resposta, usando o seguinte formato JSON:
+            ```json
+            {
+                "type": "MISSING_RECORD_EXAMPLE",
+                "record_name": "NOME_DO_REGISTRO_IDENTIFICADO",
+                "identifier": "ID_DO_REGISTRO",
+                "reason": "Dados encontrados para este registro, mas sem exemplo detalhado de campos no prompt. Necessário consultar mapeamentoTxt.xml para estrutura completa.",
+                "data_found_summary": "Resumo dos dados relevantes encontrados no informe para este registro (ex: 'CNPJ: 12.345.678/0001-90, Valor: R$ 500,00, Descrição: Despesa com médico')."
+            }
+            ```
+            - Continue processando outros registros para os quais você tem exemplos ou informações suficientes.
+
+        **LÓGICA PARA DADOS AUSENTES OU NÃO INFERÍVEIS (PERGUNTAR AO USUÁRIO):**
+        - Se um campo **obrigatório ou altamente relevante** para um registro identificado (seja ele com exemplo ou listado em "Outros Registros Detalhados Disponíveis") **não puder ser inferido** do documento nem do `CONTEXTO ADICIONAL` fornecido:
+            - Adicione um ponto de incerteza (`uncertainty_points`) na sua resposta, usando o seguinte formato JSON:
+            ```json
+            {
+                "type": "USER_INPUT_REQUIRED",
+                "field_name": "NOME_DO_CAMPO_XML_FALTANTE",
+                "record_name": "NOME_DO_REGISTRO_XML_AO_QUAL_O_CAMPO_PERTENCE",
+                "description": "Explicação clara do dado necessário e por que ele é importante (ex: 'Valor do bem em 31/12 do ano anterior, não encontrado no informe atual nem no contexto do DBK anterior. Essencial para o registro de bens.').",
+                "context_from_document": "Trecho ou resumo do documento que levou a essa necessidade (ex: 'Informe de rendimentos mostra saldo atual de R$ X, mas não o saldo do ano anterior para este bem/investimento.').",
+                "suggested_options": "Lista de opções ou formato esperado (ex: 'Formato: 1234.56' ou 'Opções: 0-Não, 1-Sim')."
+            }
+            ```
+            - **Exemplos de cenários para `USER_INPUT_REQUIRED`:**
+                - `NR_CPF_BENEFIC` para um dependente se o nome do dependente for mencionado, mas o CPF não estiver no `CONTEXTO ADICIONAL`.
+                - `CNPJ_DA_FONTE_PAGADORA` ou `NOME_DA_FONTE_PAGADORA` se o informe não os fornecer para um rendimento que os exige.
+                - `CD_BEM` ou `NR_COD` se a descrição do item no informe for ambígua e não permitir inferir o código exato.
+            - Continue processando outros registros.
+
         **INSTRUÇÕES PARA CAMPOS:**
         1. Use o atributo `Nome` exatamente como no `mapeamentoTxt.xml`.
         2. Inclua os atributos `Descricao`, `Tamanho`, `Tipo`, e `Decimais` (se aplicável para Tipo="N") como definidos no `mapeamentoTxt.xml`.
         3. O TEXTO DENTRO DO CAMPO `<Campo>...</Campo>` deve ser o VALOR EXTRAÍDO do informe.
-        4. Se um campo não tiver valor no informe, preencha-o com um placeholder vazio ou o valor padrão indicado (ex: "0" para numéricos, "" para texto).
+        4. Se um campo não tiver valor no informe, preencha-o com um placeholder vazio (`{campo_vazio}`) ou o valor padrão indicado (ex: "0" para numéricos, "" para texto).
         5. Para o campo `NR_CONTROLE` em cada registro, use o texto 0000000000, exemplo:
             <Campo Nome="NR_CONTROLE" Descricao="Numero de Controle" Tamanho="10" Tipo="N">0000000000</Campo>
         6. Para campos de CPF/CNPJ, extraia apenas os números.
@@ -265,7 +371,7 @@ class PromptBuilder:
              * "R$ 1.640,40" → 1640.40
              * "R$ 12.345,67" → 12345.67
         
-        8. Se você estiver INCERTO sobre um valor específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`        {additional_context if additional_context else ""}
+        8. Se você estiver INCERTO sobre um valor específico, adicione um comentário XML como: `<!-- LLM_UNCERTAINTY: [explicação] -->`        
 
         **EXEMPLOS DE EXTRAÇÃO DE VALORES MONETÁRIOS:**
         - Documento mostra "Rendimento: R$ 6,40" → No XML: <Campo Nome="VR_VALOR">6.40</Campo>
