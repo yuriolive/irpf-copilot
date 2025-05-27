@@ -67,6 +67,9 @@ class IRPFAgent:
         self.current_dbk_info = None
         self.llm_manager = LLMManager()
         self.agent_executor = self._setup_agent()
+
+        # Attempt auto-detection of DBK file on initialization
+        self._auto_detect_initial_dbk()
         
         logger.info("IRPFAgent inicializado com sucesso")
         
@@ -114,19 +117,19 @@ class IRPFAgent:
     def _get_irpf_prompt_template(self) -> str:
         """Retorna o template de prompt customizado para IRPF."""
         return '''Você é um especialista em IRPF que manipula arquivos DBK da Receita Federal.
-
+ 
 REGRAS CRÍTICAS:
 1. SEMPRE validar checksums antes e após modificações
 2. NUNCA alterar arquivos sem backup
 3. Usar encoding Latin-1 para arquivos DBK
 4. Seguir especificações oficiais da Receita Federal
-
+ 
 FERRAMENTAS DISPONÍVEIS:
 {tools}
-
+ 
 FORMATO DE RESPOSTA OBRIGATÓRIO - SIGA EXATAMENTE:
 Você DEVE seguir este formato sem exceções:
-
+ 
 Question: a pergunta do usuário
 Thought: [sua análise do que precisa fazer]
 Action: [nome_exato_da_ferramenta]
@@ -135,20 +138,20 @@ Observation: [resultado retornado pela ferramenta]
 ... (repita Thought/Action/Action Input/Observation se necessário)
 Thought: [análise final baseada nas observações]
 Final Answer: [resposta final clara e objetiva para o usuário]
-
+ 
 REGRAS CRÍTICAS DE FORMATO:
 - SEMPRE use "Action:" seguido do nome exato da ferramenta
 - SEMPRE use "Action Input:" seguido de JSON válido
 - NUNCA escreva texto livre após "Thought:" sem usar "Action:" ou "Final Answer:"
 - Se precisar de informações adicionais, use Final Answer para perguntar claramente
 - NÃO repita a mesma ação várias vezes se ela falhar - tente uma abordagem diferente
-
+ 
 FERRAMENTAS DISPONÍVEIS:
 {tool_names}
-
+ 
 HISTÓRICO DA CONVERSA:
 {chat_history}
-
+ 
 Question: {input}
 Thought:{agent_scratchpad}'''
     
@@ -256,13 +259,13 @@ INFORMAÇÕES DO DBK ATUAL DISPONÍVEIS:
 - CPF do declarante: {self.current_dbk_info.get('cpf_declarante', '')}
 - Ano calendário: {self.current_dbk_info.get('ano_calendario', '')}
 - Ano exercício: {self.current_dbk_info.get('ano_exercicio', '')}
-
+ 
 INSTRUÇÃO IMPORTANTE: A ferramenta llm_pdf_tool foi atualizada para detectar automaticamente essas informações 
 dos arquivos DBK disponíveis. Você NÃO precisa mais fornecer os parâmetros cpf_declarante_irpf e ano_calendario 
 manualmente. Simplesmente use:
-
+ 
 {{"operation": "extract_to_xml", "file_path": "caminho/do/arquivo.pdf"}}
-
+ 
 A ferramenta buscará automaticamente nos DBK disponíveis e também tentará extrair as informações do próprio informe.
 """
             context_parts.append(dbk_context)
@@ -332,7 +335,8 @@ A ferramenta buscará automaticamente nos DBK disponíveis e também tentará ex
             parser = DbkParser()
             analysis = parser.analyze_dbk_file(file_path)
             
-            if analysis and not analysis.get('error'):                # Extrair CPF e ano calendário do header IRPF
+            if analysis and not analysis.get('error'):
+                # Extrair CPF e ano calendário do header IRPF
                 for record in analysis.get('records', []):
                     if record.get('record_type') == 'IRPF':
                         self.current_dbk_info = {
@@ -349,6 +353,27 @@ A ferramenta buscará automaticamente nos DBK disponíveis e também tentará ex
             logger.warning(f"Não foi possível extrair informações do DBK {file_path}: {e}")
         
         logger.info(f"Arquivo DBK atual definido: {file_path}")
+
+    def _auto_detect_initial_dbk(self):
+        """
+        Tenta detectar automaticamente um arquivo DBK na inicialização
+        e o define como o arquivo DBK atual se apenas um for encontrado.
+        """
+        from .utils.file_utils import FileUtils
+        
+        logger.info("Tentando detecção automática de DBK na inicialização...")
+        detection_result = FileUtils.auto_detect_files(dbk_directory="dbks")
+        dbk_files = detection_result.get("auto_detection_results", {}).get("dbk_files", [])
+        
+        if len(dbk_files) == 1:
+            file_path = dbk_files[0]['full_path']
+            self.set_current_dbk_file(file_path)
+            logger.info(f"DBK detectado e configurado na inicialização: {file_path}")
+        elif len(dbk_files) > 1:
+            logger.info(f"Múltiplos arquivos DBK encontrados na inicialização. "
+                        f"Use 'auto-detect-dbk' para selecionar: {[f['filename'] for f in dbk_files]}")
+        else:
+            logger.info("Nenhum arquivo DBK encontrado nas pastas padrão na inicialização.")
 
 def get_agent_instance(tools: Optional[List[BaseTool]] = None) -> IRPFAgent:
     """

@@ -88,6 +88,7 @@ def display_help():
     table.add_row("clear", "Limpa o histórico da conversa")
     table.add_row("status", "Mostra status do sistema e arquivos")
     table.add_row("list-dbk", "Lista arquivos DBK disponíveis")
+    table.add_row("auto-detect-dbk", "Detecta e configura automaticamente o arquivo DBK mais relevante")
     table.add_row("list-informes", "Lista informes disponíveis na pasta informes/")
     table.add_row("test-pdf", "Testa extração de PDF do primeiro informe disponível")
     table.add_row("test-pdf <arquivo>", "Testa extração de um informe específico")
@@ -303,7 +304,7 @@ def is_markdown_content(text: str) -> bool:
             return True
     
     return False
-
+    
 def display_agent_response(output: str, force_markdown: bool = False, is_error: bool = False):
     """Display agent response with markdown formatting if detected."""
     try:
@@ -386,11 +387,7 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
     """Test PDF extraction directly with LLMPdfTool."""
     try:
         console.print("[blue]Executando teste de extração de PDF...[/blue]")
-        
-        # Import the test function from test_basic
-        sys.path.insert(0, str(project_root))
-        from test_basic import test_pdf_extraction as run_pdf_test
-        
+
         # If a specific file was requested
         if file_path:
             # Initialize tool
@@ -416,13 +413,13 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
                     
                     # Format result as markdown for better display
                     result_md = f"""# ✅ Extração de PDF Bem-sucedida
-
+ 
 ## 📄 Informações do Arquivo
 - **Arquivo:** `{data.get('file_path')}`
 - **Tipo de documento:** {data.get('document_type')}
 - **Método:** {data.get('processing_method')}
 - **Confiança:** {data.get('confidence', 0.0):.2f}
-
+ 
 ## 📊 Dados Estruturados Extraídos
 """
                     
@@ -487,7 +484,7 @@ def test_pdf_extraction(file_path=None, document_type="auto"):
         logger.error(f"Error testing PDF extraction: {e}")
         display_response(f"❌ Erro no teste: {e}", "error")
 
-def handle_special_commands(user_input: str) -> bool:
+def handle_special_commands(user_input: str, agent: IRPFAgent) -> bool:
     """Handle special commands. Returns True if command was handled."""
     command = user_input.lower().strip()
     
@@ -520,6 +517,66 @@ def handle_special_commands(user_input: str) -> bool:
             console.print(table)
         else:
             console.print("[yellow]Nenhum arquivo DBK encontrado nas pastas dbks/original ou dbks/gerado[/yellow]")
+        return True
+    
+    elif command == "auto-detect-dbk":
+        from agent.utils.file_utils import FileUtils
+        
+        console.print("[blue]Iniciando detecção automática de arquivos DBK...[/blue]")
+        detection_result = FileUtils.auto_detect_files(dbk_directory="dbks")
+        
+        dbk_files = detection_result.get("auto_detection_results", {}).get("dbk_files", [])
+        recommendations = detection_result.get("auto_detection_results", {}).get("recommendations", [])
+        
+        if dbk_files:
+            if len(dbk_files) == 1:
+                file_path = dbk_files[0]['full_path']
+                console.print(f"[green]✅ Um arquivo DBK encontrado: `{dbk_files[0]['filename']}`[/green]")
+                console.print(f"[blue]Configurando '{dbk_files[0]['filename']}' como arquivo DBK atual...[/blue]")
+                
+                # Set the current DBK file in the agent instance
+                agent.set_current_dbk_file(file_path)
+                
+                display_response(f"Arquivo DBK atual configurado para: `{dbk_files[0]['filename']}`", "success")
+            else:
+                table = Table(title="Múltiplos Arquivos DBK Encontrados")
+                table.add_column("ID", style="cyan", no_wrap=True)
+                table.add_column("Nome do Arquivo", style="white")
+                table.add_column("Caminho", style="dim")
+                table.add_column("Tamanho", style="yellow")
+                
+                for i, file in enumerate(dbk_files):
+                    table.add_row(str(i+1), file['filename'], file['full_path'], f"{file['size_mb']:.2f} MB")
+                
+                console.print(table)
+                console.print("\n[yellow]Por favor, digite o ID do arquivo que deseja usar, ou 'cancelar' para abortar.[/yellow]")
+                
+                while True:
+                    try:
+                        choice = input("[bold green]Sua escolha:[/bold green] ").strip().lower()
+                        if choice == 'cancelar':
+                            display_response("Operação de seleção de DBK cancelada.", "info")
+                            return True
+                        
+                        choice_idx = int(choice) - 1
+                        if 0 <= choice_idx < len(dbk_files):
+                            selected_file = dbk_files[choice_idx]
+                            console.print(f"[blue]Configurando '{selected_file['filename']}' como arquivo DBK atual...[/blue]")
+                            agent.set_current_dbk_file(selected_file['full_path'])
+                            display_response(f"Arquivo DBK atual configurado para: `{selected_file['filename']}`", "success")
+                            break
+                        else:
+                            console.print("[red]ID inválido. Por favor, digite um número da lista ou 'cancelar'.[/red]")
+                    except ValueError:
+                        console.print("[red]Entrada inválida. Por favor, digite um número ou 'cancelar'.[/red]")
+        else:
+            display_response(
+                "Nenhum arquivo DBK encontrado nas pastas padrão (`dbks`, `dbks/original`, `dbks/gerado`). "
+                "Por favor, coloque seu arquivo DBK em uma dessas pastas.",
+                "warning"
+            )
+            if recommendations:
+                display_response("Recomendações: " + "\n".join(recommendations), "info")
         return True
     
     elif command == "list-informes":
@@ -574,8 +631,8 @@ def handle_special_commands(user_input: str) -> bool:
                 match_list = "\n".join([f"{i+1}. `{match.name}`" for i, match in enumerate(matches)])
                 display_response(
                     f"## Múltiplos arquivos encontrados para '{file_name}':\n\n{match_list}\n\n"
-                    "Use o nome completo do arquivo para especificar.", 
-                    "warning", 
+                    "Use o nome completo do arquivo para especificar.",
+                    "warning",
                     force_markdown=True
                 )
         else:
@@ -602,7 +659,7 @@ def main():
     try:
         # Display welcome message
         display_welcome()
-          # Check environment setup
+        # Check environment setup
         if not check_environment():
             display_response(
                 "❌ Configuração do ambiente incompleta. Verifique as variáveis de ambiente.\n\n"
@@ -665,8 +722,8 @@ def main():
                     console.print("\n[green]🧹 Histórico da conversa limpo![/green]")
                     continue
                 
-                # Handle special commands
-                if handle_special_commands(user_input):
+                # Handle special commands, passing the agent instance
+                if handle_special_commands(user_input, agent):
                     continue
                 # Process with agent
                 with console.status("[blue]Processando...[/blue]"):
